@@ -20,7 +20,8 @@ body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene {
   --set-light: .008 !important;
   --sheen-light: .002 !important;
   --darkness: .998 !important;
-  filter: brightness(.10) saturate(.42) contrast(1.18) !important;
+  filter: none !important;
+  background: #000 !important;
 }
 body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .room-dimmer {
   opacity: .998 !important;
@@ -43,15 +44,15 @@ body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .
   display: none !important;
 }
 body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .phone-wrap {
-  opacity: .68 !important;
-  filter: none !important;
+  opacity: .88 !important;
+  filter: brightness(.12) contrast(1.2) drop-shadow(0 18px 24px rgba(0,0,0,.96)) !important;
 }
 
 /* The LCD remains visible for the entire time the vintage phone is powered,
    not only during the short key-wake class. The handset shell remains dark. */
 body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene.phone-powered .lcd-frame,
 body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .phone.is-lit .lcd-frame {
-  filter: brightness(18) contrast(1.38) saturate(.72) !important;
+  filter: brightness(9) contrast(1.38) saturate(.72) !important;
   box-shadow: 0 0 34px rgba(162,222,148,.42), inset 0 0 18px rgba(226,255,202,.45) !important;
 }
 body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene.phone-powered .lcd-frame::before,

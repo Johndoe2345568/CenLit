@@ -31,8 +31,8 @@
   const TITLE_CARD = "LAST SEEN";
   const PAGES = [
     "Pagkatapos mo Kunin ang iyong certificates sa bahay ng iyong ina may nakita Ikaw na voice tape kasama sa drawer",
-    "Inuwi mo ito at nakita mo na para kay Tito Ato mo ang voice tape na ito at pagkatapos nakita mo na may PIN para ito'y maparingan",
-    "Kaya naisipan mo pumunta sa abandona na bahay ng iyong Tito , dito mo nahanap ang isang cellphone"
+    "Inuwi mo ito at pagkatapos nakita mo na may PIN para ito'y maparingan",
+    "Kaya naiisipan mo pumunta sa abandona na bahay ng iyong Tito , dito mo nahanap ang isang cellphone"
   ];
 
   let inOpening = false;
