@@ -1,0 +1,3812 @@
+<!doctype html>
+<html lang="fil">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#19130f">
+  <title>LAST SEEN: The Final Voice Message</title>
+
+  <!--
+    DESIGN RESEARCH / HISTORICAL BASIS
+    ----------------------------------
+    This interface is deliberately based on a late-1990s Nokia 5110-era GSM
+    handset rather than a 1980s MicroTAC. A 1989 MicroTAC was an analog,
+    call-focused device and could not send or receive SMS. Cellular service
+    began in the Philippines in 1991; GSM/SMS arrived in the mid-1990s, and
+    the Nokia 5110 became one of the country's most familiar SMS handsets in
+    the late 1990s and early 2000s.
+
+    Sources consulted:
+    - Nokia 5110 User's Guide (1998): Navi key, C key, two-way scroll key,
+      84x48 monochrome screen, menu order, Inbox/Outbox, call register,
+      voice mailbox, shortcut navigation, keypad lock, games and tones.
+      https://www.manualslib.com/manual/112042/Nokia-5110.html
+    - Esquire Philippines, "20 Cellphones Every Filipino Went Through and
+      Loved": Nokia 5110 ubiquity in the Philippines.
+      https://www.esquiremag.ph/culture/tech/20-cellphones-every-filipino-went-through-and-loved-a1760-20170608-lfrm
+    - Inquirer, history of the first SMS and Philippine texting culture.
+      https://technology.inquirer.net/70008/worlds-first-text-message-turns-25-years-old
+    - Motorola MicroTAC owner's manual / historical specifications.
+      https://www.manualslib.com/manual/106251/Motorola-Microtac.html
+    - SIMULACRA official description: found-phone investigation through
+      personal messages, call records and recovered clues.
+      https://store.steampowered.com/app/712730
+
+    No external assets, fonts, libraries, network requests or trademarked
+    game assets are used. The phone is a hand-built CSS/canvas interpretation.
+  -->
+
+  <style>
+    :root {
+      --wood-1: #030507;
+      --wood-2: #080b0d;
+      --wood-line: rgba(91, 118, 124, .055);
+      --shell-black: #111719;
+      --shell-edge: #050808;
+      --face-blue: #314d59;
+      --face-blue-hi: #486b78;
+      --face-blue-lo: #20343c;
+      --rubber: #202728;
+      --rubber-hi: #414a4b;
+      --rubber-lo: #0b0f10;
+      --key-ink: #e8ece8;
+      --lcd-glass: #93a083;
+      --paper: #d2c5a3;
+      --paper-ink: #30271f;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+    html { scrollbar-gutter: stable; }
+
+    body {
+      position: relative;
+      margin: 0;
+      overflow-x: hidden;
+      color: #ddd;
+      background:
+        radial-gradient(ellipse at 50% 40%, rgba(64, 92, 101, .09) 0 8%, transparent 42%),
+        repeating-linear-gradient(2deg, transparent 0 35px, var(--wood-line) 36px 37px, transparent 38px 74px),
+        repeating-linear-gradient(89deg, rgba(255,255,255,.006) 0 1px, transparent 2px 76px),
+        linear-gradient(180deg,#010203,#050708 56%,#020304);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body.tape-modal-open { overflow:hidden; }
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse at 50% 43%, transparent 13%, rgba(0,0,0,.72) 58%, rgba(0,0,0,.94) 100%);
+      z-index: 20;
+    }
+
+    .ambient-atmosphere {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      isolation: isolate;
+    }
+
+    .hanging-lamp {
+      position:absolute;
+      z-index:6;
+      left:50%;
+      top:-6px;
+      width:150px;
+      height:150px;
+      transform:translateX(-50%);
+      pointer-events:none;
+    }
+    .hanging-lamp::before { content:""; position:absolute; left:73px; top:0; width:4px; height:52px; background:#111719; box-shadow:1px 0 0 #273234; }
+    .hanging-lamp i { position:absolute; left:45px; top:46px; width:60px; height:31px; border-radius:55% 55% 12% 12%; background:linear-gradient(#263133,#0b1011); border:3px solid #050708; box-shadow:inset 0 3px 0 rgba(255,255,255,.08),0 8px 14px rgba(0,0,0,.7); }
+    .hanging-lamp b { position:absolute; left:67px; top:72px; width:17px; height:18px; border-radius:45% 45% 60% 60%; opacity:var(--room-light,.55); background:#d9f2e8; box-shadow:0 0 12px rgba(194,235,222,.85),0 0 38px rgba(114,197,181,.52),0 0 100px rgba(76,152,148,.25); transition:opacity var(--flicker-speed,.4s) ease; }
+
+    .room-set { position:absolute; inset:0; opacity:var(--set-light,.32); transition:opacity var(--flicker-speed,.4s) ease; }
+    .rain-window {
+      position:absolute;
+      left:4%;
+      top:10%;
+      width:min(360px,34vw);
+      height:48%;
+      border:12px solid #080d0f;
+      background:
+        repeating-linear-gradient(102deg,transparent 0 18px,rgba(155,197,207,.09) 19px 21px,transparent 22px 43px),
+        linear-gradient(180deg,#0a161b,#071013);
+      box-shadow:inset 0 0 60px #000,0 20px 50px rgba(0,0,0,.65);
+      transform:perspective(900px) rotateY(5deg);
+    }
+    .rain-window::before,.rain-window::after,.rain-window i { content:""; position:absolute; background:#080c0e; }
+    .rain-window::before { left:48%; top:0; bottom:0; width:10px; }
+    .rain-window::after { left:0; right:0; top:48%; height:10px; }
+    .rain-window i:nth-child(1){left:18%;top:4%;width:2px;height:82%;transform:rotate(9deg);background:rgba(180,217,223,.2)}
+    .rain-window i:nth-child(2){left:71%;top:8%;width:2px;height:74%;transform:rotate(7deg);background:rgba(180,217,223,.17)}
+    .rain-window i:nth-child(3){left:34%;top:12%;width:1px;height:55%;transform:rotate(11deg);background:rgba(180,217,223,.16)}
+    .rain-window i:nth-child(4){right:10%;top:3%;width:1px;height:68%;transform:rotate(8deg);background:rgba(180,217,223,.13)}
+
+    .aparador-silhouette {
+      position:absolute;
+      right:4%;
+      top:15%;
+      width:min(310px,29vw);
+      height:58%;
+      border:7px solid #070808;
+      background:linear-gradient(100deg,#101211,#060707 54%,#111311);
+      box-shadow:inset 14px 0 22px rgba(255,255,255,.02),-25px 24px 60px rgba(0,0,0,.72);
+      transform:perspective(900px) rotateY(-6deg);
+    }
+    .aparador-silhouette::before { content:""; position:absolute; left:49%; top:2%; bottom:2%; width:5px; background:#050606; }
+    .aparador-silhouette i { position:absolute; width:9px; height:9px; border-radius:50%; background:#4a4a3c; box-shadow:0 0 5px #000; }
+    .aparador-silhouette i:nth-child(1){left:43%;top:32%}.aparador-silhouette i:nth-child(2){right:43%;top:32%}.aparador-silhouette i:nth-child(3){left:48%;bottom:26%}
+    .wall-frame { position:absolute; right:31%; top:10%; width:130px; height:92px; border:8px solid #090b0b; background:radial-gradient(circle at 50% 38%,#202421 0 10px,transparent 11px),linear-gradient(#101413,#080a0a); transform:rotate(2deg); box-shadow:0 12px 22px rgba(0,0,0,.5); }
+    .desk-papers { position:absolute; left:13%; right:13%; bottom:5%; height:180px; }
+    .desk-papers i { position:absolute; width:170px; height:110px; border:1px solid rgba(129,124,99,.22); background:#151713; box-shadow:8px 10px 20px rgba(0,0,0,.5); opacity:.5; }
+    .desk-papers i:nth-child(1){left:9%;bottom:8%;transform:rotate(12deg)}.desk-papers i:nth-child(2){right:7%;bottom:3%;transform:rotate(-8deg)}.desk-papers i:nth-child(3){left:41%;bottom:-20%;transform:rotate(3deg)}
+
+    .lamp-bloom {
+      position: absolute;
+      left: 50%;
+      top: -36%;
+      width: min(1500px, 155vw);
+      height: 132%;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(213,238,239,.52) 0 7%, rgba(102,164,178,.25) 23%, rgba(28,60,69,.1) 48%, transparent 72%);
+      transform: translateX(-50%);
+      mix-blend-mode: screen;
+      animation: lampBreathe 10.5s ease-in-out infinite;
+    }
+
+    .light-beam {
+      position: absolute;
+      left: 50%;
+      top: -14%;
+      width: min(1040px, 112vw);
+      height: 132%;
+      background: linear-gradient(180deg, rgba(205,235,238,.25), rgba(95,147,157,.12) 53%, rgba(35,69,76,.035) 84%, transparent 100%);
+      clip-path: polygon(38% 0, 62% 0, 92% 100%, 8% 100%);
+      transform: translateX(-50%) rotate(-1deg);
+      filter: blur(9px);
+      mix-blend-mode: screen;
+      animation: beamFalter 13s steps(1, end) infinite;
+    }
+
+    .room-dimmer {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 2, 3, .62);
+      opacity:var(--darkness,.54);
+      transition:opacity var(--flicker-speed,.4s) ease;
+    }
+
+    .phone-aura {
+      position:absolute;
+      left:50%;
+      top:43%;
+      width:min(920px,95vw);
+      height:min(900px,88vh);
+      border-radius:50%;
+      opacity:.1;
+      margin-left:var(--light-x,0px);
+      margin-top:var(--light-y,0px);
+      transform:translate(-50%,-50%) scale(.72);
+      background:radial-gradient(ellipse at center,rgba(151,225,184,.32) 0 5%,rgba(76,145,117,.14) 23%,rgba(26,61,55,.055) 48%,transparent 72%);
+      filter:blur(14px);
+      mix-blend-mode:screen;
+      transition:opacity 1.1s ease,transform 1.3s cubic-bezier(.16,.8,.25,1);
+    }
+    .scene.phone-powered .phone-aura {
+      opacity:1;
+      transform:translate(-50%,-50%) scale(1);
+      animation:phoneAuraPulse 4.8s ease-in-out infinite;
+    }
+    .scene.phone-powered .phone-wrap {
+      filter:drop-shadow(0 0 28px rgba(126,221,169,.2)) drop-shadow(22px 30px 20px rgba(0,0,0,.72));
+    }
+    @keyframes phoneAuraPulse {
+      0%,100% { filter:blur(15px) brightness(.92); }
+      50% { filter:blur(19px) brightness(1.16); }
+    }
+
+    .dust-field {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .dust-mote {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      width: var(--size);
+      height: var(--size);
+      border-radius: 50%;
+      opacity: 0;
+      background: rgba(255, 224, 164, .85);
+      box-shadow: 0 0 calc(var(--size) * 3) rgba(255, 205, 127, .55);
+      animation: dustDrift var(--duration) linear var(--delay) infinite;
+      will-change: transform, opacity;
+    }
+
+    .ambient-grain {
+      position: absolute;
+      inset: -20%;
+      opacity: .08;
+      background:
+        repeating-radial-gradient(circle at 20% 30%, rgba(255,255,255,.5) 0 1px, transparent 1px 7px),
+        repeating-radial-gradient(circle at 70% 60%, rgba(0,0,0,.6) 0 1px, transparent 1px 9px);
+      background-size: 37px 31px, 43px 47px;
+      animation: grainShift 1.2s steps(2) infinite;
+      mix-blend-mode: overlay;
+    }
+
+    @keyframes lampBreathe {
+      0%, 100% { opacity: .9; transform: translateX(-50%) scale(1); }
+      18% { opacity: .76; }
+      39% { opacity: .95; transform: translateX(-50%) scale(1.025); }
+      62% { opacity: .7; }
+      66% { opacity: .88; }
+      82% { opacity: .8; transform: translateX(-50%) scale(.99); }
+    }
+
+    @keyframes beamFalter {
+      0%, 15%, 18%, 46%, 49%, 71%, 74%, 100% { opacity: .9; }
+      16%, 47%, 72% { opacity: .56; }
+      17%, 48%, 73% { opacity: .78; }
+    }
+
+    @keyframes roomDimming {
+      0%, 100% { opacity: .16; }
+      27% { opacity: .31; }
+      52% { opacity: .12; }
+      73% { opacity: .38; }
+      79% { opacity: .22; }
+    }
+
+    @keyframes dustDrift {
+      0% { opacity: 0; transform: translate3d(0, 28px, 0) scale(.75); }
+      12% { opacity: var(--opacity); }
+      48% { transform: translate3d(var(--drift-x), -35px, 0) scale(1); }
+      82% { opacity: var(--opacity-low); }
+      100% { opacity: 0; transform: translate3d(var(--drift-x2), -110px, 0) scale(.68); }
+    }
+
+    @keyframes grainShift {
+      0% { transform: translate3d(-1%, 0, 0); }
+      50% { transform: translate3d(1%, 1%, 0); }
+      100% { transform: translate3d(0, -1%, 0); }
+    }
+
+    button { font: inherit; }
+
+    .scene {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 38px 18px 54px;
+      isolation: isolate;
+    }
+
+    .desk-object {
+      position: absolute;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .cassette {
+      z-index: -1;
+      right: max(12px, calc(50% - 465px));
+      top: 28%;
+      width: 250px;
+      height: 155px;
+      border: 8px solid #161818;
+      border-radius: 10px;
+      background: #292c2b;
+      box-shadow: 15px 18px 24px rgba(0,0,0,.46), inset 0 0 0 3px #4d504d;
+      transform: rotate(7deg);
+    }
+
+    .cassette::before,
+    .cassette::after {
+      content: "";
+      position: absolute;
+      top: 55px;
+      width: 44px;
+      height: 44px;
+      border: 7px dotted #1a1b1b;
+      border-radius: 50%;
+      background: #c2b88f;
+      box-shadow: 0 0 0 6px #0f1110;
+    }
+
+    .cassette::before { left: 41px; }
+    .cassette::after { right: 41px; }
+
+    .cassette-label {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      top: 17px;
+      height: 42px;
+      padding: 7px;
+      color: #483125;
+      background: #d4c9a4;
+      font: 700 11px/1.25 "Courier New", monospace;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .phone-wrap {
+      position: relative;
+      z-index: 4;
+      width: min(480px, 96vw);
+      filter: drop-shadow(22px 30px 20px rgba(0,0,0,.62));
+    }
+
+    .phone {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      min-height: 835px;
+      padding: 50px 25px 34px;
+      overflow: visible;
+      border: 4px solid var(--shell-edge);
+      border-radius: 76px 76px 54px 54px / 58px 58px 74px 74px;
+      background:
+        repeating-linear-gradient(88deg, rgba(255,255,255,.018) 0 1px, transparent 2px 7px),
+        var(--shell-black);
+      box-shadow:
+        inset 8px 4px 0 #263033,
+        inset -9px -3px 0 #070a0a,
+        inset 0 -12px 0 rgba(0,0,0,.28);
+    }
+
+    .phone::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      inset: 8px;
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 67px 67px 47px 47px / 52px 52px 67px 67px;
+    }
+
+    .antenna {
+      position: absolute;
+      z-index: -1;
+      top: -29px;
+      right: 57px;
+      width: 38px;
+      height: 99px;
+      border: 4px solid #050707;
+      border-radius: 14px 14px 5px 5px;
+      background: #141a1b;
+      box-shadow: inset 7px 0 0 #283133, 5px 4px 0 rgba(0,0,0,.5);
+      transform: rotate(1deg);
+    }
+
+    .antenna::before {
+      content: "";
+      position: absolute;
+      top: -17px;
+      left: -2px;
+      width: 34px;
+      height: 26px;
+      border: 3px solid #050707;
+      border-radius: 11px 11px 3px 3px;
+      background: #1e2628;
+    }
+
+    .power-key {
+      position: absolute;
+      z-index: 5;
+      top: -10px;
+      left: 138px;
+      width: 54px;
+      height: 25px;
+      border: 3px solid #060808;
+      border-radius: 9px 9px 4px 4px;
+      color: #bfc5c2;
+      background: #202728;
+      box-shadow: inset 0 4px 0 #3f4849, 3px 3px 0 rgba(0,0,0,.46);
+      cursor: pointer;
+      font: 900 13px/1 Arial, sans-serif;
+    }
+
+    .power-key:active,
+    .physical-key:active,
+    .physical-key.is-down {
+      transform: translateY(3px);
+      box-shadow: inset 0 3px 5px rgba(0,0,0,.7), 1px 1px 0 rgba(0,0,0,.7);
+    }
+
+    .faceplate {
+      position: relative;
+      padding: 24px 19px 34px;
+      border: 3px solid #17272d;
+      border-radius: 55px 55px 43px 43px / 44px 44px 64px 64px;
+      background:
+        linear-gradient(93deg, transparent 0 4%, rgba(255,255,255,.055) 5%, transparent 9%),
+        linear-gradient(173deg, var(--face-blue-hi) 0 5%, var(--face-blue) 17% 75%, var(--face-blue-lo) 100%);
+      box-shadow:
+        inset 5px 0 0 rgba(255,255,255,.09),
+        inset -7px 0 0 rgba(0,0,0,.18),
+        0 7px 0 #0b1113;
+    }
+
+    .earpiece {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      width: 102px;
+      height: 22px;
+      margin: 0 auto 12px;
+      padding: 5px 9px;
+      border-radius: 13px;
+      background: #192326;
+      box-shadow: inset 0 3px 4px #070a0a, 0 2px 0 rgba(255,255,255,.08);
+    }
+
+    .earpiece i {
+      display: block;
+      width: 4px;
+      height: 10px;
+      border-radius: 3px;
+      background: #090d0e;
+      box-shadow: 1px 0 0 #45575d;
+    }
+
+    .brand {
+      margin-bottom: 9px;
+      color: #d6e0e0;
+      font: 900 17px/1 Arial, sans-serif;
+      letter-spacing: .16em;
+      text-align: center;
+      text-shadow: 0 2px 0 #15272d;
+    }
+
+    .screen-bezel {
+      position: relative;
+      padding: 17px 13px 20px;
+      border: 4px solid #0a1011;
+      border-radius: 31px 31px 23px 23px / 25px 25px 19px 19px;
+      background: #20292b;
+      box-shadow:
+        inset 4px 5px 0 #384346,
+        inset -4px -5px 0 #080b0c,
+        0 5px 0 rgba(0,0,0,.28);
+    }
+
+    .lcd-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 84 / 48;
+      overflow: hidden;
+      border: 3px solid #070b09;
+      border-radius: 3px;
+      background: var(--lcd-glass);
+      box-shadow:
+        inset 5px 5px 10px rgba(28,38,26,.35),
+        inset -3px -3px 5px rgba(219,228,207,.28);
+    }
+
+    #lcd {
+      display: block;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    .lcd-frame::before {
+      content: "";
+      position: absolute;
+      z-index: 3;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(112deg, rgba(255,255,255,.16) 0 12%, transparent 24% 66%, rgba(255,255,255,.05) 78%, transparent 90%),
+        repeating-linear-gradient(0deg, transparent 0 5px, rgba(15,25,16,.045) 6px);
+      mix-blend-mode: screen;
+    }
+
+    .lcd-frame::after {
+      content: "";
+      position: absolute;
+      z-index: 4;
+      inset: 0;
+      pointer-events: none;
+      box-shadow: inset 0 0 13px rgba(14,25,16,.48);
+    }
+
+    .model-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 8px 5px 1px;
+      color: rgba(231,239,237,.62);
+      font: 700 8px/1 Arial, sans-serif;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .control-cluster {
+      display: grid;
+      grid-template-columns: 70px 1fr 76px;
+      gap: 17px;
+      align-items: center;
+      margin: 19px 9px 24px;
+    }
+
+    .physical-key {
+      border: 3px solid #090d0e;
+      color: var(--key-ink);
+      background: var(--rubber);
+      box-shadow:
+        inset 3px 3px 0 var(--rubber-hi),
+        inset -3px -3px 0 var(--rubber-lo),
+        0 5px 0 #090c0d;
+      cursor: pointer;
+      text-shadow: 0 1px 0 #000;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .clear-key {
+      height: 48px;
+      border-radius: 50% 42% 48% 44%;
+      font: 900 21px/1 Arial, sans-serif;
+    }
+
+    .navi-key {
+      height: 54px;
+      border-radius: 50% / 42%;
+      background: #243033;
+      font-size: 0;
+    }
+
+    .navi-key::before {
+      content: "";
+      display: block;
+      width: 32px;
+      height: 5px;
+      margin: 0 auto;
+      border-radius: 3px;
+      background: #cbd3cf;
+      box-shadow: 0 2px 0 #080b0c;
+    }
+
+    .scroll-rocker {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      height: 67px;
+      border: 3px solid #090d0e;
+      border-radius: 48% 48% 46% 46%;
+      overflow: hidden;
+      background: var(--rubber);
+      box-shadow: 0 5px 0 #090c0d;
+    }
+
+    .scroll-rocker .physical-key {
+      min-height: 0;
+      border: 0;
+      border-radius: 0;
+      box-shadow: inset 3px 2px 0 var(--rubber-hi), inset -3px -2px 0 var(--rubber-lo);
+      font-size: 15px;
+    }
+
+    .scroll-rocker .physical-key:first-child { border-bottom: 1px solid #080b0c; }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 22px;
+      row-gap: 14px;
+      padding: 0 16px;
+    }
+
+    .number-key {
+      position: relative;
+      height: 52px;
+      border-radius: 48% 48% 43% 43% / 42% 42% 50% 50%;
+      font: 900 20px/1 Arial, sans-serif;
+    }
+
+    .number-key:nth-child(3n+1) { transform: rotate(2deg); }
+    .number-key:nth-child(3n) { transform: rotate(-2deg); }
+    .number-key:nth-child(3n+1):active,
+    .number-key:nth-child(3n+1).is-down,
+    .number-key:nth-child(3n):active,
+    .number-key:nth-child(3n).is-down { transform: translateY(3px); }
+
+    .number-key small {
+      display: block;
+      margin-top: 4px;
+      color: #aeb9b5;
+      font: 700 7px/1 Arial, sans-serif;
+      letter-spacing: .08em;
+    }
+
+    .microphone {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      margin: 22px auto 0;
+    }
+
+    .microphone i {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #080b0c;
+      box-shadow: 1px 1px 0 rgba(255,255,255,.08);
+    }
+
+    .bottom-port {
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      width: 95px;
+      height: 20px;
+      border: 3px solid #050707;
+      border-radius: 2px 2px 8px 8px;
+      background: #090d0e;
+      transform: translateX(-50%);
+    }
+
+    .bottom-port::after {
+      content: "";
+      position: absolute;
+      left: 15px;
+      top: 4px;
+      width: 59px;
+      height: 5px;
+      background: repeating-linear-gradient(90deg, #8a7d4c 0 3px, transparent 3px 7px);
+    }
+
+    /* Subtle wear keeps the handset from looking like a modern plastic mock-up. */
+    .faceplate::after {
+      content: "";
+      position: absolute;
+      inset: 13px 9px 18px;
+      z-index: 8;
+      pointer-events: none;
+      border-radius: inherit;
+      opacity: .3;
+      background:
+        linear-gradient(103deg, transparent 0 27%, rgba(226,241,240,.17) 27.2% 27.45%, transparent 27.7% 100%),
+        linear-gradient(78deg, transparent 0 64%, rgba(6,15,17,.28) 64.2% 64.45%, transparent 64.8% 100%),
+        linear-gradient(96deg, transparent 0 42%, rgba(226,241,240,.11) 42.2% 42.4%, transparent 42.7% 100%);
+    }
+
+    .lcd-frame.is-lit {
+      box-shadow:
+        0 0 24px rgba(155, 220, 146, .28),
+        inset 5px 5px 10px rgba(28,38,26,.23),
+        inset -3px -3px 5px rgba(235,255,223,.38);
+    }
+
+    .phone.is-lit .physical-key {
+      color: #f4fff0;
+      text-shadow: 0 0 5px rgba(180,255,169,.35), 0 1px 0 #000;
+    }
+
+    .fullscreen-message-key {
+      position: absolute;
+      z-index: 1;
+      top: 250px;
+      right: -139px;
+      width: 150px;
+      min-height: 62px;
+      padding: 10px 12px 10px 22px;
+      border: 3px solid #080c0d;
+      border-left: 0;
+      border-radius: 0 10px 10px 0;
+      color: #d8e0d8;
+      background: #202a2c;
+      box-shadow: inset 0 3px 0 #435052, 8px 9px 12px rgba(0,0,0,.42);
+      cursor: pointer;
+      font: 900 11px/1.25 "Courier New", monospace;
+      letter-spacing: .08em;
+      text-align: center;
+      text-transform: uppercase;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-38px);
+      transition: opacity .18s steps(2), transform .22s steps(4);
+    }
+
+    .fullscreen-message-key::before {
+      content: "";
+      display: block;
+      width: 18px;
+      height: 13px;
+      margin: 0 auto 5px;
+      border: 2px solid currentColor;
+      box-shadow: inset 0 0 0 2px #202a2c;
+    }
+
+    .fullscreen-message-key.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    .fullscreen-message-key:active { transform: translate(2px, 2px); }
+
+    .message-reader {
+      position: fixed;
+      z-index: 100;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 28px;
+      background: rgba(5, 8, 7, .94);
+      backdrop-filter: blur(5px);
+    }
+
+    .message-reader.is-open { display: grid; }
+
+    .reader-shell {
+      position: relative;
+      width: min(980px, 96vw);
+      max-height: 92vh;
+      padding: 22px;
+      border: 5px solid #111817;
+      border-radius: 24px;
+      background: #283334;
+      box-shadow: 18px 22px 0 rgba(0,0,0,.46), inset 4px 4px 0 #455254, inset -4px -4px 0 #0a0f0f;
+    }
+
+    .reader-lcd {
+      position: relative;
+      max-height: calc(92vh - 44px);
+      overflow: auto;
+      padding: clamp(28px, 6vw, 70px);
+      border: 5px solid #070b09;
+      color: #162019;
+      background:
+        repeating-linear-gradient(0deg, transparent 0 5px, rgba(15,25,16,.04) 6px),
+        #b5c4a5;
+      box-shadow: inset 0 0 44px rgba(23,35,24,.32);
+      scrollbar-color: #26342a #8d9e83;
+    }
+
+    .reader-lcd::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(115deg, rgba(255,255,255,.14), transparent 23% 76%, rgba(255,255,255,.06));
+    }
+
+    .reader-kicker {
+      margin: 0 0 13px;
+      padding-bottom: 11px;
+      border-bottom: 3px double #344438;
+      font: 900 clamp(11px, 1.5vw, 16px)/1.4 "Courier New", monospace;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .reader-lcd h2 {
+      margin: 0 0 23px;
+      font: 900 clamp(24px, 5vw, 54px)/1.05 "Courier New", monospace;
+      letter-spacing: -.05em;
+      text-transform: uppercase;
+    }
+
+    .reader-lcd p {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font: 700 clamp(18px, 2.6vw, 31px)/1.65 "Courier New", monospace;
+    }
+
+    .reader-close {
+      position: absolute;
+      z-index: 5;
+      top: 9px;
+      right: 9px;
+      min-width: 74px;
+      min-height: 38px;
+      border: 3px solid #080c0d;
+      color: #f0f3ee;
+      background: #6b3330;
+      box-shadow: inset 0 3px 0 #97524d, 3px 4px 0 rgba(0,0,0,.5);
+      cursor: pointer;
+      font: 900 11px "Courier New", monospace;
+    }
+
+    .reader-close:active { transform: translateY(2px); box-shadow: 1px 1px 0 #000; }
+
+    /* Scene-anchored window, weather and insects */
+    .window-shadow {
+      position: absolute;
+      left: 50%;
+      top: 5%;
+      width: min(1100px, 108vw);
+      height: 88%;
+      opacity: .24;
+      transform: translateX(-50%) rotate(-3deg);
+      filter: blur(4px);
+      animation: windowSway 18s ease-in-out infinite alternate;
+    }
+
+    .window-shadow::before,
+    .window-shadow::after,
+    .window-shadow i {
+      content: "";
+      position: absolute;
+      background: rgba(18, 12, 8, .62);
+      box-shadow: 0 0 18px rgba(8,5,3,.3);
+    }
+
+    .window-shadow::before { left: 7%; right: 7%; top: 25%; height: 25px; }
+    .window-shadow::after { top: 3%; bottom: 3%; left: 49%; width: 28px; }
+    .window-shadow i:nth-child(1) { left: 12%; top: 5%; width: 8px; height: 68%; transform: rotate(12deg); }
+    .window-shadow i:nth-child(2) { right: 15%; top: 18%; width: 7px; height: 74%; transform: rotate(-16deg); }
+    .window-shadow i:nth-child(3) { left: 24%; top: 8%; width: 5px; height: 42%; transform: rotate(28deg); }
+    .window-shadow i:nth-child(4) { right: 28%; top: 37%; width: 5px; height: 48%; transform: rotate(-25deg); }
+
+    .rain-field {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity .5s ease;
+      overflow: hidden;
+    }
+
+    .rain-drop {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      width: 1px;
+      height: var(--length);
+      opacity: var(--alpha);
+      background: linear-gradient(transparent, rgba(190,220,225,.72));
+      transform: rotate(10deg);
+      animation: rainFall var(--speed) linear var(--delay) infinite;
+    }
+
+    .moth-field { position: absolute; inset: 0; }
+    .moth-field i {
+      position: absolute;
+      left: 50%;
+      top: 20%;
+      width: 5px;
+      height: 3px;
+      border-radius: 50%;
+      background: #d8c49b;
+      box-shadow: -4px 0 0 rgba(224,205,162,.68), 4px 0 0 rgba(224,205,162,.68), 0 0 7px rgba(255,221,151,.58);
+      opacity: .55;
+    }
+    .moth-field i:nth-child(1) { animation: mothOne 13s ease-in-out infinite; }
+    .moth-field i:nth-child(2) { animation: mothTwo 17s ease-in-out -6s infinite; }
+    .moth-field i:nth-child(3) { animation: mothThree 21s ease-in-out -11s infinite; }
+
+    .scene.weather-rain .lamp-bloom {
+      opacity:var(--room-light,.56);
+      filter:hue-rotate(25deg) saturate(.55);
+      transition:opacity var(--flicker-speed,.4s) ease,filter var(--flicker-speed,.4s) ease;
+    }
+    .scene.weather-rain .light-beam {
+      opacity:var(--beam-light,.42);
+      filter:blur(10px) hue-rotate(30deg) saturate(.45);
+      transition:opacity var(--flicker-speed,.4s) ease;
+    }
+    .scene.weather-rain .rain-field { opacity:.86; }
+    .scene.weather-rain .dust-field { opacity:.1; }
+    .scene.weather-rain .window-shadow { opacity:.43; }
+
+    .storm-flash {
+      position:absolute;
+      inset:0;
+      opacity:0;
+      background:radial-gradient(ellipse at 60% 8%,rgba(214,232,238,.48),rgba(137,169,180,.14) 30%,transparent 68%);
+      mix-blend-mode:screen;
+      pointer-events:none;
+    }
+    .storm-flash.is-flashing { animation:lightningBurst .62s steps(1,end) both;
+    }
+    .rain-sheen {
+      position:absolute;
+      left:50%;
+      bottom:2%;
+      width:min(1150px,120vw);
+      height:42%;
+      transform:translateX(-50%);
+      opacity:var(--sheen-light,.32);
+      background:
+        radial-gradient(ellipse at 52% 60%,rgba(153,190,198,.25),transparent 54%),
+        repeating-linear-gradient(98deg,transparent 0 34px,rgba(186,213,216,.09) 35px 37px,transparent 38px 70px);
+      filter:blur(2px);
+      mix-blend-mode:screen;
+      transition:opacity var(--flicker-speed,.4s) ease;
+    }
+
+    @keyframes lightningBurst {
+      0%,18%,48%,100% { opacity:0; }
+      8% { opacity:.72; }
+      28% { opacity:.16; }
+      38% { opacity:.52; }
+      62% { opacity:.08; }
+    }
+
+    @keyframes windowSway {
+      from { transform: translateX(-50%) rotate(-3deg) translateX(-10px); }
+      to { transform: translateX(-50%) rotate(-1deg) translateX(14px); }
+    }
+    @keyframes rainFall {
+      from { transform: translate3d(0,-90px,0) rotate(10deg); }
+      to { transform: translate3d(45px,1000px,0) rotate(10deg); }
+    }
+    @keyframes mothOne {
+      0%,100% { transform: translate(-180px,20px) rotate(0); }
+      23% { transform: translate(90px,-35px) rotate(26deg); }
+      48% { transform: translate(210px,90px) rotate(-18deg); }
+      72% { transform: translate(-40px,145px) rotate(12deg); }
+    }
+    @keyframes mothTwo {
+      0%,100% { transform: translate(160px,80px) scale(.7); }
+      31% { transform: translate(-120px,-15px) scale(1); }
+      58% { transform: translate(-230px,125px) scale(.8); }
+      81% { transform: translate(45px,190px) scale(1); }
+    }
+    @keyframes mothThree {
+      0%,100% { transform: translate(-40px,-30px) scale(.55); }
+      35% { transform: translate(250px,75px) scale(.8); }
+      67% { transform: translate(70px,225px) scale(.65); }
+    }
+
+    .rain-ambience-badge {
+      position:absolute;
+      z-index:8;
+      right:max(12px,calc(50% - 510px));
+      bottom:30px;
+      display:flex;
+      align-items:flex-end;
+      gap:4px;
+      padding:10px 13px;
+      border:2px solid rgba(144,173,176,.36);
+      color:#b9ced0;
+      background:rgba(20,30,31,.72);
+      box-shadow:inset 0 0 18px rgba(123,164,169,.1),6px 8px 13px rgba(0,0,0,.35);
+      font:800 8px "Courier New",monospace;
+      letter-spacing:.11em;
+      pointer-events:none;
+    }
+    .rain-ambience-badge i {
+      width:3px;
+      height:8px;
+      background:#9cbfc1;
+      box-shadow:0 0 4px rgba(157,203,207,.44);
+      animation:rainMeter .9s steps(3) infinite alternate;
+    }
+    .rain-ambience-badge i:nth-child(2){animation-delay:-.24s;height:13px}
+    .rain-ambience-badge i:nth-child(3){animation-delay:-.48s;height:10px}
+    .rain-ambience-badge i:nth-child(4){animation-delay:-.66s;height:15px}
+    .rain-ambience-badge span { margin-left:5px; align-self:center; }
+    @keyframes rainMeter { from{transform:scaleY(.35);opacity:.45} to{transform:scaleY(1);opacity:1} }
+
+    /* More physical age and wear */
+    .screen-bezel::after {
+      content:"";
+      position:absolute;
+      inset:7px 9px;
+      pointer-events:none;
+      border-radius:22px;
+      background:
+        radial-gradient(circle at 6% 14%, rgba(184,166,121,.45) 0 1px, transparent 2px),
+        radial-gradient(circle at 94% 77%, rgba(184,166,121,.32) 0 1px, transparent 2px),
+        radial-gradient(circle at 15% 91%, rgba(20,15,11,.5) 0 1px, transparent 2px);
+      background-size:17px 13px,23px 19px,29px 17px;
+      opacity:.5;
+    }
+    .dead-pixel { position:absolute; z-index:5; left:73%; top:31%; width:3px; height:3px; background:rgba(18,29,20,.48); pointer-events:none; }
+    .number-key:nth-child(2), .number-key:nth-child(5), .number-key:nth-child(8) { color:#cbd1cc; }
+    .number-key:nth-child(5) { box-shadow: inset 3px 3px 0 #3c4546, inset -3px -3px 0 #101415, 0 5px 0 #090c0d, inset 0 0 12px rgba(187,173,133,.12); }
+    .phone-wear { position:absolute; z-index:7; inset:0; pointer-events:none; overflow:hidden; border-radius:inherit; }
+    .phone-wear i { position:absolute; height:1px; background:rgba(222,232,227,.16); transform-origin:left; }
+    .phone-wear i:nth-child(1){width:92px;left:25px;top:230px;transform:rotate(66deg)}
+    .phone-wear i:nth-child(2){width:68px;right:12px;top:520px;transform:rotate(-48deg)}
+    .phone-wear i:nth-child(3){width:44px;left:55px;bottom:70px;transform:rotate(12deg)}
+
+    /* Interactive 3D voice tape — no subtitle deck */
+    .cassette-player {
+      position:fixed;
+      z-index:120;
+      inset:0;
+      display:none;
+      place-items:center;
+      padding:20px;
+      overflow:hidden;
+      background:
+        radial-gradient(ellipse at 50% 46%,rgba(62,92,98,.22),transparent 44%),
+        rgba(0,2,3,.965);
+      backdrop-filter:blur(11px) brightness(.52);
+      perspective:1400px;
+    }
+    .cassette-player.is-open { display:grid; }
+    .cassette { pointer-events:auto; cursor:pointer; appearance:none; transition:translate .24s ease,filter .24s ease; }
+    .cassette:not(.is-picked-up):hover { translate:0 -6px; filter:brightness(1.12) drop-shadow(0 16px 14px rgba(75,143,139,.25)); }
+    .cassette:focus-visible { outline:4px dashed #cde5d5; outline-offset:8px; }
+
+    .cassette-inspection {
+      position:relative;
+      width:min(1040px,96vw);
+      height:min(820px,94vh);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      color:#d6e1df;
+      transform-style:preserve-3d;
+    }
+    .cassette-viewport {
+      position:relative;
+      width:min(900px,94vw);
+      height:min(610px,70vh);
+      display:grid;
+      place-items:center;
+      outline:none;
+      perspective:1250px;
+      cursor:grab;
+      touch-action:none;
+      user-select:none;
+    }
+    .cassette-viewport:active { cursor:grabbing; }
+    .cassette-viewport::before {
+      content:"";
+      position:absolute;
+      left:50%;
+      top:58%;
+      width:min(690px,74vw);
+      height:190px;
+      border-radius:50%;
+      background:radial-gradient(ellipse at center,rgba(0,0,0,.74),rgba(0,0,0,.25) 47%,transparent 73%);
+      filter:blur(18px);
+      transform:translate(-50%,-50%) rotateX(72deg);
+      transition:opacity .3s,transform .3s;
+    }
+    .cassette-viewport:focus-visible::after {
+      content:"DRAG OR USE ARROW KEYS";
+      position:absolute;
+      bottom:22px;
+      color:#c9ded8;
+      font:800 9px "Courier New",monospace;
+      letter-spacing:.12em;
+    }
+
+    .cassette-3d {
+      --tape-depth:30px;
+      position:relative;
+      z-index:2;
+      width:min(570px,82vw);
+      aspect-ratio:1.6 / 1;
+      transform-style:preserve-3d;
+      transform:rotateX(-10deg) rotateY(18deg);
+      will-change:transform;
+    }
+    .cassette-3d:not(.is-dragging) { transition:transform .32s cubic-bezier(.2,.72,.22,1); }
+    .cassette-3d.back-facing .tape-front { pointer-events:none; }
+    .cassette-3d.front-facing .tape-back { pointer-events:none; }
+    .cassette-3d.is-playing .spool { animation:spoolRotate 1.15s linear infinite; }
+    .cassette-3d.is-playing .tape-face { box-shadow:inset 0 0 0 3px #4c5351,inset 0 -28px 40px rgba(0,0,0,.48),inset 0 20px 30px rgba(255,255,255,.035),0 0 26px rgba(103,184,158,.14); }
+
+    .tape-face {
+      position:absolute;
+      inset:0;
+      overflow:hidden;
+      border:9px solid #0b0e0e;
+      border-radius:15px;
+      backface-visibility:hidden;
+      transform-style:preserve-3d;
+      filter:brightness(var(--face-light,1));
+      box-shadow:
+        inset 0 0 0 3px #4c5351,
+        inset 0 -28px 40px rgba(0,0,0,.48),
+        inset 0 20px 30px rgba(255,255,255,.035),
+        0 0 0 1px #000;
+    }
+    .tape-front {
+      transform:translateZ(var(--tape-depth));
+      background:
+        linear-gradient(115deg,rgba(255,255,255,.1),transparent 20% 73%,rgba(255,255,255,.025)),
+        repeating-linear-gradient(90deg,transparent 0 7px,rgba(255,255,255,.012) 8px),
+        #252a29;
+    }
+    .tape-back {
+      transform:rotateY(180deg) translateZ(var(--tape-depth));
+      background:
+        linear-gradient(245deg,rgba(255,255,255,.075),transparent 23% 72%,rgba(0,0,0,.12)),
+        repeating-linear-gradient(0deg,#242a29 0 5px,#202524 6px 8px);
+    }
+    .tape-shell-highlight {
+      position:absolute;
+      inset:-45% 60% -45% -24%;
+      background:linear-gradient(108deg,transparent,rgba(255,255,255,.19),transparent);
+      transform:translateX(var(--shine-shift,0%)) skewX(-12deg);
+      transition:transform .08s linear;
+      pointer-events:none;
+      mix-blend-mode:screen;
+    }
+
+    .front-label {
+      position:absolute;
+      left:8%;
+      right:8%;
+      top:7%;
+      height:25%;
+      padding:3.2% 5%;
+      color:#483527;
+      background:
+        repeating-linear-gradient(0deg,transparent 0 20px,rgba(85,68,47,.13) 21px 22px),
+        #d4c8a4;
+      border:2px solid #80745b;
+      box-shadow:inset 0 0 17px rgba(85,64,40,.14),0 4px 8px rgba(0,0,0,.32);
+      text-align:center;
+      transform:translateZ(2px);
+    }
+    .front-label small,.front-label b { display:block; }
+    .front-label small { font:800 clamp(7px,1.2vw,11px) "Courier New",monospace; letter-spacing:.11em; }
+    .front-label b { margin-top:3%; font:900 clamp(12px,2.4vw,23px)/1 "Courier New",monospace; }
+    .front-label i { display:block; width:44%; height:2px; margin:4% auto 0; background:#7f6c50; }
+
+    .spool-window {
+      position:absolute;
+      left:14%;
+      right:14%;
+      top:35%;
+      height:28%;
+      border:5px solid #080b0a;
+      border-radius:33px;
+      background:
+        radial-gradient(circle at center,rgba(195,186,148,.18),transparent 68%),
+        rgba(8,11,10,.82);
+      box-shadow:inset 0 0 0 5px #3f4542,inset 0 0 22px #000;
+      transform:translateZ(3px);
+    }
+    .spool {
+      position:absolute;
+      top:16%;
+      width:24%;
+      aspect-ratio:1;
+      border:8px dotted #c9bea0;
+      border-radius:50%;
+      background:#1b1f1d;
+      box-shadow:0 0 0 7px #070908,inset 0 0 0 3px #6d6650;
+    }
+    .spool i { position:absolute; inset:33%; border-radius:50%; background:#bcb08e; box-shadow:0 0 0 3px #151817; }
+    .left-spool{left:9%}.right-spool{right:9%}
+    .tape-bridge { position:absolute; left:29%; right:29%; top:46%; height:7%; background:#5c4933; box-shadow:0 0 5px #000; }
+
+    .tape-bottom-ui {
+      position:absolute;
+      z-index:30;
+      left:50%;
+      bottom:18px;
+      width:min(720px,92vw);
+      min-height:64px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:10px 12px;
+      border:1px solid rgba(166,205,196,.28);
+      border-radius:8px;
+      background:linear-gradient(180deg,rgba(17,26,26,.86),rgba(4,8,8,.95));
+      box-shadow:0 20px 48px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,255,255,.065),0 0 28px rgba(93,167,145,.07);
+      backdrop-filter:blur(12px);
+      transform:translateX(-50%);
+    }
+    .tape-close {
+      flex:0 0 44px;
+      min-height:42px;
+      border:1px solid rgba(200,221,216,.28);
+      color:#c8d8d4;
+      background:#1c2928;
+      cursor:pointer;
+      font:300 27px/1 Arial,sans-serif;
+    }
+    .tape-close:hover { color:#fff; background:#344542; }
+
+    .tape-code-entry {
+      flex:1;
+      display:grid;
+      grid-template-columns:minmax(120px,1fr) 48px minmax(150px,1.6fr);
+      gap:8px;
+      align-items:center;
+    }
+    .tape-code-entry input {
+      width:100%;
+      min-width:0;
+      height:42px;
+      border:1px solid #607a72;
+      color:#e4f1e9;
+      background:#080d0c;
+      padding:6px 10px;
+      outline:none;
+      font:900 20px "Courier New",monospace;
+      letter-spacing:.28em;
+      text-align:center;
+    }
+    .tape-code-entry input:focus { border-color:#b5d6c5; box-shadow:0 0 18px rgba(133,207,169,.24); }
+    .tape-code-entry button,
+    .tape-controls button {
+      min-height:42px;
+      border:1px solid rgba(174,204,196,.3);
+      color:#d9e4df;
+      background:#293633;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 4px 12px rgba(0,0,0,.35);
+      cursor:pointer;
+      font:900 16px "Courier New",monospace;
+    }
+    .tape-code-entry button:hover,.tape-controls button:hover { background:#465a55; color:#fff; }
+    .tape-code-entry span { color:#708681; font:800 8px/1.35 "Courier New",monospace; letter-spacing:.08em; }
+    .tape-code-entry.is-error { animation:codeShake .34s steps(4); }
+    .tape-code-entry.is-error input { border-color:#b85d57; color:#ffc7bf; }
+    .cassette-player.tape-unlocked .tape-code-entry { display:none; }
+    .cassette-player.showing-back:not(.tape-unlocked) .tape-code-entry { opacity:.22; filter:blur(1px); pointer-events:none; }
+
+    .tape-controls {
+      flex:1;
+      display:none;
+      grid-template-columns:54px 54px 54px 82px 1fr;
+      gap:8px;
+      align-items:center;
+    }
+    .cassette-player.tape-unlocked .tape-controls { display:grid; }
+    .tape-controls output { color:#ef725d; font:900 17px "Courier New",monospace; text-align:center; }
+    .murmur-meter { height:30px; display:flex; align-items:center; justify-content:flex-end; gap:4px; }
+    .murmur-meter b { width:3px; height:var(--h,12px); background:#84afa2; box-shadow:0 0 5px rgba(120,198,171,.42); transform:scaleY(.2); transform-origin:bottom; animation:murmurMeter .5s steps(3) infinite alternate paused; }
+    .murmur-meter b:nth-child(1){--h:8px}.murmur-meter b:nth-child(2){--h:20px;animation-delay:-.16s}.murmur-meter b:nth-child(3){--h:13px;animation-delay:-.31s}.murmur-meter b:nth-child(4){--h:25px;animation-delay:-.08s}.murmur-meter b:nth-child(5){--h:16px;animation-delay:-.24s}
+    .cassette-player.tape-playing .murmur-meter b { animation-play-state:running; }
+
+    .tape-screw { position:absolute; width:8px; height:8px; border-radius:50%; background:#abb1ac; box-shadow:0 0 0 2px #080a09,inset 0 0 0 1px #555; }
+    .tape-screw::after { content:""; position:absolute; left:1px; right:1px; top:3px; height:1px; background:#333; }
+    .ts1{left:4%;top:5%}.ts2{right:4%;top:5%}.ts3{left:5%;bottom:5%}.ts4{right:5%;bottom:5%}
+
+    .back-ridges { position:absolute; inset:3%; opacity:.24; background:repeating-linear-gradient(0deg,transparent 0 8px,rgba(255,255,255,.12) 9px 10px); }
+    .back-label {
+      position:absolute;
+      left:13%;
+      right:13%;
+      top:12%;
+      min-height:45%;
+      padding:5%;
+      color:#30281e;
+      background:#cabd96;
+      border:2px solid #75694f;
+      text-align:center;
+      box-shadow:inset 0 0 25px rgba(72,51,32,.16),0 5px 12px rgba(0,0,0,.35);
+      transform:translateZ(3px);
+    }
+    .back-label small,.back-label b,.back-label strong,.back-label span { display:block; }
+    .back-label small { font:800 clamp(7px,1.2vw,11px) "Courier New",monospace; letter-spacing:.1em; }
+    .back-label b { margin-top:4%; font:900 clamp(10px,1.8vw,16px) "Courier New",monospace; }
+    .back-label strong { margin:2% 0; color:#6b2722; font:900 clamp(34px,8vw,70px)/1 "Courier New",monospace; letter-spacing:.18em; text-shadow:1px 2px 0 rgba(255,255,255,.35); }
+    .back-label span { font:800 clamp(7px,1.2vw,11px) "Courier New",monospace; }
+    .back-window { position:absolute; left:28%; right:28%; bottom:9%; height:22%; border:4px solid #0b0d0c; border-radius:20px; background:#171b19; }
+    .back-window i { position:absolute; top:19%; width:30%; aspect-ratio:1; border:6px dotted #b9ae8d; border-radius:50%; }
+    .back-window i:first-child{left:7%}.back-window i:last-child{right:7%}
+
+    .tape-edge { position:absolute; display:block; background:#181d1b; border:2px solid #050706; transform-style:preserve-3d; }
+    .edge-top,.edge-bottom { left:8px; right:8px; height:calc(var(--tape-depth)*2); }
+    .edge-top { top:0; transform:rotateX(90deg) translateZ(var(--tape-depth)); transform-origin:top; }
+    .edge-bottom { bottom:0; transform:rotateX(-90deg) translateZ(var(--tape-depth)); transform-origin:bottom; }
+    .edge-left,.edge-right { top:8px; bottom:8px; width:calc(var(--tape-depth)*2); }
+    .edge-left { left:0; transform:rotateY(-90deg) translateZ(var(--tape-depth)); transform-origin:left; }
+    .edge-right { right:0; transform:rotateY(90deg) translateZ(var(--tape-depth)); transform-origin:right; }
+
+    .global-subtitles {
+      position:fixed;
+      z-index:175;
+      left:50%;
+      bottom:96px;
+      width:min(900px,92vw);
+      padding:16px 22px 18px;
+      border:1px solid rgba(181,214,208,.33);
+      color:#eef7f2;
+      background:linear-gradient(180deg,rgba(7,12,12,.82),rgba(2,5,5,.95));
+      box-shadow:0 0 45px rgba(96,175,151,.14),0 18px 42px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.08);
+      backdrop-filter:blur(14px);
+      opacity:0;
+      pointer-events:none;
+      transform:translate(-50%,35px);
+      transition:opacity .28s,transform .38s cubic-bezier(.16,.8,.2,1);
+    }
+    .global-subtitles.is-visible { opacity:1; transform:translate(-50%,0); }
+    .global-subtitles > time { position:absolute; top:8px; right:12px; color:#6e938a; font:800 9px "Courier New",monospace; }
+    .global-subtitles p { margin:4px 36px 0; font:800 clamp(18px,3vw,30px)/1.45 "Courier New",monospace; text-align:center; text-shadow:0 2px 12px #000; }
+
+    @keyframes spoolRotate { to { transform:rotate(360deg); } }
+    @keyframes murmurMeter { from{transform:scaleY(.18);opacity:.38} to{transform:scaleY(1);opacity:1} }
+    @keyframes codeShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 50%{transform:translateX(8px)} 75%{transform:translateX(-4px)} }
+
+    /* Cinematic 3D pickup / return animation for the physical tape */
+    .cassette.is-picked-up { opacity:0 !important; visibility:hidden; }
+    .cassette.is-landed { animation:cassetteLanding .72s cubic-bezier(.18,.84,.2,1); }
+
+    .cassette-player.is-preparing,
+    .cassette-player.is-closing {
+      display:grid;
+    }
+    .cassette-player.is-preparing {
+      animation:tapeBackdropIn .9s ease both;
+    }
+    .cassette-player.is-preparing .cassette-inspection { visibility:hidden; }
+    .cassette-player.is-open .cassette-inspection { visibility:visible; opacity:1; }
+    .cassette-player.is-closing { animation:tapeBackdropOut .95s ease both; }
+    .cassette-player.is-closing .cassette-inspection { visibility:hidden; pointer-events:none; }
+
+    .cassette-flight {
+      position:fixed;
+      z-index:180;
+      margin:0;
+      padding:0;
+      border:8px solid #111514;
+      border-radius:10px;
+      overflow:hidden;
+      pointer-events:none;
+      color:#483125;
+      background:
+        linear-gradient(165deg, rgba(255,255,255,.12), transparent 23%),
+        linear-gradient(345deg, rgba(0,0,0,.28), transparent 34%),
+        #292d2b;
+      box-shadow:
+        inset 0 0 0 3px #555a56,
+        inset 0 -12px 18px rgba(0,0,0,.35),
+        0 22px 35px rgba(0,0,0,.58);
+      transform-origin:50% 50%;
+      transform-style:preserve-3d;
+      backface-visibility:hidden;
+      will-change:transform,filter,opacity;
+    }
+    .cassette-flight::before,
+    .cassette-flight::after {
+      content:"";
+      position:absolute;
+      top:36%;
+      width:18%;
+      aspect-ratio:1;
+      border:7px dotted #151817;
+      border-radius:50%;
+      background:#c3b991;
+      box-shadow:0 0 0 7px #0e1110, inset 0 0 0 2px #71694f;
+    }
+    .cassette-flight::before { left:16%; }
+    .cassette-flight::after { right:16%; }
+    .flight-label {
+      position:absolute;
+      left:9%;
+      right:9%;
+      top:9%;
+      height:28%;
+      padding:4% 5%;
+      overflow:hidden;
+      color:#4d3528;
+      background:#d5caa5;
+      border:1px solid #84795f;
+      font:700 clamp(7px,1.5vw,13px)/1.15 "Courier New",monospace;
+      text-align:center;
+      text-transform:uppercase;
+    }
+    .flight-window {
+      position:absolute;
+      left:31%;
+      right:31%;
+      top:42%;
+      height:19%;
+      border:3px solid #0b0e0d;
+      border-radius:12px;
+      background:rgba(198,187,148,.5);
+      box-shadow:inset 0 0 0 3px rgba(37,39,35,.55);
+    }
+    .flight-tape {
+      position:absolute;
+      left:22%;
+      right:22%;
+      bottom:13%;
+      height:16%;
+      clip-path:polygon(10% 0,90% 0,100% 100%,0 100%);
+      border:2px solid #0b0d0c;
+      background:#1b1e1c;
+    }
+    .flight-shine {
+      position:absolute;
+      inset:-35% 58% -35% -20%;
+      background:linear-gradient(105deg,transparent,rgba(255,255,255,.3),transparent);
+      transform:skewX(-12deg);
+      mix-blend-mode:screen;
+      animation:flightShine 1.2s ease-in-out infinite;
+    }
+    .flight-screw {
+      position:absolute;
+      width:4px;
+      height:4px;
+      border-radius:50%;
+      background:#b2b7af;
+      box-shadow:0 0 0 1px #0a0c0b;
+    }
+    .flight-screw.s1{left:5%;top:6%}.flight-screw.s2{right:5%;top:6%}.flight-screw.s3{left:6%;bottom:6%}.flight-screw.s4{right:6%;bottom:6%}
+
+    .cassette-ground-shadow {
+      position:fixed;
+      z-index:145;
+      pointer-events:none;
+      border-radius:50%;
+      background:radial-gradient(ellipse at center,rgba(0,0,0,.64),rgba(0,0,0,.24) 48%,transparent 73%);
+      filter:blur(8px);
+      transform-origin:center;
+      will-change:transform,opacity,filter;
+    }
+
+    .landing-dust-burst {
+      position:fixed;
+      z-index:175;
+      width:4px;
+      height:4px;
+      pointer-events:none;
+    }
+    .landing-dust-burst i {
+      position:absolute;
+      width:var(--s);
+      height:var(--s);
+      border-radius:50%;
+      background:rgba(226,198,140,.72);
+      box-shadow:0 0 6px rgba(255,214,145,.45);
+      animation:landingDust .8s ease-out var(--d) both;
+    }
+
+    @keyframes tapeBackdropIn {
+      0% { background:rgba(4,5,4,0); backdrop-filter:blur(0); }
+      100% { background:rgba(4,5,4,.93); backdrop-filter:blur(5px); }
+    }
+    @keyframes tapeBackdropOut {
+      0% { background:rgba(4,5,4,.93); backdrop-filter:blur(5px); }
+      72% { background:rgba(4,5,4,.48); }
+      100% { background:rgba(4,5,4,0); backdrop-filter:blur(0); }
+    }
+    @keyframes flightShine {
+      0%,25% { transform:translateX(-90%) skewX(-12deg); opacity:0; }
+      48% { opacity:.78; }
+      75%,100% { transform:translateX(260%) skewX(-12deg); opacity:0; }
+    }
+    @keyframes cassetteLanding {
+      0% { transform:rotate(7deg) translateY(-24px) scale(1.04); filter:drop-shadow(0 28px 18px rgba(0,0,0,.6)); }
+      38% { transform:rotate(5.5deg) translateY(5px) scale(.985,1.02); }
+      58% { transform:rotate(7.8deg) translateY(-4px) scale(1.012,.992); }
+      76% { transform:rotate(6.6deg) translateY(2px); }
+      100% { transform:rotate(7deg) translateY(0) scale(1); filter:none; }
+    }
+    @keyframes landingDust {
+      0% { opacity:0; transform:translate(0,0) scale(.5); }
+      18% { opacity:.8; }
+      100% { opacity:0; transform:translate(var(--dx),var(--dy)) scale(1.8); }
+    }
+
+    .sr-only {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
+    @media (max-width: 900px) {
+      .cassette { right:3vw; opacity:.78; transform:rotate(8deg) scale(.82); transform-origin:right center; }
+    }
+
+    @media (max-width: 650px) {
+      .scene { padding:28px 7px 135px; align-items:start; }
+      .cassette { display:block; top:auto; right:5px; bottom:110px; transform:rotate(7deg) scale(.58); transform-origin:right bottom; opacity:.9; }
+      .phone { min-height:0; padding:42px 15px 26px; }
+      .faceplate { padding: 18px 10px 27px; }
+      .screen-bezel { padding: 14px 9px 17px; }
+      .control-cluster { grid-template-columns: 58px 1fr 64px; gap: 11px; margin-left: 5px; margin-right: 5px; }
+      .keypad { column-gap: 13px; padding: 0 7px; }
+      .phone-wrap { width: min(460px, 97vw); }
+      .fullscreen-message-key {
+        position: fixed;
+        z-index: 45;
+        top: auto;
+        right: 10px;
+        bottom: 12px;
+        width: 132px;
+        min-height: 50px;
+        padding: 8px 10px;
+        border-left: 3px solid #080c0d;
+        border-radius: 8px;
+        transform: translateY(30px);
+      }
+      .fullscreen-message-key.is-visible { transform: translateY(0); }
+      .fullscreen-message-key::before { display: inline-block; width: 14px; height: 10px; margin: 0 7px 0 0; vertical-align: -2px; }
+      .message-reader { padding: 9px; }
+      .reader-shell { padding: 10px; border-radius: 12px; }
+      .reader-lcd { padding:46px 18px 28px; }
+      .cassette-player { padding:8px; }
+      .cassette-inspection { width:100vw; height:100vh; }
+      .cassette-viewport { width:100vw; height:76vh; margin-top:-32px; }
+      .cassette-3d { width:min(570px,91vw); }
+      .tape-bottom-ui { bottom:8px; width:96vw; padding:8px; }
+      .tape-code-entry { grid-template-columns:1fr 44px; }
+      .tape-code-entry span { grid-column:1/-1; text-align:center; }
+      .tape-controls { grid-template-columns:46px 46px 46px 65px 1fr; }
+      .global-subtitles { bottom:82px; width:96vw; padding:12px 14px 14px; }
+      .global-subtitles p { margin-right:28px; margin-left:28px; font-size:clamp(15px,4.8vw,22px); }
+      .rain-ambience-badge { right:10px; bottom:18px; }
+    }
+
+    @media (max-width: 370px) {
+      .number-key { height: 44px; }
+      .keypad { row-gap: 9px; column-gap: 9px; }
+      .phone { padding-left: 13px; padding-right: 13px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+      .dust-mote { opacity: .12; }
+      .ambient-grain { display: none; }
+    }
+  </style>
+
+  <!-- ============== LAST SEEN — NARRATIVE OVERLAY STYLES ============== -->
+  <link rel="stylesheet" href="css/narrative.css">
+  <link rel="stylesheet" href="css/title.css">
+  <link rel="stylesheet" href="css/flashlight.css">
+  <link rel="stylesheet" href="css/corridor.css">
+  <link rel="stylesheet" href="css/storm-eas.css">
+  <link rel="stylesheet" href="css/ending.css">
+  <link rel="stylesheet" href="css/newer-phone.css">
+  <link rel="stylesheet" href="css/quality-fixes.css">
+
+  <!-- Critical first-paint gate. The title must own the first frame before
+       any legacy phone renderer or narrative module can initialize. -->
+  <style id="ls-critical-boot">
+    html, body { background: #000 !important; }
+    body.ls-state-title main.scene,
+    body.ls-state-opening main.scene,
+    body.ls-state-ending main.scene {
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    #ls-overlays {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      pointer-events: none;
+    }
+    #ls-overlays > * {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    #ls-title-screen.is-active {
+      display: flex;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+  </style>
+  <script>
+    // Prevent the legacy inline ambience and lightning schedulers from
+    // starting before the title/opening controller takes ownership.
+    window.LS_NATIVE_AMBIENCE_DISABLED = true;
+  </script>
+</head>
+<body class="ls-state-title">
+  <main class="scene weather-rain" aria-label="Found phone narrative experience">
+    <div class="ambient-atmosphere" aria-hidden="true">
+      <div class="hanging-lamp"><i></i><b></b></div>
+      <div class="room-set">
+        <div class="rain-window"><i></i><i></i><i></i><i></i></div>
+        <div class="aparador-silhouette"><i></i><i></i><i></i></div>
+        <div class="wall-frame"></div>
+        <div class="desk-papers"><i></i><i></i><i></i></div>
+      </div>
+      <div class="lamp-bloom"></div>
+      <div class="light-beam"></div>
+      <div class="room-dimmer"></div>
+      <div class="phone-aura"></div>
+      <div class="storm-flash"></div>
+      <div class="rain-sheen"></div>
+      <div class="window-shadow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="rain-field" id="rainField" aria-hidden="true"></div>
+      <div class="dust-field" id="dustField"></div>
+      <div class="moth-field" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="ambient-grain"></div>
+    </div>
+
+    <button class="desk-object cassette" id="cassetteObject" type="button" aria-label="Open the voice tape subtitle player">
+      <span class="cassette-label">4 my one &amp; onli lab ATO</span>
+    </button>
+
+    <div class="rain-ambience-badge" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><span>RAIN AMBIENCE · ON</span>
+    </div>
+
+    <section class="phone-wrap" aria-label="Late-1990s Philippine GSM phone">
+      <div class="phone">
+        <div class="antenna" aria-hidden="true"></div>
+        <button class="power-key" id="powerKey" type="button" aria-label="Power phone on or off">●</button>
+
+        <div class="faceplate">
+          <div class="earpiece" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="brand" aria-hidden="true">NOKIA</div>
+
+          <div class="screen-bezel">
+            <div class="lcd-frame">
+              <canvas id="lcd" width="84" height="48" aria-label="Monochrome phone display"></canvas>
+              <i class="dead-pixel" aria-hidden="true"></i>
+            </div>
+          </div>
+
+          <div class="model-row" aria-hidden="true"><span>GSM</span><span>5110</span></div>
+
+          <div class="control-cluster">
+            <button class="physical-key clear-key" type="button" data-key="clear" aria-label="Clear or back">C</button>
+            <button class="physical-key navi-key" type="button" data-key="navi" aria-label="Navi select key"></button>
+            <div class="scroll-rocker" aria-label="Scroll keys">
+              <button class="physical-key" type="button" data-key="up" aria-label="Scroll up">▲</button>
+              <button class="physical-key" type="button" data-key="down" aria-label="Scroll down">▼</button>
+            </div>
+          </div>
+
+          <div class="keypad" aria-label="Telephone keypad">
+            <button class="physical-key number-key" type="button" data-key="1">1<small>.,?!</small></button>
+            <button class="physical-key number-key" type="button" data-key="2">2<small>ABC</small></button>
+            <button class="physical-key number-key" type="button" data-key="3">3<small>DEF</small></button>
+            <button class="physical-key number-key" type="button" data-key="4">4<small>GHI</small></button>
+            <button class="physical-key number-key" type="button" data-key="5">5<small>JKL</small></button>
+            <button class="physical-key number-key" type="button" data-key="6">6<small>MNO</small></button>
+            <button class="physical-key number-key" type="button" data-key="7">7<small>PQRS</small></button>
+            <button class="physical-key number-key" type="button" data-key="8">8<small>TUV</small></button>
+            <button class="physical-key number-key" type="button" data-key="9">9<small>WXYZ</small></button>
+            <button class="physical-key number-key" type="button" data-key="star">*<small>+</small></button>
+            <button class="physical-key number-key" type="button" data-key="0">0<small>SPACE</small></button>
+            <button class="physical-key number-key" type="button" data-key="hash">#<small>⇧</small></button>
+          </div>
+
+          <div class="microphone" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+
+        <div class="phone-wear" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="bottom-port" aria-hidden="true"></div>
+      </div>
+
+      <button class="fullscreen-message-key" id="fullscreenMessageKey" type="button" aria-label="Open the current message in a large fullscreen reader">
+        Fullscreen
+      </button>
+    </section>
+
+    <div class="message-reader" id="messageReader" role="dialog" aria-modal="true" aria-labelledby="readerTitle" aria-hidden="true">
+      <div class="reader-shell">
+        <button class="reader-close" id="readerClose" type="button">EXIT</button>
+        <article class="reader-lcd">
+          <p class="reader-kicker" id="readerMeta">Recovered message</p>
+          <h2 id="readerTitle">Message</h2>
+          <p id="readerBody"></p>
+        </article>
+      </div>
+    </div>
+
+    <div class="cassette-player" id="cassettePlayer" role="dialog" aria-modal="true" aria-label="Interactive cassette" aria-hidden="true">
+      <section class="cassette-inspection">
+
+        <div class="cassette-viewport" id="cassetteViewport" tabindex="0" aria-label="Interactive three-dimensional cassette. Drag left or right to rotate.">
+          <div class="cassette-3d front-facing" id="cassette3d">
+            <section class="tape-face tape-front" aria-label="Front side of cassette">
+              <div class="tape-shell-highlight"></div>
+              <div class="front-label"><b>4 my one &amp; onli lab ATO</b><i></i></div>
+              <div class="spool-window" aria-hidden="true">
+                <span class="spool left-spool"><i></i></span>
+                <span class="tape-bridge"></span>
+                <span class="spool right-spool"><i></i></span>
+              </div>
+              <i class="tape-screw ts1"></i><i class="tape-screw ts2"></i><i class="tape-screw ts3"></i><i class="tape-screw ts4"></i>
+            </section>
+
+            <section class="tape-face tape-back" aria-label="Back side of cassette">
+              <div class="back-ridges" aria-hidden="true"></div>
+              <div class="back-label"><small>SIDE B · PERSONAL RECORDING</small></div>
+              <div class="back-window" aria-hidden="true"><i></i><i></i></div>
+              <i class="tape-screw ts1"></i><i class="tape-screw ts2"></i><i class="tape-screw ts3"></i><i class="tape-screw ts4"></i>
+            </section>
+
+            <i class="tape-edge edge-top"></i><i class="tape-edge edge-bottom"></i><i class="tape-edge edge-left"></i><i class="tape-edge edge-right"></i>
+          </div>
+        </div>
+
+        <div class="tape-bottom-ui">
+          <button type="button" class="tape-close" id="cassetteClose" aria-label="Return cassette to desk">×</button>
+          <div class="tape-code-entry" id="tapeCodeEntry">
+            <input id="cassetteCodeInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="CODE" aria-label="Cassette code" aria-describedby="cassetteCodeStatus">
+            <button type="button" id="cassetteCodeSubmit" aria-label="Unlock cassette">↵</button>
+            <span id="cassetteCodeStatus">ROTATE · READ BACK · ENTER CODE</span>
+          </div>
+          <div class="tape-controls" id="tapeControls">
+            <button type="button" id="cassetteRewind" aria-label="Rewind">◀◀</button>
+            <button type="button" id="cassettePlay" aria-label="Play">▶</button>
+            <button type="button" id="cassetteStop" aria-label="Stop">■</button>
+            <output id="cassetteCounter">00:00</output>
+            <i class="murmur-meter" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></i>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="global-subtitles" id="globalSubtitles" aria-live="polite" aria-hidden="true">
+      <time id="cassetteSubtitleTime">00:00</time>
+      <p id="cassetteSubtitle"> </p>
+    </div>
+
+    <div id="screenReader" class="sr-only" aria-live="polite"></div>
+  </main>
+
+  <!-- ============== LAST SEEN — NARRATIVE OVERLAYS ============== -->
+  <div id="ls-overlays">
+
+    <!-- Title screen: pitch black + LAST SEEN + Play button -->
+    <div id="ls-title-screen" class="is-active" role="dialog" aria-modal="true" aria-labelledby="ls-title-text">
+      <h1 id="ls-title-text">LAST SEEN</h1>
+      <button id="ls-title-play" type="button" aria-label="Play">▶</button>
+    </div>
+
+    <!-- Opening cinematic (candle-lit Filipino text pages) -->
+    <div id="ls-opening" aria-hidden="true">
+      <div id="ls-candle-glow" aria-hidden="true"></div>
+      <div id="ls-opening-text"></div>
+    </div>
+
+    <!-- Flashlight (cursor-following, F to toggle) -->
+    <canvas id="ls-flashlight" aria-hidden="true"></canvas>
+
+    <!-- Corridor view (Z to toggle) -->
+    <div id="ls-corridor" aria-hidden="true">
+      <div class="ls-corridor-wall"></div>
+      <div class="ls-corridor-floor"></div>
+      <div class="ls-corridor-window-shadow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="ls-corridor-storm-flash" aria-hidden="true"></div>
+      <div class="ls-corridor-eyes" aria-hidden="true">
+        <img src="assets/images/eyes.svg" alt="" />
+      </div>
+      <div class="ls-corridor-figure" aria-hidden="true"></div>
+    </div>
+
+    <!-- EAS alert (Philippine-style fictional emergency alert) -->
+    <div id="ls-eas" role="alertdialog" aria-modal="true" aria-labelledby="ls-eas-title" aria-hidden="true">
+      <div class="ls-eas-header">
+        <span class="ls-eas-flag" aria-hidden="true">⚠</span>
+        <span id="ls-eas-title">EMERGENCY ALERT</span>
+      </div>
+      <div class="ls-eas-body">
+        <p id="ls-eas-category">SEVERE WEATHER BULLETIN</p>
+        <p id="ls-eas-area"></p>
+        <p id="ls-eas-message"></p>
+        <p id="ls-eas-time"></p>
+      </div>
+    </div>
+
+    <!-- Newer phone (cracked, bloodied) with Dante alert -->
+    <div id="ls-newer-phone" aria-hidden="true">
+      <div class="ls-newer-shell">
+        <div class="ls-newer-screen">
+          <div class="ls-newer-cracks" aria-hidden="true">
+            <img src="assets/images/screen-cracks.svg" alt="" />
+          </div>
+          <div class="ls-newer-blood" aria-hidden="true">
+            <img src="assets/images/blood-splatter.svg" alt="" />
+          </div>
+          <div class="ls-newer-alert" role="alertdialog" aria-modal="true" aria-labelledby="ls-dante-title">
+            <div class="ls-dante-header">
+              <span class="ls-dante-flag" aria-hidden="true">⚠</span>
+              <span id="ls-dante-title">EMERGENCY ALERT</span>
+            </div>
+            <div class="ls-dante-body">
+              <p class="ls-dante-category">MISSING PERSON</p>
+              <p class="ls-dante-name">NAME: DANTE</p>
+              <p class="ls-dante-message">LAST SEEN NEAR SAINT FRANCIS ROAD, ILOCOS REGION</p>
+              <p class="ls-dante-time"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ls-newer-floor-blood" aria-hidden="true"></div>
+    </div>
+
+    <!-- Man silhouette (revealed by lightning during ending) -->
+    <div id="ls-man-silhouette" aria-hidden="true">
+      <img src="assets/images/man-silhouette.svg" alt="" />
+    </div>
+
+    <!-- Notification banner: 'new message in inbox' -->
+    <div id="ls-notification" role="alert" aria-live="assertive" aria-hidden="true" tabindex="0">
+      <span>new message in inbox</span>
+    </div>
+
+    <!-- The ending message is rendered in the vintage LCD language, not as a
+         neon browser card or a modern phone overlay. -->
+    <div id="ls-inbox-takeover" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1">
+      <div class="ls-inbox-header">INBOX</div>
+      <div class="ls-inbox-meta">NEW MESSAGE · 07:12 · 16-02-1999</div>
+      <div class="ls-inbox-message">Nadito na ako</div>
+      <div class="ls-inbox-footer">C</div>
+    </div>
+
+    <!-- Final black title card before returning to the interactive title screen. -->
+    <div id="ls-credit-card" aria-hidden="true">
+      <h2>LAST SEEN</h2>
+      <p>by: Nuyda Productions</p>
+    </div>
+
+    <!-- Full environmental lightning exposure, source-positioned by storm-eas.js. -->
+    <div id="ls-lightning-exposure" aria-hidden="true"></div>
+
+    <!-- Black fade overlay (transitions between states) -->
+    <div id="ls-fade" aria-hidden="true"></div>
+
+  </div>
+  <!-- ============== END NARRATIVE OVERLAYS ============== -->
+
+  <script>
+    (() => {
+      "use strict";
+
+      // ------------------------------------------------------------------
+      // 84 x 48 LCD PIXEL RENDERER
+      // ------------------------------------------------------------------
+      const canvas = document.getElementById("lcd");
+      const ctx = canvas.getContext("2d", { alpha: false });
+      const screenReader = document.getElementById("screenReader");
+      const phoneElement = document.querySelector(".phone");
+      const lcdFrame = document.querySelector(".lcd-frame");
+      const fullscreenMessageKey = document.getElementById("fullscreenMessageKey");
+      const messageReader = document.getElementById("messageReader");
+      const readerClose = document.getElementById("readerClose");
+      const readerTitle = document.getElementById("readerTitle");
+      const readerMeta = document.getElementById("readerMeta");
+      const readerBody = document.getElementById("readerBody");
+      const sceneElement = document.querySelector(".scene");
+      const dustField = document.getElementById("dustField");
+      const rainField = document.getElementById("rainField");
+      const stormFlashElement = document.querySelector(".storm-flash");
+      const cassetteObject = document.getElementById("cassetteObject");
+      const cassettePlayer = document.getElementById("cassettePlayer");
+      const cassetteClose = document.getElementById("cassetteClose");
+      const cassettePlay = document.getElementById("cassettePlay");
+      const cassetteStop = document.getElementById("cassetteStop");
+      const cassetteRewind = document.getElementById("cassetteRewind");
+      const cassetteSubtitle = document.getElementById("cassetteSubtitle");
+      const cassetteCounter = document.getElementById("cassetteCounter");
+      const cassetteViewport = document.getElementById("cassetteViewport");
+      const cassette3d = document.getElementById("cassette3d");
+      const cassetteCodeInput = document.getElementById("cassetteCodeInput");
+      const cassetteCodeSubmit = document.getElementById("cassetteCodeSubmit");
+      const cassetteCodeStatus = document.getElementById("cassetteCodeStatus");
+      const tapeControls = document.getElementById("tapeControls");
+      const globalSubtitles = document.getElementById("globalSubtitles");
+      const cassetteSubtitleTime = document.getElementById("cassetteSubtitleTime");
+      const LCD_INK = "#142017";
+      const LCD_GHOST = "rgba(20,32,23,.12)";
+      const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches || false;
+
+      const FONT = {
+        " ":["00000","00000","00000","00000","00000","00000","00000"],
+        "A":["01110","10001","10001","11111","10001","10001","10001"],
+        "B":["11110","10001","10001","11110","10001","10001","11110"],
+        "C":["01111","10000","10000","10000","10000","10000","01111"],
+        "D":["11110","10001","10001","10001","10001","10001","11110"],
+        "E":["11111","10000","10000","11110","10000","10000","11111"],
+        "F":["11111","10000","10000","11110","10000","10000","10000"],
+        "G":["01111","10000","10000","10111","10001","10001","01110"],
+        "H":["10001","10001","10001","11111","10001","10001","10001"],
+        "I":["11111","00100","00100","00100","00100","00100","11111"],
+        "J":["00111","00010","00010","00010","10010","10010","01100"],
+        "K":["10001","10010","10100","11000","10100","10010","10001"],
+        "L":["10000","10000","10000","10000","10000","10000","11111"],
+        "M":["10001","11011","10101","10101","10001","10001","10001"],
+        "N":["10001","11001","10101","10011","10001","10001","10001"],
+        "O":["01110","10001","10001","10001","10001","10001","01110"],
+        "P":["11110","10001","10001","11110","10000","10000","10000"],
+        "Q":["01110","10001","10001","10001","10101","10010","01101"],
+        "R":["11110","10001","10001","11110","10100","10010","10001"],
+        "S":["01111","10000","10000","01110","00001","00001","11110"],
+        "T":["11111","00100","00100","00100","00100","00100","00100"],
+        "U":["10001","10001","10001","10001","10001","10001","01110"],
+        "V":["10001","10001","10001","10001","10001","01010","00100"],
+        "W":["10001","10001","10001","10101","10101","10101","01010"],
+        "X":["10001","10001","01010","00100","01010","10001","10001"],
+        "Y":["10001","10001","01010","00100","00100","00100","00100"],
+        "Z":["11111","00001","00010","00100","01000","10000","11111"],
+        "0":["01110","10001","10011","10101","11001","10001","01110"],
+        "1":["00100","01100","00100","00100","00100","00100","01110"],
+        "2":["01110","10001","00001","00010","00100","01000","11111"],
+        "3":["11110","00001","00001","01110","00001","00001","11110"],
+        "4":["00010","00110","01010","10010","11111","00010","00010"],
+        "5":["11111","10000","10000","11110","00001","00001","11110"],
+        "6":["01110","10000","10000","11110","10001","10001","01110"],
+        "7":["11111","00001","00010","00100","01000","01000","01000"],
+        "8":["01110","10001","10001","01110","10001","10001","01110"],
+        "9":["01110","10001","10001","01111","00001","00001","01110"],
+        ".":["00000","00000","00000","00000","00000","00110","00110"],
+        ",":["00000","00000","00000","00000","00110","00100","01000"],
+        ":":["00000","00110","00110","00000","00110","00110","00000"],
+        ";":["00000","00110","00110","00000","00110","00100","01000"],
+        "!":["00100","00100","00100","00100","00100","00000","00100"],
+        "?":["01110","10001","00001","00010","00100","00000","00100"],
+        "'":["00100","00100","01000","00000","00000","00000","00000"],
+        "\"":["01010","01010","01010","00000","00000","00000","00000"],
+        "-":["00000","00000","00000","11111","00000","00000","00000"],
+        "+":["00000","00100","00100","11111","00100","00100","00000"],
+        "*":["00000","10101","01110","11111","01110","10101","00000"],
+        "/":["00001","00010","00010","00100","01000","01000","10000"],
+        "=":["00000","11111","00000","11111","00000","00000","00000"],
+        "#":["01010","11111","01010","01010","11111","01010","00000"],
+        "(":["00010","00100","01000","01000","01000","00100","00010"],
+        ")":["01000","00100","00010","00010","00010","00100","01000"],
+        "<":["00010","00100","01000","10000","01000","00100","00010"],
+        ">":["01000","00100","00010","00001","00010","00100","01000"],
+        "_":["00000","00000","00000","00000","00000","00000","11111"],
+        "[":["01110","01000","01000","01000","01000","01000","01110"],
+        "]":["01110","00010","00010","00010","00010","00010","01110"],
+        "%":["11001","11010","00100","01000","10110","00110","00000"]
+      };
+
+      function cleanText(value) {
+        return String(value ?? "")
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .replace(/[’‘]/g, "'").replace(/[“”]/g, "\"")
+          .replace(/…/g, "...").replace(/₱/g, "P")
+          .replace(/❤️|❤/g, "<3")
+          .toUpperCase();
+      }
+
+      function seedDust() {
+        const count = window.innerWidth < 650 ? 30 : 52;
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < count; i++) {
+          const mote = document.createElement("i");
+          mote.className = "dust-mote";
+          const opacity = .16 + Math.random() * .48;
+          mote.style.setProperty("--x", `${9 + Math.random() * 82}%`);
+          mote.style.setProperty("--y", `${8 + Math.random() * 105}%`);
+          mote.style.setProperty("--size", `${.7 + Math.random() * 3.2}px`);
+          mote.style.setProperty("--duration", `${10 + Math.random() * 18}s`);
+          mote.style.setProperty("--delay", `${-Math.random() * 24}s`);
+          mote.style.setProperty("--opacity", opacity.toFixed(2));
+          mote.style.setProperty("--opacity-low", (opacity * .58).toFixed(2));
+          mote.style.setProperty("--drift-x", `${-28 + Math.random() * 56}px`);
+          mote.style.setProperty("--drift-x2", `${-52 + Math.random() * 104}px`);
+          fragment.appendChild(mote);
+        }
+        dustField.replaceChildren(fragment);
+      }
+
+      function seedRain() {
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < 74; i++) {
+          const drop = document.createElement("i");
+          drop.className = "rain-drop";
+          drop.style.setProperty("--x", `${Math.random() * 100}%`);
+          drop.style.setProperty("--y", `${-20 + Math.random() * 110}%`);
+          drop.style.setProperty("--length", `${20 + Math.random() * 58}px`);
+          drop.style.setProperty("--alpha", (.12 + Math.random() * .42).toFixed(2));
+          drop.style.setProperty("--speed", `${.75 + Math.random() * 1.45}s`);
+          drop.style.setProperty("--delay", `${-Math.random() * 3}s`);
+          fragment.appendChild(drop);
+        }
+        rainField.replaceChildren(fragment);
+      }
+
+      function lcdBackground() { 
+        const normal = ["#8d9a80", "#9eaa8e", "#adb99d"][lcdContrast] || "#9eaa8e";
+        const lit = ["#a7bf99", "#b5cda5", "#c3d9b4"][lcdContrast] || "#b5cda5";
+        return backlightOn ? lit : normal;
+      }
+
+      function clearLCD() {
+        ctx.fillStyle = lcdBackground();
+        ctx.fillRect(0, 0, 84, 48);
+        ctx.fillStyle = LCD_GHOST;
+        for (let y = 1; y < 48; y += 3) {
+          for (let x = (y % 2); x < 84; x += 4) ctx.fillRect(x, y, 1, 1);
+        }
+      }
+
+      function glyphWidth(scale = 1) { return 6 * scale; }
+
+      function drawChar(char, x, y, scale = 1, color = LCD_INK) {
+        const rows = FONT[char] || FONT["?"];
+        ctx.fillStyle = color;
+        rows.forEach((row, ry) => {
+          for (let rx = 0; rx < 5; rx++) {
+            if (row[rx] === "1") ctx.fillRect(x + rx * scale, y + ry * scale, scale, scale);
+          }
+        });
+      }
+
+      function drawText(value, x, y, options = {}) {
+        const text = cleanText(value);
+        const scale = options.scale || 1;
+        const color = options.color || LCD_INK;
+        const align = options.align || "left";
+        const width = text.length * glyphWidth(scale) - scale;
+        let startX = x;
+        if (align === "center") startX = x - Math.floor(width / 2);
+        if (align === "right") startX = x - width;
+        if (options.invert) {
+          ctx.fillStyle = LCD_INK;
+          ctx.fillRect(Math.max(0, startX - 1), y - 1, Math.min(84 - startX, width + 2), 9 * scale);
+        }
+        [...text].forEach((char, index) => drawChar(char, startX + index * glyphWidth(scale), y, scale, options.invert ? lcdBackground() : color));
+      }
+
+      function truncate(text, max = 14) {
+        const cleaned = cleanText(text);
+        return cleaned.length <= max ? cleaned : cleaned.slice(0, Math.max(0, max - 1)) + ">";
+      }
+
+      function wrapText(value, max = 14) {
+        const text = cleanText(value).replace(/\s+/g, " ").trim();
+        if (!text) return [""];
+        const words = text.split(" ");
+        const lines = [];
+        let line = "";
+        for (let word of words) {
+          while (word.length > max) {
+            if (line) { lines.push(line); line = ""; }
+            lines.push(word.slice(0, max - 1) + "-");
+            word = word.slice(max - 1);
+          }
+          if (!line) line = word;
+          else if ((line + " " + word).length <= max) line += " " + word;
+          else { lines.push(line); line = word; }
+        }
+        if (line) lines.push(line);
+        return lines;
+      }
+
+      function drawSignalBattery(showMessage = false) {
+        ctx.fillStyle = LCD_INK;
+        for (let i = 0; i < 4; i++) ctx.fillRect(1 + i * 3, 5 - i, 2, 2 + i);
+        drawText("G", 15, 0);
+        if (showMessage) drawEnvelope(39, 1);
+        ctx.strokeStyle = LCD_INK;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(70, 1, 11, 6);
+        ctx.fillRect(81, 3, 2, 2);
+        ctx.fillRect(72, 3, 7, 2);
+      }
+
+      function drawEnvelope(x, y) {
+        ctx.strokeStyle = LCD_INK;
+        ctx.strokeRect(x, y, 9, 6);
+        ctx.beginPath();
+        ctx.moveTo(x, y); ctx.lineTo(x + 4, y + 3); ctx.lineTo(x + 9, y);
+        ctx.stroke();
+      }
+
+      function drawScrollHints(page, total) {
+        ctx.fillStyle = LCD_INK;
+        if (page > 0) {
+          ctx.fillRect(80, 10, 3, 1); ctx.fillRect(79, 11, 5, 1); ctx.fillRect(78, 12, 7, 1);
+        }
+        if (page < total - 1) {
+          ctx.fillRect(78, 35, 7, 1); ctx.fillRect(79, 36, 5, 1); ctx.fillRect(80, 37, 3, 1);
+        }
+      }
+
+      function drawFooter(label = "") {
+        if (!label) return;
+        drawText(truncate(label, 12), 42, 41, { align: "center" });
+      }
+
+      // ------------------------------------------------------------------
+      // STORY DATA: scattered across authentic phone functions
+      // ------------------------------------------------------------------
+      const contacts = [
+        { name: "MANANG/NANAY", number: "0917 000 0192" },
+        { name: "MAHAL", number: "+971 50 000 0412" },
+        { name: "DANTE", number: "0917 000 0216" },
+        { name: "TITO MULONG", number: "0917 000 0004" },
+        { name: "FATHER ED", number: "078 000 1128" },
+        { name: "MANNY TRANS", number: "078 000 2000" },
+        { name: "MUNICIPYO", number: "078 000 1000" },
+        { name: "ST FRANCIS", number: "078 000 0702" },
+        { name: "FUNERARIA", number: "078 000 1418" }
+      ];
+
+      const inbox = [
+        { from: "DANTE", date: "16-02", time: "07:04", unread: true, text: "TITO ATO! Adda nabangga sa tapat ng Saint Francis, sa likod ng Manny Trans. Ikaw ba yun? Pls txt o tawag ka kahit isang beses lang. Akala ko si Boying kaya tumakbo ako pauwi, pero pagdating ni Nanay sa kalsada sumigaw siya ng pangalan mo. Tito, sumagot ka. Umiiyak siya at d namin mapigilan." },
+        { from: "MANANG/NANAY", date: "16-02", time: "07:03", unread: true, text: "ATO! Sadino ka? Sumagot ka man! May aksidente sa kalsada at sinasabi nilang ikaw. Ato, ading ko, sagutin mo ako. Kahit sabihin mong galit ka, kahit murahin mo ako, basta sumagot ka. Nasa may bakanteng lote ako. Ay Apo Dios, huwag naman sana ikaw ito." },
+        { from: "MAHAL", date: "16-02", time: "00:15", unread: true, text: "May iniwan ako sa voice mail. Mahaba at magulo kasi nanginginig ako. Pakinggan mo pag mag-isa ka at wag mo muna iparinig sa mga ubing. Please, Ato, huwag kang gagawa ng gulo at huwag kang pupunta rito. Pakawanen nak, Mahal. Tatawag ulit ako pag nakalabas siya ng kuwarto." },
+        { from: "MAHAL", date: "15-02", time: "23:08", unread: false, text: "D ko laging hawak phone. Kinukuha nila pagkatapos ko maglinis at binabalik lang pag may ipapatawag sa Pilipinas. Wag ka muna tumawag, please Ato, baka marinig. Hindi ako galit at hindi kita iniiwasan. Pag ligtas na ako ang tatawag. Alagaan mo mga ubing. Agannad ka, Mahal." },
+        { from: "MAHAL", date: "15-02", time: "20:42", unread: false, text: "Ato, nabasa ko msgs mo pero d ako makasagot nang mahaba. Nasa sala pa sila at bukas pinto ng kuwarto ko. Wag ka mag-alala sa padala; wala pa talaga. Kumusta si Princess? Sabihin mo matulog na siya sa banig at wag hintayin tawag ko. Tatawag ako kapag kaya." },
+        { from: "MANANG/NANAY", date: "15-02", time: "18:17", unread: false, text: "Ato, umay ka ditoy. Kanina ka pa nakaupo sa ugat ng kamatsile at nakatingin sa bukid. Gabi na, ading; wala ka pang kain mula tanghali sabi ni Mulong. Mangan ka muna dito, may dinengdeng at natirang isda. Haan ka agmaymaysa dita. Hindi kita pipilitin magsalita, basta pumasok ka." },
+        { from: "TITO MULONG", date: "15-02", time: "16:43", unread: false, text: "Kabsat, inton bigat tayo mag-usap sa nuang, utang at pambayad sa school. Dika pupunta Ilocos mag-isa. Sasama ako kahit maglakad tayo hanggang bayan. Yung paltik mo iwan mo sa bahay; kalawangin na yun at lalo ka lang mapapahamak. Wen? Txt mo ko kung saan tayo magkita." },
+        { from: "MAHAL", date: "14-02", time: "23:59", unread: false, text: "Para sa mga ubing ito kaya tinitiis ko. Kailangan ko tapusin kontrata kahit narigat. Mahina signal at bawal phone dito; minsan dalawang minuto lang binibigay. Kumakain naman ako pero kaunti. Miss ko amoy ng palay at ingay nila sa umaga. Halikan mo si Princess para sakin. Ay-ayaten kayo amin." },
+        { from: "PRINCESS/KAY MANANG", date: "14-02", time: "19:14", unread: false, text: "Tatang, si Princess po. Ako nagdidikta kay Manang. Umuwi ka agad galing bukid kasi may drawing ako natin lima at ni Nanang. Ikaw pinakamalaki sa drawing kasi sabi ni Kuya ikaw bantay namin. Wag mo kalimutan pulang laso ko. Good night po." },
+        { from: "TITO MULONG", date: "14-02", time: "08:30", unread: false, text: "Kabsat, napuntahan ko dulo ng bukid. Wala na sariwang bakas ng nuang dahil umulan kagabi. Tinanong ko rin tanod; walang dumaan sa checkpoint na may hila. Baka dinala sa pilapil. Mamayang hapon hanapin natin ulit, pero wag ka muna bumili kung anu-ano sa Ilocos." },
+        { from: "MAHAL", date: "13-02", time: "22:18", unread: false, text: "Kumusta tatlong lalaki? Marunong na ba magsaing nang hindi tutong? Pabantayan mo bunso pag nagpapastol sila. Dito tahimik pag gabi kaya lalo ko naririnig ingay nila sa isip ko. Sabihin mo kay Dante salamat sa malinaw na sulat na ipinadala ninyo." },
+        { from: "MANANG/NANAY", date: "13-02", time: "12:30", unread: false, text: "Ato, 12 Abril birthday ni Princess, lima na siya. Saan mo lipaten yung pulang laso at maliit na cake na ipinangako mo. Kanayon niyang sinasabi na paggising niya dapat ikaw una niyang makita. Kung kapos kayo, ako muna bibili. Wag ka mahiya, ading. Bayaran mo na lang pag maganda ani." },
+        { from: "MAHAL", date: "12-02", time: "23:46", unread: false, text: "Nakarating nko Abu Dhabi. Naimbag met biyahe kahit nahilo ako sa eroplano at sumakit tenga ko. Malaki bahay dito pero tahimik at nakakatakot pag gabi. Mahina lang signal sa kuwarto ng katulong. Saan ka agdanag; magpapahinga ako pagkatapos magligpit. Agannad ka, Mahal. Kumusta mga ubing?" },
+        { from: "MANANG/NANAY", date: "11-02", time: "17:05", unread: false, text: "Ato, binasa sa akin ni Dante yung sulat mo bago isinara. Maayos at malinaw. Nilagyan daw niya P.S. para malaman ng hipag mo na siya ang sumulat. Huwag mong istorbohin nang matagal dahil may periodical exam bukas. May natirang linen paper dito kung kailangan mo ulit." },
+        { from: "DANTE", date: "11-02", time: "16:20", unread: false, text: "Tito, natapos ko na po yung sulat. Inulit ko lang isang linya kasi may bura sa pangalan ni Princess. Nasa ibabaw ng radio cassette yung envelope. Pakibasa muna bago ipadala. Magre-review na po ako para exam bukas." },
+        { from: "TITO MULONG", date: "09-02", time: "16:04", unread: false, text: "Ato, kabsat, tayo ang maghanap sa ninakaw na nuang. Nagtanong na ko kina Manong Pilo; may bakas daw papunta sa ilog pero nawawala sa batuhan. Wag padalos-dalos at wag kang magdala ng itak kung galit ka. Apat ang ubing mo. Umay ka muna dito, magkape tayo at magplano." },
+        { from: "UNKNOWN", date: "09-02", time: "16:03", unread: false, text: "Manong, may nakakita raw sa kalabaw mo sa lumang daan pa-Ilocos bago magbukang-liwayway. Lalaking naka-sumbrero raw ang may hila. D ko sure ha; baka tsismis lang ng mga nag-iinuman. Wag mo sabihin galing sakin at ayoko madamay. Magtanong ka muna sa checkpoint." },
+        { from: "ST FRANCIS", date: "08-02", time: "09:10", unread: false, text: "SFA NOTICE: Remaining school balance for two pupils is due before month-end. Please visit the office if the family needs an extension or installment arrangement. The children may continue attending class while the request is reviewed. Agyaman kami. —School Treasurer" },
+        { from: "MANANG/NANAY", date: "07-02", time: "18:20", unread: false, text: "Ading, magsabi ka lang kung kapos. Adda pay bassit a bagas dito at may bagoong pa sa banga. Kunin mo bukas bago ka pumunta bukid. Huwag mong gutumin sarili mo at mga ubing dahil nahihiya kang humingi. Kabsat kita; hindi utang ang tulong sa pamilya. Sabihin mo rin kay Princess na dumalaw." }
+      ];
+
+
+      // Ending bridge: the new message enters the actual Inbox archive only
+      // after the cassette sequence requests it. It is removed on replay.
+      const ENDING_INBOX_TEXT = "Nadito na ako";
+      function injectEndingInboxMessage() {
+        if (inbox.some(message => message.text === ENDING_INBOX_TEXT)) return;
+        inbox.unshift({ from: "", date: "16-02", time: "07:12", unread: true, text: ENDING_INBOX_TEXT });
+        if (powered) render();
+      }
+      function removeEndingInboxMessage() {
+        for (let i = inbox.length - 1; i >= 0; i--) {
+          if (inbox[i].text === ENDING_INBOX_TEXT) inbox.splice(i, 1);
+        }
+        if (powered) render();
+      }
+      document.addEventListener("ls:injectInboxMessage", injectEndingInboxMessage);
+      document.addEventListener("ls:removeEndingInboxMessage", removeEndingInboxMessage);
+      document.addEventListener("ls:openEndingInbox", () => {
+        if (!powered) powerOn();
+        openMessageFolder("INBOX", inbox, "from");
+      });
+
+      const outbox = [ 
+        { to: "MAHAL", date: "16-02", time: "00:21", status: "SAVED", text: "Narinig ko lahat. Apay, Mahal? Sino gumawa sayo? Sabihin mo pangalan at address. Tatawag ako sa agency o pupunta ako dyan kahit ibenta ko natitirang nuang. Wag ka matakot. D mo kasalanan yun. Bakit sinabi mong para sa pangarap natin? Ayoko ng perang galing sa ganyang hirap. Mahal? Sagutin mo. Gising ako." },
+        { to: "MANANG/NANAY", date: "15-02", time: "18:39", status: "SAVED", text: "Manang... nabannogakon. Pagod na ko sa bukid, utang at paghihintay ng tawag. May gusto akong sabihin pero d ko alam pano sisimulan. Baka magalit ka o sabihin mong magpakatatag ako para sa ubing. Haan ka muna magtanong. Pwede bang maupo lang ako dyan mamaya at wag tayong magsalita?" },
+        { to: "MAHAL", date: "15-02", time: "23:10", status: "SENT", text: "Ibaga mo ti pudno. Sabihin mo sakin ang totoo kahit masakit. D ako magagalit sayo. Naririnig ko sa boses mo na may tinatago ka at d normal yang bawal palagi ang phone. Naghihintay ako sa tabi ng radyo. Txt ka kahit isang salita lang: ligtas o hindi." },
+        { to: "MAHAL", date: "15-02", time: "17:31", status: "SENT", text: "Mahal? Apay d ka sumasagot mula kagabi? Nabasa mo ba msgs ko? Ania ti napasamak dita? Tinawagan ko number ng agency pero walang sumagot. Sabi ni Manang baka pagod ka lang, pero iba kutob ko. Kung may problema, sabihin mo. D mo kailangang sarilinin dahil malayo ka." },
+        { to: "MAHAL", date: "14-02", time: "20:22", status: "SENT", text: "Nagawa ni Princess drawing natin. Lima raw tayo kahit apat ang ubing dahil ikaw nasa gitna. Tinupi ko at inilagay sa aparador para di mabasa. Mamaya matutulog siya dito. Sana nakapagpahinga ka kahit Valentines. Dito wala handa, pero nagkape kami kina Manang." },
+        { to: "MAHAL", date: "14-02", time: "06:04", status: "SENT", text: "Katabi ko si Princess kagabi. Sinipa ako sa tulog tapos kinuha buong kumot :) Ikaw na ikaw pati pagsimangot pag ginising. Yung 3 lalaki marunong na magsaing pero tutong na naman kanina. Dito muna si Princess, ha? Sa kanya nawawala lungkot ko. Ay-ayaten ka, Mahal. Happy Valentines." },
+        { to: "MAHAL", date: "13-02", time: "05:18", status: "SENT", text: "Nu dmo kaya dyan, umuwi ka. Narigat man dito, basta magkakasama tayo. Wag muna isipin padala; may bigas pa kina Manang at tuturuan ko ulit mag-araro yung batang nuang. D ko kailangan malaking bahay. Kayo lang ng mga ubing sapat na. Agannad ka dita." },
+        { to: "MAHAL", date: "12-02", time: "20:11", status: "SENT", text: "Naimbag a rabii, Mahal. Nakarating ka ba nang maayos? Nahilo ka sa bus o eroplano? Kumusta amo at tutulugan mo? Txt ka agad pag pwede para d ako maghintay buong gabi. Nandito mga ubing at tanong nang tanong kung anong oras ka tatawag. Dito lang ako sa bahay." },
+        { to: "MANANG/NANAY", date: "12-02", time: "15:30", status: "SENT", text: "Manang, pahiram ulit radio cassette mamayang gabi. Baka tumawag si Mahal at mahina tunog ng maliit naming radyo. Ibabalik ko bukas bago ka magsaing. Sabihin mo kay Dante salamat sa sulat; malinaw at hindi nakakahiya ipadala." },
+        { to: "DANTE", date: "11-02", time: "15:44", status: "SENT", text: "Dante, may oras ka pagkatapos review? Gawa tayo maikling sulat para sa tiya mo. Ako magdidikta. Dalhin notebook pero may linen paper ako. Dali lang, tatlong pangungusap at P.S. para malaman niyang ikaw nagsulat." },
+        { to: "MANANG/NANAY", date: "09-02", time: "16:02", status: "SENT", text: "Manang. Natakaw diay maysa a nuang na nakatali sa dulo bukid. Putol lubid at may bakas papunta batuhan. Yung babaeng nuang naibenta na para sa placement ni Mahal; ito na lang katuwang ko sa araro. Makapapatay ako pag nalaman ko sino kumuha. Pupunta ko Ilocos." },
+        { to: "TITO MULONG", date: "09-02", time: "16:06", status: "SENT", text: "Mulong, sumama ka Ilocos. May nagsabi nakita yung nuang sa lumang daan. Alis tayo bago sumikat araw para maabutan checkpoint. Wag mo muna sabihin kay Manang kung dala ko itak; pipigilan lang niya. Magdala ka tubig at tanungin mo si Manong Pilo sa bakas." },
+        { to: "SELF", date: "13-02", time: "13:02", status: "SAVED", text: "VM PIN = bday Princess. MM muna bago DD. Haan mo lipaten. Sinulat ko rin sa likod ng lumang resibo sa tabi ng radyo." },
+        { to: "SELF", date: "14-02", time: "12:01", status: "SAVED", text: "BIGAS 280 / SCHOOL 420 / ABONO 700 / ASIN+BAGOONG 84 / PAMASAHE 90 / NATIRA 116. Awanen. Ani sa susunod na buwan pa. Wag muna mangutang kina Manang; ginamit nila pera sa abono ni Tatang. Hanap dagdag na sakahan kay Kapitan." },
+        { to: "MAHAL", date: "16-02", time: "05:51", status: "SAVED", text: "D pa ko natutulog. Awan tulog. Paulit-ulit ko pinakinggan sinabi mo at d ko alam ano gagawin. May bagay na d naaayos ng pera o pagtatapos ng kontrata. Sana adda ka ditoy para makita kong ligtas ka. Sisikat na araw. Kailangan kong lumabas bago magising mga ubing." }
+      ];
+
+      const infoMessages = [
+        { from: "BRGY ALERT", date: "16-02", time: "07:02", text: "BARANGAY ALERT: Adda nabangga sa national road sa tapat ng Saint Francis Academy, malapit sa bakanteng lote. Manny Trans bus ang sangkot. Nasa lugar na ang barangay tanod at pulis. Huwag muna dumaan o magtipon sa kalsada. Parents, sunduin ang mga bata sa silangang gate." },
+        { from: "FORWARDED", date: "28-03", time: "16:20", text: "FWD: Kusang tumalon daw yung lalaking nabangga. Maaga pa raw nakaupo sa waiting shed sabi ng nagtitinda pandesal. May mga estudyante raw nakakita. Kaya pala nasa maling side ng kalsada. Paki-fwd para malaman ng lahat. NOTE: kwento lang ito at di pa confirmed kung sino original source." },
+        { from: "BRGY ADMIN", date: "28-03", time: "17:02", text: "PAKAAMMO KADAGITI AMIN: Saan tayo agwaras ti saan a sigurado. Huwag magpakalat ng di beripikadong balita tungkol sa nasawi o magpadala ng mensahe sa mga anak. Ang imbestigasyon ay nasa pulis at hukuman. Irespeto ang pamilya habang nagluluksa. —Barangay Office" },
+        { from: "MUNICIPYO", date: "02-03", time: "09:00", text: "OFFICIAL NOTICE: Hearing regarding complaint against Manny Trans is scheduled Monday, 9:00 AM, Municipal Hall. Complainant must bring police report, death certificate, fare or route information, and names of available witnesses. Failure to appear may delay processing. Please coordinate with the clerk before Friday." }
+      ];
+
+      const callLogs = {
+        missed: [
+          { name: "MANANG/NANAY", date: "16-02", time: "07:04", number: "0917 000 0192" },
+          { name: "DANTE", date: "16-02", time: "07:03", number: "0917 000 0216" },
+          { name: "MAHAL", date: "16-02", time: "00:09", number: "+971 50 000 0412" },
+          { name: "MAHAL", date: "15-02", time: "23:54", number: "+971 50 000 0412" },
+          { name: "UNKNOWN", date: "15-02", time: "22:51", number: "+971 50 000 0000" }
+        ],
+        received: [
+          { name: "MAHAL", date: "15-02", time: "22:58", duration: "00:46", number: "+971 50 000 0412" },
+          { name: "MANANG/NANAY", date: "15-02", time: "18:01", duration: "00:12", number: "0917 000 0192" },
+          { name: "TITO MULONG", date: "09-02", time: "16:05", duration: "01:33", number: "0917 000 0004" }
+        ],
+        dialled: [
+          { name: "MAHAL", date: "16-02", time: "00:18", duration: "00:00", number: "+971 50 000 0412" },
+          { name: "MAHAL", date: "16-02", time: "00:17", duration: "00:00", number: "+971 50 000 0412" },
+          { name: "MAHAL", date: "15-02", time: "23:12", duration: "00:00", number: "+971 50 000 0412" },
+          { name: "MANANG/NANAY", date: "15-02", time: "18:39", duration: "00:00", number: "0917 000 0192" },
+          { name: "TITO MULONG", date: "09-02", time: "16:06", duration: "00:28", number: "0917 000 0004" }
+        ]
+      };
+
+      const voiceMessages = [
+        {
+          name: "MAHAL",
+          date: "16-02",
+          time: "00:14",
+          heard: false,
+          transcript: "Patawarin mo ako, Mahal. 'Di ko ginusto. Papatayin ako kapag lumaban ako. Isipin mo na lang na... na makakamtan na rin natin ang hinahangad mong magandang kinabukasan para sa mga anak natin... Matatapos din ang kontrata ko..."
+        }
+      ];
+
+      // ------------------------------------------------------------------
+      // PHONE STATE
+      // ------------------------------------------------------------------
+      const mainMenu = [
+        { name: "PHONE BOOK", icon: "book", open: openPhonebook },
+        { name: "MESSAGES", icon: "message", open: openMessages },
+        { name: "CALL REGISTER", icon: "calls", open: openCallRegister },
+        { name: "SETTINGS", icon: "settings", open: openSettings },
+        { name: "CALL DIVERT", icon: "divert", open: openCallDivert },
+        { name: "GAMES", icon: "game", open: openGames },
+        { name: "CALCULATOR", icon: "calculator", open: openCalculator },
+        { name: "CLOCK", icon: "clock", open: openClock },
+        { name: "TONES", icon: "tone", open: openTones }
+      ];
+
+      let powered = false;
+      let bootTimer = null;
+      let history = [];
+      let state = { view: "off" };
+      let keypadTones = true;
+      let lcdContrast = 0;
+      let audioContext = null;
+      let composeTimer = null;
+      let lastTapKey = null;
+      let lastTapAt = 0;
+      let snakeTimer = null;
+      let backlightOn = false;
+      let backlightTimer = null;
+      let readerOpen = false;
+      let menuOpenedAt = 0;
+      let ambientNodes = null;
+      let cassetteOpen = false;
+      let cassetteTransitioning = false;
+      let cassettePlaying = false;
+      let cassetteCodeUnlocked = false;
+      let cassetteRotationX = -10;
+      let cassetteRotationY = 18;
+      let cassetteDragging = false;
+      let cassettePointerX = 0;
+      let cassettePointerY = 0;
+      let cassetteStartX = 0;
+      let cassetteStartY = 0;
+      let cassetteIndex = 0;
+      let cassetteTimer = null;
+      let tapeAudioNodes = null;
+      let randomLightTimer = null;
+      let lightningTimer = null;
+
+      function cloneState(source) {
+        return { ...source, lines: source.lines ? [...source.lines] : undefined, items: source.items ? [...source.items] : undefined };
+      }
+
+      function setState(next, push = true) {
+        stopSnake();
+        closeMessageReader(false);
+        if (push && state.view !== "off" && state.view !== "boot") history.push(cloneState(state));
+        state = { index: 0, page: 0, ...next };
+        render();
+      }
+
+      function goBack() {
+        if (state.view === "compose" && state.text) {
+          state.text = state.text.slice(0, -1);
+          lastTapKey = null;
+          render();
+          return;
+        }
+        stopSnake();
+        if (history.length) state = history.pop();
+        else state = { view: "standby" };
+        render();
+      }
+
+      function anyUnread() {
+        return inbox.some(message => message.unread) || voiceMessages.some(message => !message.heard);
+      }
+
+      function wakeBacklight() {
+        if (!powered) return;
+        backlightOn = true;
+        phoneElement.classList.add("is-lit");
+        lcdFrame.classList.add("is-lit");
+        window.clearTimeout(backlightTimer);
+        backlightTimer = window.setTimeout(() => {
+          backlightOn = false;
+          phoneElement.classList.remove("is-lit");
+          lcdFrame.classList.remove("is-lit");
+          if (powered) render();
+        }, 4200);
+      }
+
+      function updateFullscreenControl() {
+        const visible = powered && state.view === "detail" && Boolean(state.canFullscreen);
+        fullscreenMessageKey.classList.toggle("is-visible", visible);
+        fullscreenMessageKey.setAttribute("aria-hidden", visible ? "false" : "true");
+        fullscreenMessageKey.tabIndex = visible ? 0 : -1;
+        if (!visible && readerOpen) closeMessageReader(false);
+      }
+
+      function openMessageReader() {
+        if (!(state.view === "detail" && state.canFullscreen)) return;
+        readerTitle.textContent = state.fullTitle || state.title || "Message";
+        readerMeta.textContent = state.fullMeta || "Recovered SMS";
+        readerBody.textContent = state.fullText || state.lines.join(" ");
+        messageReader.classList.add("is-open");
+        if ((state.fullText || state.lines.join(" ")).includes("Nadito na ako")) document.dispatchEvent(new CustomEvent("ls:naditoMessageOpened"));
+        messageReader.setAttribute("aria-hidden", "false");
+        readerOpen = true;
+        readerClose.focus();
+      }
+
+      function closeMessageReader(returnFocus = true) {
+        if (!readerOpen && !messageReader.classList.contains("is-open")) return;
+        messageReader.classList.remove("is-open");
+        messageReader.setAttribute("aria-hidden", "true");
+        readerOpen = false;
+        if (returnFocus && fullscreenMessageKey.classList.contains("is-visible")) fullscreenMessageKey.focus();
+      }
+
+      function ensureAudioContext() {
+        try {
+          audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+          if (audioContext.state === "suspended") audioContext.resume();
+          return audioContext;
+        } catch (_) { return null; }
+      }
+
+      function playTone(frequency, duration = .05, volume = .022, type = "square", delay = 0) {
+        const context = ensureAudioContext();
+        if (!context) return;
+        const start = context.currentTime + delay;
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        oscillator.type = type;
+        oscillator.frequency.setValueAtTime(frequency, start);
+        gain.gain.setValueAtTime(.0001, start);
+        gain.gain.linearRampToValueAtTime(volume, start + .006);
+        gain.gain.exponentialRampToValueAtTime(.0001, start + duration);
+        oscillator.connect(gain).connect(context.destination);
+        oscillator.start(start);
+        oscillator.stop(start + duration + .02);
+      }
+
+      function playDualTone(first, second, duration = .07, volume = .012) {
+        playTone(first, duration, volume, "sine");
+        playTone(second, duration, volume, "sine");
+      }
+
+      function beep(frequency = 720, duration = .035) {
+        if (!keypadTones || !powered) return;
+        playTone(frequency, duration, .022, "square");
+      }
+
+      const DTMF = {
+        "1":[697,1209], "2":[697,1336], "3":[697,1477],
+        "4":[770,1209], "5":[770,1336], "6":[770,1477],
+        "7":[852,1209], "8":[852,1336], "9":[852,1477],
+        "star":[941,1209], "0":[941,1336], "hash":[941,1477]
+      };
+
+      function playPhysicalKeyTone(key) {
+        if (!keypadTones || !powered) return;
+        if (DTMF[key]) playDualTone(DTMF[key][0], DTMF[key][1]);
+        else if (key === "navi") playTone(880, .055, .022);
+        else if (key === "clear") playTone(470, .05, .021);
+        else if (key === "up") playTone(660, .035, .018);
+        else if (key === "down") playTone(590, .035, .018);
+      }
+
+      function playPowerTone(on) {
+        const notes = on ? [523,659,784] : [784,659,392];
+        notes.forEach((note, index) => playTone(note, .11, .018, "square", index * .1));
+      }
+
+      function playErrorTone() {
+        [330,247,185].forEach((note,index) => playTone(note,.1,.024,"square",index*.085));
+      }
+
+      function playMessageTone() {
+        playTone(1046,.08,.02,"square");
+        playTone(1318,.09,.018,"square",.09);
+      }
+
+      function playRingback() {
+        playTone(440,.7,.012,"sine");
+        playTone(480,.7,.009,"sine");
+      }
+
+      function createNoiseBuffer(context) {
+        const buffer = context.createBuffer(1, context.sampleRate * 3, context.sampleRate);
+        const data = buffer.getChannelData(0);
+        let last = 0;
+        for (let i = 0; i < data.length; i++) {
+          const white = Math.random() * 2 - 1;
+          last = last * .985 + white * .015;
+          data[i] = last * 2.2;
+        }
+        return buffer;
+      }
+
+      function playDistantThunder() {
+        if (!ambientNodes || !audioContext) return;
+        const duration = 2.8;
+        const buffer = audioContext.createBuffer(1, Math.floor(audioContext.sampleRate * duration), audioContext.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < data.length; i++) {
+          const t = i / data.length;
+          const rumble = (Math.random() * 2 - 1) * Math.pow(1 - t, 2.2);
+          data[i] = rumble * (.7 + .3 * Math.sin(i / 210));
+        }
+        const source = audioContext.createBufferSource();
+        const filter = audioContext.createBiquadFilter();
+        const gain = audioContext.createGain();
+        source.buffer = buffer;
+        filter.type = "lowpass";
+        filter.frequency.value = 210;
+        gain.gain.setValueAtTime(.0001, audioContext.currentTime);
+        gain.gain.linearRampToValueAtTime(.075, audioContext.currentTime + .16);
+        gain.gain.exponentialRampToValueAtTime(.0001, audioContext.currentTime + duration);
+        source.connect(filter).connect(gain).connect(ambientNodes.master);
+        source.start();
+      }
+
+      function scheduleThunder(delay = 10000) {
+        if (!ambientNodes) return;
+        window.clearTimeout(ambientNodes.thunderTimer);
+        ambientNodes.thunderTimer = window.setTimeout(() => {
+          playDistantThunder();
+          scheduleThunder(15000 + Math.random() * 6000);
+        }, delay);
+      }
+
+      function startAmbience() {
+        if (window.LS_NATIVE_AMBIENCE_DISABLED) return;
+        if (ambientNodes) return;
+        const context = ensureAudioContext();
+        if (!context) return;
+        const master = context.createGain();
+        master.gain.value = .42;
+        master.connect(context.destination);
+
+        const hum = context.createOscillator();
+        hum.type = "sine";
+        hum.frequency.value = 59.8;
+        const humGain = context.createGain();
+        humGain.gain.value = .012;
+        hum.connect(humGain).connect(master);
+
+        const noise = context.createBufferSource();
+        noise.buffer = createNoiseBuffer(context);
+        noise.loop = true;
+        const airFilter = context.createBiquadFilter();
+        airFilter.type = "lowpass";
+        airFilter.frequency.value = 1150;
+        const airGain = context.createGain();
+        noise.connect(airFilter).connect(airGain).connect(master);
+
+        const rainFilter = context.createBiquadFilter();
+        rainFilter.type = "highpass";
+        rainFilter.frequency.value = 1350;
+        const rainGain = context.createGain();
+        noise.connect(rainFilter).connect(rainGain).connect(master);
+
+        const cricket = context.createOscillator();
+        cricket.type = "sine";
+        cricket.frequency.value = 3550;
+        const cricketGain = context.createGain();
+        const cricketLfo = context.createOscillator();
+        const cricketDepth = context.createGain();
+        cricketLfo.frequency.value = 6.7;
+        cricketDepth.gain.value = .0018;
+        cricketLfo.connect(cricketDepth).connect(cricketGain.gain);
+        cricket.connect(cricketGain).connect(master);
+
+        hum.start(); noise.start(); cricket.start(); cricketLfo.start();
+        ambientNodes = { master, hum, noise, cricket, cricketLfo, humGain, airGain, rainGain, cricketGain, thunderTimer:null };
+        updateAmbientSound();
+      }
+
+      function stopAmbience() {
+        if (!ambientNodes) return;
+        window.clearTimeout(ambientNodes.thunderTimer);
+        for (const name of ["hum","noise","cricket","cricketLfo"]) {
+          try { ambientNodes[name].stop(); } catch (_) {}
+        }
+        try { ambientNodes.master.disconnect(); } catch (_) {}
+        ambientNodes = null;
+      }
+
+      function updateAmbientSound() {
+        if (!ambientNodes || !audioContext) return;
+        const now = audioContext.currentTime;
+        const values = { air:.007, rain:.038, cricket:.0001, hum:.007 };
+        ambientNodes.airGain.gain.setTargetAtTime(values.air, now, .25);
+        ambientNodes.rainGain.gain.setTargetAtTime(values.rain, now, .25);
+        ambientNodes.cricketGain.gain.setTargetAtTime(values.cricket, now, .25);
+        ambientNodes.humGain.gain.setTargetAtTime(values.hum, now, .25);
+      }
+
+      function activateRainAmbience() {
+        ensureAudioContext();
+        if (!ambientNodes) startAmbience();
+        updateAmbientSound();
+      }
+
+      function applyRandomRoomLight() {
+        if (reducedMotion) {
+          sceneElement.style.setProperty("--room-light",".48");
+          sceneElement.style.setProperty("--beam-light",".34");
+          sceneElement.style.setProperty("--set-light",".28");
+          sceneElement.style.setProperty("--sheen-light",".22");
+          sceneElement.style.setProperty("--darkness",".6");
+          return;
+        }
+        const roll = Math.random();
+        let state;
+        if (roll < .2) {
+          state = { room:0,beam:0,set:.035,sheen:.02,dark:.91,speed:.08,next:180+Math.random()*620 };
+        } else if (roll < .56) {
+          state = { room:.12+Math.random()*.2,beam:.07+Math.random()*.14,set:.12+Math.random()*.12,sheen:.08+Math.random()*.1,dark:.72+Math.random()*.12,speed:.22+Math.random()*.55,next:900+Math.random()*2600 };
+        } else {
+          state = { room:.62+Math.random()*.32,beam:.4+Math.random()*.25,set:.34+Math.random()*.24,sheen:.28+Math.random()*.2,dark:.34+Math.random()*.2,speed:.35+Math.random()*.8,next:1400+Math.random()*4200 };
+        }
+        sceneElement.style.setProperty("--flicker-speed",`${state.speed.toFixed(2)}s`);
+        sceneElement.style.setProperty("--room-light",state.room.toFixed(2));
+        sceneElement.style.setProperty("--beam-light",state.beam.toFixed(2));
+        sceneElement.style.setProperty("--set-light",state.set.toFixed(2));
+        sceneElement.style.setProperty("--sheen-light",state.sheen.toFixed(2));
+        sceneElement.style.setProperty("--darkness",state.dark.toFixed(2));
+        randomLightTimer = window.setTimeout(applyRandomRoomLight,state.next);
+      }
+
+      function scheduleRandomLightning(delay = 7000 + Math.random()*11000) {
+        if (reducedMotion) return;
+        if (window.LS_NATIVE_AMBIENCE_DISABLED) return;
+        window.clearTimeout(lightningTimer);
+        lightningTimer = window.setTimeout(() => {
+          stormFlashElement.classList.remove("is-flashing");
+          void stormFlashElement.offsetWidth;
+          stormFlashElement.classList.add("is-flashing");
+          window.setTimeout(playDistantThunder,280+Math.random()*520);
+          scheduleRandomLightning(9000+Math.random()*19000);
+        },delay);
+      }
+
+      const cassetteCues = [
+        "Patawarin mo ako, Mahal.",
+        "'Di ko ginusto.",
+        "Papatayin ako kapag lumaban ako.",
+        "Isipin mo na lang na...",
+        "na makakamtan na rin natin ang hinahangad mong magandang kinabukasan para sa mga anak natin...",
+        "Matatapos din ang kontrata ko..."
+      ];
+
+      function normalizedTapeAngle() {
+        return ((cassetteRotationY % 360) + 360) % 360;
+      }
+
+      function updateCassetteRotation() {
+        cassetteRotationX = Math.max(-34, Math.min(34, cassetteRotationX));
+        cassette3d.style.transform = `rotateX(${cassetteRotationX}deg) rotateY(${cassetteRotationY}deg)`;
+        const radians = cassetteRotationY * Math.PI / 180;
+        cassette3d.style.setProperty("--shine-shift",`${(Math.sin(radians)*115).toFixed(1)}%`);
+        cassette3d.style.setProperty("--face-light",(.72+Math.abs(Math.cos(radians))*.3).toFixed(2));
+        const angle = normalizedTapeAngle();
+        const frontFacing = angle < 90 || angle > 270;
+        cassette3d.classList.toggle("front-facing", frontFacing);
+        cassette3d.classList.toggle("back-facing", !frontFacing);
+        cassettePlayer.classList.toggle("showing-back", !frontFacing);
+      }
+
+      function submitCassetteCode() {
+        const value = cassetteCodeInput.value.replace(/\D/g, "");
+        if (value === "0412") {
+          cassetteCodeUnlocked = true;
+          cassette3d.classList.add("is-unlocked");
+          cassettePlayer.classList.add("tape-unlocked");
+          cassetteCodeStatus.textContent = "CODE ACCEPTED · TAPE CONTROLS RELEASED";
+          cassetteCodeInput.blur();
+          playMessageTone();
+          document.dispatchEvent(new CustomEvent("ls:cassetteCodeAccepted", { detail: { code: value } }));
+        } else {
+          cassetteCodeUnlocked = false;
+          cassetteCodeStatus.textContent = "CODE REJECTED · INSPECT SIDE B";
+          const panel = document.getElementById("tapeCodeEntry");
+          panel.classList.remove("is-error");
+          void panel.offsetWidth;
+          panel.classList.add("is-error");
+          playErrorTone();
+          cassetteCodeInput.select();
+        }
+      }
+
+      function createWhiteNoiseBuffer(context, seconds = 3) {
+        const buffer = context.createBuffer(1, Math.floor(context.sampleRate * seconds), context.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i=0;i<data.length;i++) data[i] = Math.random()*2-1;
+        return buffer;
+      }
+
+      function startTapeMurmurs() {
+        if (tapeAudioNodes) return;
+        const context = ensureAudioContext();
+        if (!context) return;
+
+        const master = context.createGain();
+        master.gain.setValueAtTime(.0001,context.currentTime);
+        master.gain.exponentialRampToValueAtTime(.52,context.currentTime+.22);
+        master.connect(context.destination);
+
+        const noise = context.createBufferSource();
+        noise.buffer = createWhiteNoiseBuffer(context,4);
+        noise.loop = true;
+
+        const hissFilter = context.createBiquadFilter();
+        hissFilter.type = "highpass";
+        hissFilter.frequency.value = 2600;
+        const hissGain = context.createGain();
+        hissGain.gain.value = .019;
+        noise.connect(hissFilter).connect(hissGain).connect(master);
+
+        const murmurFilter = context.createBiquadFilter();
+        murmurFilter.type = "bandpass";
+        murmurFilter.frequency.value = 680;
+        murmurFilter.Q.value = .7;
+        const murmurGain = context.createGain();
+        murmurGain.gain.value = .048;
+        noise.connect(murmurFilter).connect(murmurGain).connect(master);
+
+        const voice = context.createOscillator();
+        voice.type = "sawtooth";
+        voice.frequency.value = 112;
+        const voiceFilter = context.createBiquadFilter();
+        voiceFilter.type = "lowpass";
+        voiceFilter.frequency.value = 920;
+        const voiceGain = context.createGain();
+        voiceGain.gain.value = .012;
+        voice.connect(voiceFilter).connect(voiceGain).connect(master);
+
+        const secondVoice = context.createOscillator();
+        secondVoice.type = "triangle";
+        secondVoice.frequency.value = 151;
+        const secondFilter = context.createBiquadFilter();
+        secondFilter.type = "bandpass";
+        secondFilter.frequency.value = 1080;
+        secondFilter.Q.value = 1.2;
+        const secondGain = context.createGain();
+        secondGain.gain.value = .007;
+        secondVoice.connect(secondFilter).connect(secondGain).connect(master);
+
+        const phraseLfo = context.createOscillator();
+        phraseLfo.type = "sine";
+        phraseLfo.frequency.value = .74;
+        const phraseDepth = context.createGain();
+        phraseDepth.gain.value = .031;
+        phraseLfo.connect(phraseDepth).connect(murmurGain.gain);
+
+        const flutter = context.createOscillator();
+        flutter.frequency.value = 4.6;
+        const flutterDepth = context.createGain();
+        flutterDepth.gain.value = 5.5;
+        flutter.connect(flutterDepth).connect(voice.detune);
+
+        noise.start(); voice.start(); secondVoice.start(); phraseLfo.start(); flutter.start();
+        tapeAudioNodes = { master,noise,voice,secondVoice,phraseLfo,flutter };
+        if (ambientNodes && audioContext) ambientNodes.master.gain.setTargetAtTime(.18,audioContext.currentTime,.25);
+      }
+
+      function stopTapeMurmurs() {
+        if (!tapeAudioNodes) return;
+        for (const name of ["noise","voice","secondVoice","phraseLfo","flutter"]) {
+          try { tapeAudioNodes[name].stop(); } catch (_) {}
+        }
+        try { tapeAudioNodes.master.disconnect(); } catch (_) {}
+        tapeAudioNodes = null;
+        if (ambientNodes && audioContext) ambientNodes.master.gain.setTargetAtTime(.42,audioContext.currentTime,.3);
+      }
+
+      function updateCassetteSubtitle() {
+        const subtitle = cassetteIndex < cassetteCues.length
+          ? cassetteCues[cassetteIndex]
+          : "[WAKAS NG NAKUHANG RECORDING]";
+        const time = `00:${String(Math.min(59,cassetteIndex*7)).padStart(2,"0")}`;
+        cassetteSubtitle.textContent = subtitle;
+        cassetteCounter.textContent = time;
+        cassetteSubtitleTime.textContent = time;
+      }
+
+      function stopCassettePlayback() {
+        window.clearInterval(cassetteTimer);
+        cassetteTimer = null;
+        cassettePlaying = false;
+        cassette3d.classList.remove("is-playing");
+        cassettePlayer.classList.remove("tape-playing");
+        stopTapeMurmurs();
+      }
+
+      function playCassetteSubtitles() {
+        if (!cassetteCodeUnlocked) return;
+        if (cassetteIndex >= cassetteCues.length) cassetteIndex = 0;
+        stopCassettePlayback();
+        cassettePlaying = true;
+        cassette3d.classList.add("is-playing");
+        cassettePlayer.classList.add("tape-playing");
+        globalSubtitles.classList.add("is-visible");
+        globalSubtitles.setAttribute("aria-hidden","false");
+        startTapeMurmurs();
+        document.dispatchEvent(new CustomEvent("ls:cassettePlayed"));
+        updateCassetteSubtitle();
+        cassetteTimer = window.setInterval(() => {
+          cassetteIndex++;
+          updateCassetteSubtitle();
+          if (cassetteIndex >= cassetteCues.length) stopCassettePlayback();
+        },3100);
+      }
+
+      function rewindCassette() {
+        stopCassettePlayback();
+        cassetteIndex = 0;
+        cassetteSubtitle.textContent = "[TAPE REWOUND]";
+        cassetteCounter.textContent = "00:00";
+        cassetteSubtitleTime.textContent = "00:00";
+        globalSubtitles.classList.add("is-visible");
+        globalSubtitles.setAttribute("aria-hidden","false");
+      }
+
+      function cassetteFlightTarget() {
+        const width = Math.min(570, window.innerWidth * .82);
+        const height = width * .625;
+        return {
+          left: (window.innerWidth - width) / 2,
+          top: Math.max(38, (window.innerHeight - height) / 2 - 18),
+          width,
+          height
+        };
+      }
+
+      function buildFlightCassette(rect) {
+        const flight = document.createElement("div");
+        flight.className = "cassette-flight";
+        flight.setAttribute("aria-hidden","true");
+        flight.innerHTML = `
+          <span class="flight-label">4 my one &amp; onli lab ATO</span>
+          <i class="flight-window"></i><i class="flight-tape"></i><i class="flight-shine"></i>
+          <i class="flight-screw s1"></i><i class="flight-screw s2"></i><i class="flight-screw s3"></i><i class="flight-screw s4"></i>`;
+        Object.assign(flight.style, {
+          left:`${rect.left}px`, top:`${rect.top}px`, width:`${rect.width}px`, height:`${rect.height}px`
+        });
+        document.body.appendChild(flight);
+        return flight;
+      }
+
+      function buildGroundShadow(rect) {
+        const shadow = document.createElement("div");
+        shadow.className = "cassette-ground-shadow";
+        Object.assign(shadow.style, {
+          left:`${rect.left - rect.width * .05}px`,
+          top:`${rect.top + rect.height * .7}px`,
+          width:`${rect.width * 1.1}px`,
+          height:`${rect.height * .42}px`
+        });
+        document.body.appendChild(shadow);
+        return shadow;
+      }
+
+      async function animationFinished(animation, fallbackDuration) {
+        if (!animation?.finished) {
+          await new Promise(resolve => window.setTimeout(resolve, fallbackDuration));
+          return;
+        }
+        try { await animation.finished; } catch (_) {}
+      }
+
+      async function liftCassetteFromDesk(rect) {
+        const target = cassetteFlightTarget();
+        const flight = buildFlightCassette(rect);
+        const shadow = buildGroundShadow(rect);
+        const dx = target.left - rect.left;
+        const dy = target.top - rect.top;
+        const scale = target.width / Math.max(1, rect.width);
+
+        const shadowAnimation = shadow.animate([
+          { opacity:.72, transform:"scale(1) translateY(0)", filter:"blur(7px)" },
+          { opacity:.38, offset:.22, transform:"scale(.76) translateY(12px)", filter:"blur(11px)" },
+          { opacity:0, transform:"scale(.22) translateY(34px)", filter:"blur(18px)" }
+        ], { duration:940, easing:"cubic-bezier(.2,.7,.2,1)", fill:"forwards" });
+
+        const flightAnimation = flight.animate([
+          { offset:0, transform:"perspective(1100px) translate3d(0,0,0) rotateZ(7deg) rotateX(0deg) rotateY(0deg) scale(1)", filter:"drop-shadow(0 16px 12px rgba(0,0,0,.52))" },
+          { offset:.16, transform:`perspective(1100px) translate3d(${dx*.1}px,${dy*.08-28}px,105px) rotateZ(2deg) rotateX(18deg) rotateY(-9deg) scale(${1+(scale-1)*.12})`, filter:"drop-shadow(0 35px 22px rgba(0,0,0,.58))" },
+          { offset:.38, transform:`perspective(1100px) translate3d(${dx*.34}px,${dy*.29-52}px,220px) rotateZ(-5deg) rotateX(9deg) rotateY(15deg) scale(${1+(scale-1)*.37})`, filter:"drop-shadow(0 48px 30px rgba(0,0,0,.54))" },
+          { offset:.64, transform:`perspective(1100px) translate3d(${dx*.7}px,${dy*.67-34}px,285px) rotateZ(2.5deg) rotateX(-8deg) rotateY(-6deg) scale(${1+(scale-1)*.76})`, filter:"drop-shadow(0 56px 38px rgba(0,0,0,.48))" },
+          { offset:.86, transform:`perspective(1100px) translate3d(${dx*1.01}px,${dy-8}px,245px) rotateZ(-1deg) rotateX(-7deg) rotateY(12deg) scale(${scale*1.035})`, filter:"drop-shadow(0 42px 28px rgba(0,0,0,.44))" },
+          { offset:1, transform:`perspective(1100px) translate3d(${dx}px,${dy}px,220px) rotateZ(0deg) rotateX(-10deg) rotateY(18deg) scale(${scale})`, filter:"drop-shadow(0 30px 24px rgba(0,0,0,.4))" }
+        ], { duration:1080, easing:"cubic-bezier(.16,.73,.18,1)", fill:"forwards" });
+
+        await animationFinished(flightAnimation,1080);
+        shadowAnimation.cancel();
+        shadow.remove();
+        return flight;
+      }
+
+      function spawnLandingDust(rect) {
+        const burst = document.createElement("div");
+        burst.className = "landing-dust-burst";
+        burst.style.left = `${rect.left + rect.width/2}px`;
+        burst.style.top = `${rect.top + rect.height*.83}px`;
+        for (let i=0;i<13;i++) {
+          const particle = document.createElement("i");
+          const angle = Math.PI + Math.random()*Math.PI;
+          const distance = 18 + Math.random()*58;
+          particle.style.setProperty("--s",`${1+Math.random()*3}px`);
+          particle.style.setProperty("--dx",`${Math.cos(angle)*distance}px`);
+          particle.style.setProperty("--dy",`${Math.sin(angle)*distance*.42-4}px`);
+          particle.style.setProperty("--d",`${Math.random()*.12}s`);
+          burst.appendChild(particle);
+        }
+        document.body.appendChild(burst);
+        window.setTimeout(()=>burst.remove(),1000);
+      }
+
+      function settleDeskCassette() {
+        const computed = getComputedStyle(cassetteObject).transform;
+        const base = computed === "none" ? "" : computed;
+        const animation = cassetteObject.animate([
+          { transform:`${base} translateY(-18px) scale(1.035)`, filter:"drop-shadow(0 25px 16px rgba(0,0,0,.58))" },
+          { offset:.34, transform:`${base} translateY(6px) scale(.985,1.018)` },
+          { offset:.56, transform:`${base} translateY(-4px) scale(1.01,.993)` },
+          { offset:.76, transform:`${base} translateY(2px) scale(.997,1.004)` },
+          { transform:base || "none", filter:"drop-shadow(0 0 0 transparent)" }
+        ], { duration:680, easing:"cubic-bezier(.2,.82,.22,1)" });
+        animationFinished(animation,680);
+      }
+
+      async function dropCassetteToDesk() {
+        const target = cassetteFlightTarget();
+        const destination = cassetteObject.getBoundingClientRect();
+        const flight = buildFlightCassette(target);
+        const shadow = buildGroundShadow(destination);
+        const dx = destination.left - target.left;
+        const dy = destination.top - target.top;
+        const scale = destination.width / Math.max(1,target.width);
+        shadow.style.opacity = "0";
+        const shadowAnimation = shadow.animate([
+          { opacity:0, transform:"scale(.18)", filter:"blur(18px)" },
+          { opacity:.22, offset:.58, transform:"scale(.58)", filter:"blur(12px)" },
+          { opacity:.7, offset:.88, transform:"scale(1.08)", filter:"blur(7px)" },
+          { opacity:.48, transform:"scale(1)", filter:"blur(8px)" }
+        ], { duration:1040, easing:"ease-out", fill:"forwards" });
+
+        const flightAnimation = flight.animate([
+          { offset:0, transform:"perspective(1100px) translate3d(0,0,220px) rotateZ(0deg) rotateX(0deg) rotateY(0deg) scale(1)", filter:"drop-shadow(0 34px 24px rgba(0,0,0,.42))" },
+          { offset:.18, transform:`perspective(1100px) translate3d(${dx*.12}px,${dy*.09-25}px,285px) rotateZ(3deg) rotateX(-11deg) rotateY(7deg) scale(${1+(scale-1)*.12})`, filter:"drop-shadow(0 48px 30px rgba(0,0,0,.5))" },
+          { offset:.48, transform:`perspective(1100px) translate3d(${dx*.5}px,${dy*.42-38}px,210px) rotateZ(-6deg) rotateX(12deg) rotateY(-14deg) scale(${1+(scale-1)*.48})`, filter:"drop-shadow(0 42px 27px rgba(0,0,0,.55))" },
+          { offset:.74, transform:`perspective(1100px) translate3d(${dx*.82}px,${dy*.73-18}px,92px) rotateZ(9deg) rotateX(18deg) rotateY(4deg) scale(${1+(scale-1)*.8})`, filter:"drop-shadow(0 25px 17px rgba(0,0,0,.58))" },
+          { offset:.9, transform:`perspective(1100px) translate3d(${dx}px,${dy+10}px,4px) rotateZ(7deg) rotateX(0deg) rotateY(0deg) scale(${scale*.985},${scale*1.02})`, filter:"drop-shadow(0 7px 6px rgba(0,0,0,.62))" },
+          { offset:1, transform:`perspective(1100px) translate3d(${dx}px,${dy}px,0) rotateZ(7deg) rotateX(0deg) rotateY(0deg) scale(${scale})`, filter:"drop-shadow(0 10px 8px rgba(0,0,0,.48))" }
+        ], { duration:1100, easing:"cubic-bezier(.25,.55,.18,1)", fill:"forwards" });
+
+        await animationFinished(flightAnimation,1100);
+        flight.remove();
+        shadowAnimation.cancel();
+        shadow.remove();
+        cassetteObject.classList.remove("is-picked-up");
+        spawnLandingDust(destination);
+        settleDeskCassette();
+      }
+
+      async function openCassettePlayer() {
+        if (cassetteTransitioning || cassetteOpen) return;
+        closeMessageReader(false);
+        stopCassettePlayback();
+        globalSubtitles.classList.remove("is-visible");
+        globalSubtitles.setAttribute("aria-hidden","true");
+        cassetteRotationX = -10;
+        cassetteRotationY = 18;
+        cassette3d.classList.toggle("is-unlocked",cassetteCodeUnlocked);
+        cassettePlayer.classList.toggle("tape-unlocked",cassetteCodeUnlocked);
+        cassettePlayer.classList.remove("tape-playing");
+        cassetteCodeStatus.textContent = cassetteCodeUnlocked
+          ? "CODE ACCEPTED · TAPE CONTROLS RELEASED"
+          : "Rotate the tape and inspect its reverse side.";
+        cassetteCodeInput.value = "";
+        updateCassetteRotation();
+
+        cassetteTransitioning = true;
+        cassetteOpen = true;
+        const sourceRect = cassetteObject.getBoundingClientRect();
+        document.body.classList.add("tape-modal-open");
+        cassetteObject.classList.add("is-picked-up");
+        cassettePlayer.classList.remove("is-open","is-closing");
+        cassettePlayer.classList.add("is-preparing");
+        cassettePlayer.setAttribute("aria-hidden","false");
+
+        if (reducedMotion) {
+          cassettePlayer.classList.remove("is-preparing");
+          cassettePlayer.classList.add("is-open");
+          cassetteTransitioning = false;
+          cassetteViewport.focus();
+          return;
+        }
+
+        const flight = await liftCassetteFromDesk(sourceRect);
+        cassettePlayer.classList.remove("is-preparing");
+        cassettePlayer.classList.add("is-open");
+        flight.getAnimations().forEach(animation => animation.cancel());
+        flight.remove();
+        cassetteTransitioning = false;
+        cassetteViewport.focus();
+      }
+
+      async function closeCassettePlayer(returnFocus = true) {
+        if (!cassetteOpen || cassetteTransitioning) return;
+        stopCassettePlayback();
+        globalSubtitles.classList.remove("is-visible");
+        globalSubtitles.setAttribute("aria-hidden","true");
+        cassetteTransitioning = true;
+        if (!reducedMotion) {
+          cassetteRotationX = 0;
+          cassetteRotationY = Math.round(cassetteRotationY / 360) * 360;
+          updateCassetteRotation();
+          await new Promise(resolve => window.setTimeout(resolve,360));
+        }
+        cassettePlayer.classList.remove("is-open","is-preparing");
+        cassettePlayer.classList.add("is-closing");
+        if (reducedMotion) {
+          cassetteObject.classList.remove("is-picked-up");
+        } else {
+          await dropCassetteToDesk();
+        }
+        cassettePlayer.classList.remove("is-closing");
+        cassettePlayer.setAttribute("aria-hidden","true");
+        document.body.classList.remove("tape-modal-open");
+        cassetteOpen = false;
+        cassetteTransitioning = false;
+        if (cassetteCodeUnlocked) document.dispatchEvent(new CustomEvent("ls:cassetteReturned"));
+        if (returnFocus) cassetteObject.focus();
+      }
+
+      function powerToggle() { 
+        if (powered) powerOff(); else powerOn();
+      }
+
+      function powerOn() {
+        powered = true;
+        sceneElement.classList.add("phone-powered");
+        history = [];
+        state = { view: "boot" };
+        wakeBacklight();
+        render();
+        playPowerTone(true);
+        document.dispatchEvent(new CustomEvent("ls:phonePowerOn"));
+        window.clearTimeout(bootTimer);
+        bootTimer = window.setTimeout(() => {
+          if (powered && state.view === "boot") {
+            state = { view: "standby" };
+            render();
+          }
+        }, 1050);
+      }
+
+      function powerOff() {
+        playPowerTone(false);
+        document.dispatchEvent(new CustomEvent("ls:phonePowerOff"));
+        powered = false;
+        sceneElement.classList.remove("phone-powered");
+        window.clearTimeout(bootTimer);
+        window.clearTimeout(backlightTimer);
+        backlightOn = false;
+        phoneElement.classList.remove("is-lit");
+        lcdFrame.classList.remove("is-lit");
+        closeMessageReader(false);
+        stopSnake();
+        history = [];
+        state = { view: "off" };
+        render();
+      }
+
+      function openList(title, items, selectLabel = "SELECT") {
+        setState({ view: "list", title, items, index: 0, selectLabel });
+      }
+
+      function openDetail(title, text, options = {}) {
+        const prefix = options.prefix || "";
+        const lines = wrapText(prefix + text, 14);
+        setState({
+          view: "detail",
+          title,
+          lines,
+          page: 0,
+          navLabel: options.navLabel || "",
+          onNav: options.onNav || null,
+          canFullscreen: Boolean(options.canFullscreen),
+          fullTitle: options.fullTitle || title,
+          fullMeta: options.fullMeta || "Recovered SMS",
+          fullText: options.fullText || (prefix + text)
+        });
+      }
+
+      function openPhonebook() {
+        openList("PHONE BOOK", contacts.map(contact => ({
+          label: contact.name,
+          action: () => openDetail(contact.name, contact.number, {
+            navLabel: "CALL",
+            onNav: () => startCall(contact.name, contact.number)
+          })
+        })), "SHOW");
+      }
+
+      function openMessages() {
+        openList("MESSAGES", [
+          { label: "INBOX", count: inbox.length, action: () => openMessageFolder("INBOX", inbox, "from") },
+          { label: "OUTBOX", count: outbox.length, action: () => openMessageFolder("OUTBOX", outbox, "to") },
+          { label: "WRITE MSG", action: () => setState({ view: "compose", text: "" }) },
+          { label: "VOICE MAIL", count: voiceMessages.length, action: openVoiceMailbox },
+          { label: "INFO SERVICE", count: infoMessages.length, action: openInfoService }
+        ]);
+      }
+
+      function openMessageFolder(title, messages, personKey) {
+        openList(title, messages.map((message, index) => ({
+          label: (message.unread ? "*" : "") + (message[personKey] || "UNKNOWN"),
+          count: message.date,
+          action: () => {
+            const wasUnread = Boolean(message.unread);
+            if ("unread" in message) message.unread = false;
+            if (wasUnread) playMessageTone();
+            const status = message.status ? " " + message.status : "";
+            const direction = personKey === "from" ? "FROM" : "TO";
+            const person = message[personKey] || "UNKNOWN";
+            openDetail(title + " " + String(index + 1), message.text, {
+              prefix: direction + " " + person + " " + message.date + " " + message.time + status + " ",
+              canFullscreen: true,
+              fullTitle: person,
+              fullMeta: direction + " · " + message.date + " · " + message.time + status,
+              fullText: message.text
+            });
+            if (message.text === ENDING_INBOX_TEXT) {
+              document.dispatchEvent(new CustomEvent("ls:naditoMessageOpened"));
+            }
+          }
+        })), "READ");
+      }
+
+      function openInfoService() {
+        openList("INFO SERVICE", infoMessages.map((message, index) => ({
+          label: message.from,
+          count: message.date,
+          action: () => openDetail("INFO " + String(index + 1), message.text, {
+            prefix: message.from + " " + message.date + " " + message.time + " ",
+            canFullscreen: true,
+            fullTitle: message.from,
+            fullMeta: "INFO SERVICE · " + message.date + " · " + message.time,
+            fullText: message.text
+          })
+        })), "READ");
+      }
+
+      function openVoiceMailbox() {
+        setState({ view: "voicePin", code: "", error: false });
+      }
+
+      function enterVoiceMailbox() {
+        if (state.code === "0412") {
+          openList("VOICE MAIL", voiceMessages.map((message, index) => ({
+            label: (message.heard ? "" : "*") + message.name,
+            count: message.date,
+            action: () => {
+              message.heard = true;
+              if (state.items?.[index]) state.items[index].label = message.name;
+              openDetail("VOICE " + String(index + 1), message.transcript, {
+                prefix: message.name + " " + message.date + " " + message.time + " ",
+                canFullscreen: true,
+                fullTitle: message.name,
+                fullMeta: "VOICE MAIL · " + message.date + " · " + message.time,
+                fullText: message.transcript
+              });
+            }
+          })), "LISTEN");
+        } else {
+          state.error = true;
+          state.code = "";
+          render();
+          playErrorTone();
+        }
+      }
+
+      function openCallRegister() {
+        openList("CALL REGISTER", [
+          { label: "MISSED CALLS", count: callLogs.missed.length, action: () => openCallList("MISSED", callLogs.missed) },
+          { label: "RECEIVED", count: callLogs.received.length, action: () => openCallList("RECEIVED", callLogs.received) },
+          { label: "DIALLED NOS.", count: callLogs.dialled.length, action: () => openCallList("DIALLED", callLogs.dialled) },
+          { label: "CALL DURATION", action: () => openDetail("CALL TIME", "LAST CALL 00:00 ALL CALLS 03:49") },
+          { label: "CALL COSTS", action: () => openDetail("CALL COSTS", "LAST CALL P0.00 ALL CALLS P17.50") }
+        ]);
+      }
+
+      function openCallList(title, logs) {
+        openList(title, logs.map((entry, index) => ({
+          label: entry.name,
+          count: entry.date,
+          action: () => openDetail(title + " " + String(index + 1), entry.number, {
+            prefix: entry.name + " " + entry.date + " " + entry.time + (entry.duration ? " DUR " + entry.duration : "") + " ",
+            navLabel: "CALL",
+            onNav: () => startCall(entry.name, entry.number)
+          })
+        })), "SHOW");
+      }
+
+      function startCall(name, number) {
+        setState({ view: "calling", name, number }, true);
+        playRingback();
+      }
+
+      function openSettings() {
+        openList("SETTINGS", [
+          { label: "PHONE SETTINGS", action: () => openList("PHONE SET.", [
+            { label: "KEYPAD TONES", count: keypadTones ? "ON" : "OFF", action: () => {
+              keypadTones = !keypadTones;
+              if (state.items?.[state.index]) state.items[state.index].count = keypadTones ? "ON" : "OFF";
+              render();
+            } },
+            { label: "LCD CONTRAST", count: String(lcdContrast + 5), action: () => {
+              lcdContrast = (lcdContrast + 1) % 3;
+              if (state.items?.[state.index]) state.items[state.index].count = String(lcdContrast + 5);
+              render();
+            } },
+            { label: "LANGUAGE", count: "ENGLISH", action: () => openDetail("LANGUAGE", "ENGLISH SELECTED") }
+          ]) },
+          { label: "SECURITY", action: () => openDetail("SECURITY", "PIN REQUEST OFF FIXED DIALLING OFF") },
+          { label: "RESTORE", action: () => openDetail("RESTORE", "FACTORY RESET IS NOT AVAILABLE WHILE SIM MEMORY IS IN USE") }
+        ]);
+      }
+
+      function openCallDivert() {
+        openDetail("CALL DIVERT", "ALL CALLS NOT ACTIVE IF BUSY NOT ACTIVE NO REPLY NOT ACTIVE");
+      }
+
+      function openGames() {
+        openList("GAMES", [
+          { label: "SNAKE", action: () => openSnake() },
+          { label: "MEMORY", action: () => openDetail("MEMORY", "GAME DATA NOT FOUND") }
+        ]);
+      }
+
+      function openSnake() {
+        setState({
+          view: "snake",
+          snake: [{ x: 8, y: 4 }, { x: 7, y: 4 }, { x: 6, y: 4 }],
+          food: { x: 15, y: 3 },
+          dir: { x: 1, y: 0 },
+          nextDir: { x: 1, y: 0 },
+          score: 0,
+          running: false,
+          gameOver: false
+        });
+      }
+
+      function startSnake() {
+        if (state.gameOver) {
+          state.snake = [{ x: 8, y: 4 }, { x: 7, y: 4 }, { x: 6, y: 4 }];
+          state.food = { x: 15, y: 3 };
+          state.dir = { x: 1, y: 0 };
+          state.nextDir = { x: 1, y: 0 };
+          state.score = 0;
+          state.gameOver = false;
+        }
+        state.running = !state.running;
+        stopSnake();
+        if (state.running) snakeTimer = window.setInterval(snakeTick, 260);
+        render();
+      }
+
+      function stopSnake() {
+        if (snakeTimer) window.clearInterval(snakeTimer);
+        snakeTimer = null;
+      }
+
+      function snakeTick() {
+        if (state.view !== "snake" || !state.running) { stopSnake(); return; }
+        state.dir = state.nextDir;
+        const head = state.snake[0];
+        const next = { x: (head.x + state.dir.x + 21) % 21, y: (head.y + state.dir.y + 8) % 8 };
+        if (state.snake.some(segment => segment.x === next.x && segment.y === next.y)) {
+          state.running = false;
+          state.gameOver = true;
+          stopSnake();
+          beep(150, .18);
+          render();
+          return;
+        }
+        state.snake.unshift(next);
+        if (next.x === state.food.x && next.y === state.food.y) {
+          state.score++;
+          let attempts = 0;
+          do {
+            state.food = { x: Math.floor(Math.random() * 21), y: Math.floor(Math.random() * 8) };
+            attempts++;
+          } while (attempts < 50 && state.snake.some(segment => segment.x === state.food.x && segment.y === state.food.y));
+          beep(1100, .04);
+        } else state.snake.pop();
+        render();
+      }
+
+      function setSnakeDirection(x, y) {
+        if (state.view !== "snake") return;
+        if (state.dir.x + x === 0 && state.dir.y + y === 0) return;
+        state.nextDir = { x, y };
+      }
+
+      function openCalculator() {
+        setState({ view: "calculator", expression: "", result: "0", operator: "/" });
+      }
+
+      function calculate() {
+        try {
+          const safe = state.expression.replace(/X/g, "*").replace(/[^0-9+\-*/.]/g, "");
+          if (!safe) return;
+          const value = Function("return (" + safe + ")")();
+          state.result = Number.isFinite(value) ? String(Math.round(value * 1000) / 1000) : "ERROR";
+        } catch (_) { state.result = "ERROR"; }
+        render();
+      }
+
+      function openClock() {
+        openList("CLOCK", [
+          { label: "ALARM CLOCK", count: "OFF", action: () => openDetail("ALARM", "ALARM CLOCK OFF") },
+          { label: "CLOCK SETTINGS", action: () => openDetail("CLOCK", "16-02-1999 07:12 24-HOUR FORMAT") }
+        ]);
+      }
+
+      function openTones() {
+        openList("TONES", [
+          { label: "RINGING TONE", count: "TYPE 04", action: () => { beep(523, .08); window.setTimeout(() => beep(659, .08), 90); } },
+          { label: "RINGING VOLUME", count: "LEVEL 3", action: () => openDetail("VOLUME", "RINGING VOLUME LEVEL 3") },
+          { label: "MSG ALERT", count: "BEEP ONCE", action: () => beep(990, .09) },
+          { label: "KEYPAD TONES", count: keypadTones ? "ON" : "OFF", action: () => {
+            keypadTones = !keypadTones;
+            if (state.items?.[state.index]) state.items[state.index].count = keypadTones ? "ON" : "OFF";
+            render();
+          } }
+        ]);
+      }
+
+      // ------------------------------------------------------------------
+      // SCREEN DRAWING
+      // ------------------------------------------------------------------
+      function drawIcon(name) {
+        ctx.fillStyle = LCD_INK;
+        ctx.strokeStyle = LCD_INK;
+        const x = 34, y = 10;
+        if (name === "message") {
+          ctx.strokeRect(x, y + 3, 17, 12);
+          ctx.beginPath(); ctx.moveTo(x, y + 3); ctx.lineTo(x + 8, y + 10); ctx.lineTo(x + 17, y + 3); ctx.stroke();
+        } else if (name === "book") {
+          ctx.strokeRect(x, y + 1, 16, 16); ctx.fillRect(x + 7, y + 1, 1, 16); ctx.fillRect(x + 2, y + 5, 4, 1); ctx.fillRect(x + 10, y + 5, 4, 1);
+        } else if (name === "calls") {
+          ctx.fillRect(x + 2, y + 2, 4, 4); ctx.fillRect(x + 5, y + 5, 4, 7); ctx.fillRect(x + 8, y + 11, 6, 4); ctx.fillRect(x + 13, y + 1, 2, 8);
+        } else if (name === "settings") {
+          ctx.strokeRect(x + 3, y + 3, 12, 12); ctx.fillRect(x + 7, y, 4, 18); ctx.fillRect(x, y + 7, 18, 4); ctx.fillStyle = lcdBackground(); ctx.fillRect(x + 7, y + 7, 4, 4);
+        } else if (name === "divert") {
+          ctx.fillRect(x, y + 8, 12, 3); ctx.fillRect(x + 10, y + 4, 3, 11); ctx.fillRect(x + 13, y + 2, 3, 3); ctx.fillRect(x + 16, y, 3, 3);
+        } else if (name === "game") {
+          for (let i = 0; i < 5; i++) ctx.fillRect(x + i * 3, y + (i % 2) * 3, 3, 3);
+          ctx.strokeRect(x, y, 19, 16); ctx.fillRect(x + 13, y + 10, 3, 3);
+        } else if (name === "calculator") {
+          ctx.strokeRect(x + 2, y, 15, 19); ctx.strokeRect(x + 5, y + 3, 9, 4);
+          [[5,10],[10,10],[5,15],[10,15]].forEach(p => ctx.fillRect(x + p[0], y + p[1], 3, 3));
+        } else if (name === "clock") {
+          ctx.beginPath(); ctx.arc(x + 9, y + 9, 8, 0, Math.PI * 2); ctx.stroke(); ctx.fillRect(x + 8, y + 3, 2, 7); ctx.fillRect(x + 9, y + 9, 5, 2);
+        } else if (name === "tone") {
+          ctx.fillRect(x + 11, y, 2, 13); ctx.fillRect(x + 4, y + 3, 9, 2); ctx.fillRect(x + 2, y + 12, 5, 4); ctx.fillRect(x + 9, y + 10, 5, 4);
+        }
+      }
+
+      function renderStandby() {
+        clearLCD();
+        drawSignalBattery(anyUnread());
+        const unread = inbox.filter(message => message.unread).length + voiceMessages.filter(message => !message.heard).length;
+        drawText("MESSAGES", 42, 11, { align: "center" });
+        drawText(`${inbox.length} STORED`, 42, 22, { align: "center" });
+        drawText(`${unread} UNREAD`, 42, 31, { align: "center" });
+        drawFooter("OPEN");
+        screenReader.textContent = `Messages. ${inbox.length} stored. ${unread} unread. Open.`;
+      }
+
+      function renderMainMenu() {
+        clearLCD();
+        drawSignalBattery(anyUnread());
+        const item = mainMenu[state.index];
+        drawIcon(item.icon);
+        drawText(truncate(item.name, 14), 42, 31, { align: "center" });
+        drawText(String(state.index + 1), 79, 31, { align: "right" });
+        drawFooter("SELECT");
+        screenReader.textContent = `Main menu ${state.index + 1} of ${mainMenu.length}: ${item.name}. Select.`;
+      }
+
+      function renderList() {
+        clearLCD();
+        drawSignalBattery(anyUnread());
+        drawText(truncate(state.title, 14), 42, 8, { align: "center" });
+        const visibleCount = 3;
+        const start = Math.max(0, Math.min(state.index - 1, Math.max(0, state.items.length - visibleCount)));
+        for (let row = 0; row < visibleCount; row++) {
+          const itemIndex = start + row;
+          if (itemIndex >= state.items.length) break;
+          const item = state.items[itemIndex];
+          let label = truncate(item.label, item.count ? 10 : 14);
+          if (item.count !== undefined && item.count !== "") {
+            const suffix = truncate(String(item.count), 4);
+            label = label.padEnd(10, " ") + suffix;
+          }
+          drawText(label, 1, 16 + row * 8, { invert: itemIndex === state.index });
+        }
+        drawFooter(state.selectLabel || "SELECT");
+        screenReader.textContent = `${state.title}. Item ${state.index + 1} of ${state.items.length}: ${state.items[state.index]?.label || "empty"}. ${state.selectLabel || "Select"}.`;
+      }
+
+      function renderDetail() {
+        clearLCD();
+        drawSignalBattery(anyUnread());
+        const pages = Math.max(1, Math.ceil(state.lines.length / 4));
+        state.page = Math.max(0, Math.min(state.page, pages - 1));
+        const pageLines = state.lines.slice(state.page * 4, state.page * 4 + 4);
+        pageLines.forEach((line, row) => drawText(truncate(line, 14), 1, 8 + row * 8));
+        if (pages > 1) drawText(`${state.page + 1}/${pages}`, 68, 0, { align: "right" });
+        drawScrollHints(state.page, pages);
+        drawFooter(state.navLabel || "");
+        screenReader.textContent = `${state.title}. Page ${state.page + 1} of ${pages}. ${pageLines.join(" ")}${state.navLabel ? `. ${state.navLabel}.` : ""}`;
+      }
+
+      function renderLocked() {
+        clearLCD();
+        drawSignalBattery(anyUnread());
+        drawText("KEYPAD", 42, 14, { align: "center" });
+        drawText("LOCKED", 42, 24, { align: "center" });
+        if (state.unlockPending) drawText("PRESS *", 42, 33, { align: "center" });
+        drawFooter(state.unlockPending ? "" : "UNLOCK");
+        screenReader.textContent = state.unlockPending ? "Keypad locked. Press star." : "Keypad locked. Unlock.";
+      }
+
+      function renderVoicePin() {
+        clearLCD();
+        drawSignalBattery(anyUnread());
+        drawText(state.error ? "CODE ERROR" : "VOICE MAIL", 42, 10, { align: "center" });
+        drawText("PIN CODE", 42, 21, { align: "center" });
+        drawText("*".repeat(state.code.length) || "_", 42, 31, { align: "center" });
+        drawFooter("OK");
+        screenReader.textContent = `${state.error ? "Code error. " : ""}Voice mailbox PIN code. ${state.code.length} digits entered. OK.`;
+      }
+
+      function renderCompose() {
+        clearLCD();
+        drawSignalBattery(anyUnread());
+        drawText("WRITE MSG", 1, 8);
+        const lines = wrapText(state.text || "_", 14).slice(-3);
+        lines.forEach((line, row) => drawText(truncate(line, 14), 1, 16 + row * 8));
+        drawText(String(Math.max(0, 160 - state.text.length)), 83, 0, { align: "right" });
+        drawFooter("SAVE");
+        screenReader.textContent = `Write message. ${state.text || "Empty"}. ${Math.max(0, 160 - state.text.length)} characters remaining. Save.`;
+      }
+
+      function renderDial() {
+        clearLCD();
+        drawSignalBattery(anyUnread());
+        const lines = wrapText(state.number || "_", 14).slice(-3);
+        lines.forEach((line, row) => drawText(line, 1, 12 + row * 8));
+        drawFooter("CALL");
+        screenReader.textContent = `Number entry: ${state.number || "empty"}. Call.`;
+      }
+
+      function renderCalling() {
+        clearLCD();
+        drawSignalBattery(false);
+        drawText("CALLING", 42, 11, { align: "center" });
+        drawText(truncate(state.name || state.number, 14), 42, 23, { align: "center" });
+        drawText("NO ANSWER", 42, 32, { align: "center" });
+        drawFooter("END");
+        screenReader.textContent = `Calling ${state.name || state.number}. No answer. End.`;
+      }
+
+      function renderCalculator() {
+        clearLCD();
+        drawSignalBattery(false);
+        drawText("CALCULATOR", 1, 8);
+        drawText(truncate(state.expression || "0", 14), 1, 20);
+        drawText(truncate("=" + state.result, 14), 1, 31);
+        drawFooter("=");
+        screenReader.textContent = `Calculator. ${state.expression || 0}. Result ${state.result}.`;
+      }
+
+      function renderSnake() {
+        clearLCD();
+        drawText("SNAKE", 1, 0);
+        drawText(String(state.score), 83, 0, { align: "right" });
+        ctx.strokeStyle = LCD_INK;
+        ctx.strokeRect(0, 8, 84, 32);
+        ctx.fillStyle = LCD_INK;
+        state.snake.forEach((segment, index) => {
+          ctx.fillRect(segment.x * 4 + 1, segment.y * 4 + 9, 3, 3);
+          if (index === 0) ctx.fillStyle = LCD_INK;
+        });
+        ctx.fillRect(state.food.x * 4 + 1, state.food.y * 4 + 9, 2, 2);
+        if (state.gameOver) drawText("GAME OVER", 42, 20, { align: "center", invert: true });
+        drawFooter(state.gameOver ? "AGAIN" : state.running ? "PAUSE" : "START");
+        screenReader.textContent = `Snake. Score ${state.score}. ${state.gameOver ? "Game over. Again." : state.running ? "Running. Pause." : "Start."}`;
+      }
+
+      function renderBoot() {
+        clearLCD();
+        drawText("NOKIA", 42, 12, { align: "center" });
+        drawText("GSM", 42, 23, { align: "center" });
+        drawText("CONNECTING", 42, 34, { align: "center" });
+        screenReader.textContent = "Nokia GSM connecting.";
+      }
+
+      function renderOff() {
+        ctx.fillStyle = "#68735f";
+        ctx.fillRect(0, 0, 84, 48);
+        for (let y = 1; y < 48; y += 3) {
+          for (let x = (y % 2); x < 84; x += 4) {
+            ctx.fillStyle = "rgba(16,25,18,.06)";
+            ctx.fillRect(x, y, 1, 1);
+          }
+        }
+        screenReader.textContent = "Phone is switched off.";
+      }
+
+      function render() {
+        document.documentElement.style.setProperty("--lcd-glass", ["#93a083", "#a5b092", "#b8c2a7"][lcdContrast]);
+        updateFullscreenControl();
+        if (!powered || state.view === "off") return renderOff();
+        if (state.view === "boot") return renderBoot();
+        if (state.view === "standby") return renderStandby();
+        if (state.view === "locked") return renderLocked();
+        if (state.view === "mainMenu") return renderMainMenu();
+        if (state.view === "list") return renderList();
+        if (state.view === "detail") return renderDetail();
+        if (state.view === "voicePin") return renderVoicePin();
+        if (state.view === "compose") return renderCompose();
+        if (state.view === "dial") return renderDial();
+        if (state.view === "calling") return renderCalling();
+        if (state.view === "calculator") return renderCalculator();
+        if (state.view === "snake") return renderSnake();
+        renderStandby();
+      }
+
+      // ------------------------------------------------------------------
+      // AUTHENTIC KEYPAD INPUT
+      // ------------------------------------------------------------------
+      function move(delta) {
+        if (state.view === "mainMenu") {
+          state.index = (state.index + delta + mainMenu.length) % mainMenu.length;
+          render();
+        } else if (state.view === "list") {
+          if (!state.items.length) return;
+          state.index = (state.index + delta + state.items.length) % state.items.length;
+          render();
+        } else if (state.view === "detail") {
+          const pages = Math.max(1, Math.ceil(state.lines.length / 4));
+          state.page = Math.max(0, Math.min(pages - 1, state.page + delta));
+          render();
+        } else if (state.view === "snake") {
+          setSnakeDirection(0, delta < 0 ? -1 : 1);
+        }
+      }
+
+      function pressNavi() {
+        if (state.view === "standby") {
+          openMessages();
+        } else if (state.view === "locked") {
+          state.unlockPending = true;
+          render();
+        } else if (state.view === "mainMenu") {
+          mainMenu[state.index].open();
+        } else if (state.view === "list") {
+          state.items[state.index]?.action?.();
+        } else if (state.view === "detail") {
+          state.onNav?.();
+        } else if (state.view === "voicePin") {
+          enterVoiceMailbox();
+        } else if (state.view === "compose") {
+          if (state.text.trim()) {
+            outbox.unshift({ to: "UNSENT", date: "NOW", time: "--:--", status: "SAVED", text: state.text.trim() });
+            state.text = "";
+            openDetail("MESSAGE", "MESSAGE SAVED IN OUTBOX");
+          }
+        } else if (state.view === "dial") {
+          if (state.number) startCall(findContactName(state.number), state.number);
+        } else if (state.view === "calling") {
+          goBack();
+        } else if (state.view === "calculator") {
+          calculate();
+        } else if (state.view === "snake") {
+          startSnake();
+        }
+      }
+
+      function findContactName(number) {
+        const normalized = number.replace(/\s/g, "");
+        return contacts.find(contact => contact.number.replace(/\s/g, "") === normalized)?.name || number;
+      }
+
+      const multiTapMap = {
+        "1": ".,?!1",
+        "2": "ABC2",
+        "3": "DEF3",
+        "4": "GHI4",
+        "5": "JKL5",
+        "6": "MNO6",
+        "7": "PQRS7",
+        "8": "TUV8",
+        "9": "WXYZ9",
+        "0": " 0"
+      };
+
+      function composeDigit(digit) {
+        const now = Date.now();
+        const chars = multiTapMap[digit];
+        if (!chars || state.text.length >= 160) return;
+        if (lastTapKey === digit && now - lastTapAt < 850 && state.text.length) {
+          const previous = state.text[state.text.length - 1];
+          const index = chars.indexOf(previous);
+          state.text = state.text.slice(0, -1) + chars[(index + 1 + chars.length) % chars.length];
+        } else {
+          state.text += chars[0];
+        }
+        lastTapKey = digit;
+        lastTapAt = now;
+        window.clearTimeout(composeTimer);
+        composeTimer = window.setTimeout(() => { lastTapKey = null; }, 900);
+        render();
+      }
+
+      function pressDigit(digit) {
+        if (state.view === "standby") {
+          return;
+        } else if (state.view === "dial") {
+          if (state.number.length < 24) state.number += digit;
+          render();
+        } else if (state.view === "voicePin") {
+          if (state.code.length < 4) state.code += digit;
+          state.error = false;
+          render();
+        } else if (state.view === "compose") {
+          composeDigit(digit);
+        } else if (state.view === "mainMenu") {
+          const index = Number(digit) - 1;
+          if (index >= 0 && index < mainMenu.length) {
+            state.index = index;
+            render();
+            mainMenu[index].open();
+          }
+        } else if (state.view === "snake") {
+          if (digit === "2") setSnakeDirection(0, -1);
+          if (digit === "8") setSnakeDirection(0, 1);
+          if (digit === "4") setSnakeDirection(-1, 0);
+          if (digit === "6") setSnakeDirection(1, 0);
+        } else if (state.view === "calculator") {
+          if (state.expression.length < 14) state.expression += digit;
+          render();
+        }
+      }
+
+      function pressStar() {
+        if (state.view === "locked") {
+          if (state.unlockPending) {
+            history = [];
+            state = { view: "standby" };
+          }
+          render();
+        } else if (state.view === "mainMenu" && Date.now() - menuOpenedAt < 3000) {
+          history = [];
+          state = { view: "locked", unlockPending: false };
+          render();
+        } else if (state.view === "dial") {
+          state.number += "*";
+          render();
+        } else if (state.view === "compose") {
+          state.text += "*";
+          render();
+        } else if (state.view === "calculator") {
+          const operators = ["+", "-", "X", "/"];
+          const current = operators.indexOf(state.operator);
+          state.operator = operators[(current + 1) % operators.length];
+          if (state.expression) {
+            if (/[+\-X/]$/.test(state.expression)) state.expression = state.expression.slice(0, -1) + state.operator;
+            else state.expression += state.operator;
+          }
+          render();
+        }
+      }
+
+      function pressHash() {
+        if (state.view === "dial") {
+          state.number += "#";
+          render();
+        } else if (state.view === "compose") {
+          if (state.text.length < 160) state.text += " ";
+          lastTapKey = null;
+          render();
+        } else if (state.view === "calculator") calculate();
+      }
+
+      function pressClear() {
+        if (state.view === "dial" && state.number) {
+          state.number = state.number.slice(0, -1);
+          if (!state.number) goBack(); else render();
+        } else if (state.view === "voicePin" && state.code) {
+          state.code = state.code.slice(0, -1);
+          state.error = false;
+          render();
+        } else if (state.view === "calculator" && state.expression) {
+          state.expression = state.expression.slice(0, -1);
+          render();
+        } else if (state.view === "snake") {
+          stopSnake();
+          goBack();
+        } else goBack();
+      }
+
+      function handleKey(key) {
+        if (!powered) return;
+        if (state.view === "boot") return;
+        wakeBacklight();
+        playPhysicalKeyTone(key);
+        if (readerOpen) {
+          if (key === "clear" || key === "navi") closeMessageReader();
+          return;
+        }
+        if (state.view === "locked" && key !== "navi" && key !== "star") return;
+        if (key === "navi") pressNavi();
+        else if (key === "clear") pressClear();
+        else if (key === "up") move(-1);
+        else if (key === "down") move(1);
+        else if (key === "star") pressStar();
+        else if (key === "hash") pressHash();
+        else if (/^[0-9]$/.test(key)) pressDigit(key);
+      }
+
+      document.getElementById("powerKey").addEventListener("click", powerToggle);
+      fullscreenMessageKey.addEventListener("click", openMessageReader);
+      readerClose.addEventListener("click", () => closeMessageReader());
+      messageReader.addEventListener("click", event => {
+        if (event.target === messageReader) closeMessageReader();
+      });
+      cassetteObject.addEventListener("click", openCassettePlayer);
+      cassetteClose.addEventListener("click", () => closeCassettePlayer());
+      cassetteCodeInput.addEventListener("input", () => {
+        cassetteCodeInput.value = cassetteCodeInput.value.replace(/\D/g,"").slice(0,4);
+      });
+      cassetteCodeInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") { event.preventDefault(); submitCassetteCode(); }
+      });
+      cassetteCodeSubmit.addEventListener("click", submitCassetteCode);
+
+      cassetteViewport.addEventListener("pointerdown", event => {
+        if (event.target.closest("button,input,label")) return;
+        cassetteDragging = true;
+        cassettePointerX = event.clientX;
+        cassettePointerY = event.clientY;
+        cassetteStartX = cassetteRotationX;
+        cassetteStartY = cassetteRotationY;
+        cassette3d.classList.add("is-dragging");
+        cassetteViewport.setPointerCapture(event.pointerId);
+      });
+      cassetteViewport.addEventListener("pointermove", event => {
+        if (!cassetteDragging) return;
+        cassetteRotationY = cassetteStartY + (event.clientX - cassettePointerX) * .62;
+        cassetteRotationX = cassetteStartX - (event.clientY - cassettePointerY) * .32;
+        updateCassetteRotation();
+      });
+      const releaseCassette = event => {
+        if (!cassetteDragging) return;
+        cassetteDragging = false;
+        cassette3d.classList.remove("is-dragging");
+        try { cassetteViewport.releasePointerCapture(event.pointerId); } catch (_) {}
+        updateCassetteRotation();
+      };
+      cassetteViewport.addEventListener("pointerup",releaseCassette);
+      cassetteViewport.addEventListener("pointercancel",releaseCassette);
+      cassetteViewport.addEventListener("dblclick", () => {
+        cassetteRotationY += 180;
+        updateCassetteRotation();
+      });
+      cassetteViewport.addEventListener("keydown", event => {
+        if (["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(event.key)) event.preventDefault();
+        if (event.key === "ArrowLeft") cassetteRotationY -= 15;
+        if (event.key === "ArrowRight") cassetteRotationY += 15;
+        if (event.key === "ArrowUp") cassetteRotationX = Math.min(34,cassetteRotationX + 7);
+        if (event.key === "ArrowDown") cassetteRotationX = Math.max(-34,cassetteRotationX - 7);
+        updateCassetteRotation();
+      });
+
+      cassettePlay.addEventListener("click", playCassetteSubtitles);
+      cassetteStop.addEventListener("click", stopCassettePlayback);
+      cassetteRewind.addEventListener("click", rewindCassette);
+      cassettePlayer.addEventListener("click", event => { if (event.target === cassettePlayer) closeCassettePlayer(); });
+
+      document.querySelectorAll("[data-key]").forEach(button => {
+        button.addEventListener("click", () => {
+          button.classList.add("is-down");
+          window.setTimeout(() => button.classList.remove("is-down"), 90);
+          handleKey(button.dataset.key);
+        });
+      });
+
+      document.addEventListener("keydown", event => {
+        if (event.repeat) return;
+        if (cassetteOpen) {
+          if (event.key === "Escape") closeCassettePlayer();
+          return;
+        }
+        if (readerOpen) {
+          if (event.key === "Escape") closeMessageReader();
+          return;
+        }
+        if (event.key.toLowerCase() === "p") { powerToggle(); return; }
+        if (!powered) return;
+        if (/^[0-9]$/.test(event.key)) handleKey(event.key);
+        else if (event.key === "Enter" || event.key === " ") { event.preventDefault(); handleKey("navi"); }
+        else if (event.key === "Backspace" || event.key === "Escape") { event.preventDefault(); handleKey("clear"); }
+        else if (event.key === "ArrowUp") { event.preventDefault(); handleKey("up"); }
+        else if (event.key === "ArrowDown") { event.preventDefault(); handleKey("down"); }
+        else if (event.key === "*") handleKey("star");
+        else if (event.key === "#") handleKey("hash");
+      });
+
+      if (!reducedMotion) {
+        let lightFrame = 0;
+        document.addEventListener("pointermove", event => {
+          if (lightFrame) return;
+          lightFrame = requestAnimationFrame(() => {
+            lightFrame = 0;
+            const x = (event.clientX / Math.max(1,window.innerWidth) - .5) * 26;
+            const y = (event.clientY / Math.max(1,window.innerHeight) - .5) * 18;
+            sceneElement.style.setProperty("--light-x",`${x.toFixed(1)}px`);
+            sceneElement.style.setProperty("--light-y",`${y.toFixed(1)}px`);
+          });
+        });
+      }
+
+      seedDust();
+      seedRain();
+      applyRandomRoomLight();
+      scheduleRandomLightning();
+      startAmbience();
+      document.addEventListener("pointerdown", activateRainAmbience, { once:true, capture:true });
+      document.addEventListener("keydown", activateRainAmbience, { once:true, capture:true });
+      window.addEventListener("pagehide", () => {
+        stopAmbience();
+        stopTapeMurmurs();
+        window.clearTimeout(randomLightTimer);
+        window.clearTimeout(lightningTimer);
+      }, { once:true });
+      render();
+      window.LASTSEEN = {
+        getState: () => state,
+        getPowered: () => powered,
+        sceneElement, phoneElement, lcd: canvas, cassetteObject, cassettePlayer,
+        stopAmbience, stopTapeMurmurs, startAmbience, powerOn, powerOff,
+        playTone, beep, playMessageTone, playErrorTone, playPowerTone
+      };
+    })();
+  </script>
+<!-- ============== LAST SEEN — NARRATIVE MODULES ============== -->
+<script src="js/audio-manager.js"></script>
+<script src="js/narrative.js"></script>
+<script src="js/title.js"></script>
+<script src="js/flashlight.js"></script>
+<script src="js/corridor.js"></script>
+<script src="js/storm-eas.js"></script>
+<script src="js/ending.js"></script>
+</body>
+</html>

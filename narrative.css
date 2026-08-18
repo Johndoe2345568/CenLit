@@ -1,0 +1,79 @@
+/* ============================================================
+   LAST SEEN — narrative.css
+   Top-level overlay container and shared state classes.
+   Sits above the existing <main class="scene"> layer.
+   All overlays default to invisible and aria-hidden.
+   Individual modules flip them on via state classes on
+   #ls-overlays or on themselves.
+   ============================================================ */
+
+#ls-overlays {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  /* Each child sets its own pointer-events: auto when interactive */
+}
+
+#ls-overlays > * {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 600ms ease, visibility 0s linear 600ms;
+}
+
+#ls-overlays > .is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 600ms ease, visibility 0s linear 0s;
+}
+
+#ls-overlays > .is-instant {
+  transition: opacity 0ms, visibility 0s;
+}
+
+/* Black fade overlay (fades entire viewport to black) */
+#ls-fade {
+  background: #000;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 90;
+  transition: opacity 1400ms ease, visibility 0s linear 1400ms;
+}
+#ls-fade.is-fading {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 1400ms ease, visibility 0s linear 0s;
+}
+#ls-fade.is-holding {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: none;
+}
+
+/* When the title screen is active, hide the main scene underneath
+   from screen readers and dim pointer events */
+body.ls-state-title main.scene,
+body.ls-state-opening main.scene,
+body.ls-state-ending main.scene {
+  visibility: hidden;
+  pointer-events: none;
+}
+body.ls-state-title main.scene {
+  opacity: 0;
+}
+
+/* Reduced motion: collapse all overlay transitions */
+@media (prefers-reduced-motion: reduce) {
+  #ls-overlays > *,
+  #ls-fade {
+    transition: opacity 200ms ease, visibility 0s linear 200ms !important;
+  }
+  #ls-overlays > .is-active { transition-duration: 200ms !important; }
+}

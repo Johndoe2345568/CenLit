@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  LAST SEEN — Screen Cracks
+  Original procedural SVG. Spiderweb / shatter pattern of cracked glass for
+  the newer touchscreen phone. Radiates from a primary impact point with
+  branching radial fissures and concentric ring cracks. Layered over the
+  screen at high opacity, with screen-blend so the cracks appear to sit ON
+  the glass surface.
+  License: CC0 / Public Domain — see IMAGE_CREDITS.md
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 1100" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <filter id="crackBlur" x="-5%" y="-5%" width="110%" height="110%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0.4"/>
+    </filter>
+    <linearGradient id="crackDepth" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a0a" stop-opacity="0.95"/>
+      <stop offset="50%" stop-color="#1a1a1a" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#0a0a0a" stop-opacity="0.95"/>
+    </linearGradient>
+  </defs>
+
+  <g stroke="url(#crackDepth)" fill="none" filter="url(#crackBlur)">
+    <!-- Primary impact at (220, 360) -->
+    <!-- Radial fissures -->
+    <path d="M220,360 L60,80" stroke-width="2.4"/>
+    <path d="M220,360 L40,200" stroke-width="1.8"/>
+    <path d="M220,360 L30,340" stroke-width="2.2"/>
+    <path d="M220,360 L20,500" stroke-width="1.6"/>
+    <path d="M220,360 L40,680" stroke-width="1.9"/>
+    <path d="M220,360 L80,880" stroke-width="2.3"/>
+    <path d="M220,360 L200,1020" stroke-width="1.8"/>
+    <path d="M220,360 L320,1060" stroke-width="2"/>
+    <path d="M220,360 L460,1020" stroke-width="1.6"/>
+    <path d="M220,360 L580,880" stroke-width="2.4"/>
+    <path d="M220,360 L580,640" stroke-width="1.7"/>
+    <path d="M220,360 L570,420" stroke-width="2.1"/>
+    <path d="M220,360 L540,260" stroke-width="1.8"/>
+    <path d="M220,360 L470,100" stroke-width="2.2"/>
+    <path d="M220,360 L320,40" stroke-width="1.6"/>
+    <path d="M220,360 L180,40" stroke-width="2"/>
+
+    <!-- Concentric ring cracks -->
+    <circle cx="220" cy="360" r="60" stroke-width="1.2"/>
+    <circle cx="220" cy="360" r="110" stroke-width="1"/>
+    <circle cx="220" cy="360" r="180" stroke-width="0.9"/>
+    <circle cx="220" cy="360" r="260" stroke-width="0.8"/>
+    <circle cx="220" cy="360" r="360" stroke-width="0.7"/>
+
+    <!-- Branch fissures from the radial lines -->
+    <path d="M40,200 L120,160" stroke-width="1"/>
+    <path d="M40,200 L100,260" stroke-width="0.8"/>
+    <path d="M30,340 L120,300" stroke-width="1"/>
+    <path d="M30,340 L120,380" stroke-width="0.9"/>
+    <path d="M20,500 L120,460" stroke-width="0.8"/>
+    <path d="M20,500 L120,540" stroke-width="1"/>
+    <path d="M40,680 L130,640" stroke-width="0.9"/>
+    <path d="M40,680 L140,720" stroke-width="1.1"/>
+    <path d="M80,880 L160,820" stroke-width="1"/>
+    <path d="M80,880 L180,920" stroke-width="0.8"/>
+    <path d="M200,1020 L260,940" stroke-width="1"/>
+    <path d="M320,1060 L300,960" stroke-width="0.9"/>
+    <path d="M460,1020 L400,940" stroke-width="1.1"/>
+    <path d="M580,880 L500,820" stroke-width="1"/>
+    <path d="M580,880 L500,920" stroke-width="0.8"/>
+    <path d="M580,640 L500,600" stroke-width="1"/>
+    <path d="M580,640 L500,680" stroke-width="0.9"/>
+    <path d="M570,420 L490,400" stroke-width="1"/>
+    <path d="M570,420 L490,460" stroke-width="0.8"/>
+    <path d="M540,260 L460,240" stroke-width="1"/>
+    <path d="M540,260 L460,300" stroke-width="0.9"/>
+    <path d="M470,100 L400,180" stroke-width="1"/>
+    <path d="M320,40 L320,140" stroke-width="0.8"/>
+    <path d="M180,40 L210,140" stroke-width="0.9"/>
+
+    <!-- Secondary impact at (450, 720) — smaller shatter -->
+    <circle cx="450" cy="720" r="30" stroke-width="1"/>
+    <circle cx="450" cy="720" r="60" stroke-width="0.8"/>
+    <path d="M450,720 L390,680" stroke-width="1.2"/>
+    <path d="M450,720 L520,680" stroke-width="1.1"/>
+    <path d="M450,720 L380,760" stroke-width="1"/>
+    <path d="M450,720 L520,760" stroke-width="1.3"/>
+    <path d="M450,720 L420,800" stroke-width="0.9"/>
+    <path d="M450,720 L490,800" stroke-width="0.8"/>
+  </g>
+
+  <!-- Small glass shards (highlight flecks) -->
+  <g fill="#3a3a3a" opacity="0.6">
+    <polygon points="218,358 224,356 226,362 220,366"/>
+    <polygon points="222,362 228,360 230,366 226,370"/>
+    <polygon points="448,718 454,716 456,722 452,726"/>
+  </g>
+</svg>

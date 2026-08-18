@@ -1,0 +1,288 @@
+/* LAST SEEN — quality-fixes.css
+   Consolidated final overrides. This file must remain loaded last.
+*/
+
+/* -------------------------------------------------------------------------
+   MAIN-SCENE DARKNESS
+   ------------------------------------------------------------------------- */
+
+/* Remove the old global body vignette from the playable room. Darkness is
+   owned by the room-dimmer and the flashlight compositor, so the LCD can be
+   raised independently. */
+body.ls-state-main::before { display: none !important; }
+
+/* With F off, the room is almost completely crushed. The selector uses
+   :not(.ls-flashlight-on) so it also works on the very first main frame before
+   the explicit flashlight-off class has been restored. */
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene {
+  --room-light: .006 !important;
+  --beam-light: .003 !important;
+  --set-light: .008 !important;
+  --sheen-light: .002 !important;
+  --darkness: .998 !important;
+  filter: brightness(.10) saturate(.42) contrast(1.18) !important;
+}
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .room-dimmer {
+  opacity: .998 !important;
+  background: rgba(0, 2, 3, .998) !important;
+}
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .room-set,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .rain-window,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .aparador-silhouette,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .wall-frame,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .desk-papers,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .window-shadow,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .lamp-bloom,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .light-beam,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .rain-sheen,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .moth-field {
+  opacity: .004 !important;
+  filter: brightness(.08) !important;
+}
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .phone-aura {
+  display: none !important;
+}
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .phone-wrap {
+  opacity: .68 !important;
+  filter: none !important;
+}
+
+/* The LCD remains visible for the entire time the vintage phone is powered,
+   not only during the short key-wake class. The handset shell remains dark. */
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene.phone-powered .lcd-frame,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .phone.is-lit .lcd-frame {
+  filter: brightness(18) contrast(1.38) saturate(.72) !important;
+  box-shadow: 0 0 34px rgba(162,222,148,.42), inset 0 0 18px rgba(226,255,202,.45) !important;
+}
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene.phone-powered .lcd-frame::before,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .phone.is-lit .lcd-frame::before {
+  opacity: .86;
+}
+
+/* When F is on, the canvas mask provides the dark surround; let the beam
+   reveal the actual scene and do not double-dim it with room-dimmer. */
+body.ls-state-main.ls-flashlight-on main.scene .room-dimmer {
+  opacity: 0 !important;
+  background: transparent !important;
+}
+body.ls-state-main.ls-flashlight-on main.scene {
+  filter: brightness(.86) saturate(.9) contrast(1.08) !important;
+}
+body.ls-state-main.ls-flashlight-on main.scene .phone-wrap { opacity: 1 !important; }
+
+/* -------------------------------------------------------------------------
+   NATURAL LIGHTNING
+   ------------------------------------------------------------------------- */
+
+#ls-lightning-exposure {
+  z-index: 46 !important;
+  background:
+    radial-gradient(ellipse 54% 76% at 8% 15%, rgba(238,249,255,.95) 0%, rgba(220,239,249,.62) 19%, rgba(178,211,226,.22) 47%, transparent 75%),
+    linear-gradient(104deg, rgba(224,243,250,.3), transparent 48%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0;
+}
+#ls-lightning-exposure.is-active {
+  opacity: 1;
+  visibility: visible;
+  animation: naturalLightning 1.12s steps(9,end) both;
+}
+#ls-lightning-exposure.is-corridor {
+  background:
+    radial-gradient(ellipse 70% 80% at 6% 30%, rgba(238,249,255,.94) 0%, rgba(206,231,243,.54) 24%, rgba(150,190,211,.18) 53%, transparent 78%),
+    linear-gradient(92deg, rgba(218,241,250,.24), transparent 57%);
+}
+@keyframes naturalLightning {
+  0% { opacity: 0; }
+  3% { opacity: .2; }
+  6% { opacity: .92; }
+  10% { opacity: .08; }
+  15% { opacity: 1; }
+  22% { opacity: .28; }
+  31% { opacity: .78; }
+  43% { opacity: .14; }
+  58% { opacity: .42; }
+  100% { opacity: 0; }
+}
+body.ls-state-main.ls-lightning-active::before { display: none !important; }
+body.ls-state-main.ls-lightning-active main.scene .room-dimmer {
+  opacity: 0 !important;
+  background: transparent !important;
+}
+body.ls-state-main.ls-lightning-active main.scene {
+  filter: brightness(3.4) contrast(1.2) saturate(.74) !important;
+}
+body.ls-state-main.ls-lightning-active main.scene .room-set { filter: brightness(3.1) contrast(1.18) saturate(.7) !important; }
+body.ls-state-main.ls-lightning-active main.scene .rain-window { filter: brightness(7) contrast(1.22) !important; }
+body.ls-state-main.ls-lightning-active main.scene .window-shadow {
+  opacity: 1 !important;
+  filter: brightness(10) contrast(1.42) blur(1.6px) !important;
+}
+body.ls-state-main.ls-lightning-active main.scene .phone-wrap,
+body.ls-state-main.ls-lightning-active main.scene .tape-object,
+body.ls-state-main.ls-lightning-active main.scene .desk-papers,
+body.ls-state-main.ls-lightning-active main.scene .aparador-silhouette {
+  filter: brightness(3.2) contrast(1.2) !important;
+}
+body.ls-state-main.ls-lightning-secondary main.scene {
+  filter: brightness(2.1) contrast(1.1) !important;
+}
+body.ls-state-main.ls-lightning-secondary #ls-lightning-exposure {
+  animation-duration: .36s;
+  opacity: .55;
+}
+
+body.ls-corridor-active #ls-corridor .ls-corridor-storm-flash.is-flashing {
+  opacity: .92 !important;
+  filter: hue-rotate(12deg) brightness(1.65) contrast(1.18);
+  transform: skewX(-14deg) translateX(-4%);
+  mix-blend-mode: screen;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #ls-lightning-exposure.is-active { animation: naturalLightningReduced 700ms ease both; }
+  @keyframes naturalLightningReduced { 0% { opacity:0; } 35% { opacity:.44; } 100% { opacity:0; } }
+  body.ls-state-main.ls-lightning-active main.scene { filter: brightness(1.8) contrast(1.1) !important; }
+}
+
+/* -------------------------------------------------------------------------
+   FLASHLIGHT COMPOSITOR
+   ------------------------------------------------------------------------- */
+#ls-flashlight { mix-blend-mode: normal !important; }
+
+/* -------------------------------------------------------------------------
+   PHONE-ONLY OVERLAYS AND CASSETTE STACKING
+   ------------------------------------------------------------------------- */
+body.ls-corridor-active #ls-eas.is-active,
+body.ls-corridor-active #ls-notification.is-active,
+body.ls-corridor-active #ls-inbox-takeover.is-active {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+body.tape-modal-open #ls-overlays { z-index: 100 !important; }
+body.tape-modal-open main.scene { z-index: 200 !important; }
+body.tape-modal-open .cassette-player { z-index: 1200 !important; }
+
+/* EAS, notification, and Inbox surfaces use the vintage LCD rather than a
+   neon modern warning card. */
+#ls-eas,
+#ls-notification,
+#ls-inbox-takeover {
+  image-rendering: pixelated;
+  font-family: "Courier New", monospace !important;
+  text-transform: uppercase;
+  border: 2px solid #10180e !important;
+  border-radius: 2px !important;
+  color: #10180e !important;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(16,24,14,.065) 4px),
+    #a5b092 !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(224,236,208,.28),
+    inset 0 0 18px rgba(20,32,18,.24),
+    0 0 18px rgba(105,142,90,.14) !important;
+  text-shadow: none !important;
+}
+#ls-eas .ls-eas-header,
+#ls-inbox-takeover .ls-inbox-header {
+  color: #a5b092 !important;
+  background: #10180e !important;
+  border: 0 !important;
+  border-bottom: 1px solid #10180e !important;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+#ls-eas .ls-eas-flag { color: #a5b092 !important; }
+#ls-eas .ls-eas-body,
+#ls-inbox-takeover,
+#ls-notification { font-size: clamp(7px, 1.35vw, 11px) !important; line-height: 1.28 !important; }
+#ls-eas .ls-eas-body p,
+#ls-inbox-takeover > div,
+#ls-notification span { color: #10180e !important; }
+#ls-eas .ls-eas-body p#ls-eas-category { color: #10180e !important; font-size: inherit; }
+#ls-eas.is-active { animation: lcdTakeoverFlicker 2.8s steps(2,end) infinite !important; }
+#ls-notification { padding: 0 !important; display: grid; place-items: center; }
+#ls-notification.is-active { animation: lcdTakeoverFlicker 2.8s steps(2,end) infinite !important; }
+@keyframes lcdTakeoverFlicker {
+  0%, 100% { filter: brightness(1); }
+  48% { filter: brightness(.92); }
+  51% { filter: brightness(1.08); }
+}
+#ls-inbox-takeover {
+  display: none;
+  z-index: 72;
+  padding: 5px 6px;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 3px;
+  overflow: hidden;
+}
+#ls-inbox-takeover.is-active { display: grid; opacity: 1; visibility: visible; pointer-events: auto; }
+#ls-inbox-takeover .ls-inbox-header { padding: 3px; text-align: center; }
+#ls-inbox-takeover .ls-inbox-meta { font-size: .72em; border-bottom: 1px solid rgba(16,24,14,.45); padding-bottom: 3px; }
+#ls-inbox-takeover .ls-inbox-message {
+  display: grid;
+  place-items: center;
+  font-size: clamp(11px, 2.2vw, 17px);
+  font-weight: 900;
+  text-transform: none;
+  text-align: center;
+}
+#ls-inbox-takeover .ls-inbox-footer { font-size: .75em; text-align: right; }
+
+/* Newer-phone prep during the black hold. */
+#ls-newer-phone.is-preparing {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Final title card before returning to the interactive title screen. */
+#ls-credit-card {
+  z-index: 94 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: #000;
+  color: #e8e2d4;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+#ls-credit-card.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  animation: creditCardExposure 5.8s ease-in-out both;
+}
+#ls-credit-card h2 {
+  margin: 0;
+  font-family: "Times New Roman", Times, serif;
+  font-size: clamp(42px, 10vw, 104px);
+  font-weight: 400;
+  letter-spacing: .38em;
+  text-indent: .38em;
+  text-shadow: 0 0 20px rgba(180,140,60,.22), 0 0 60px rgba(120,80,30,.12);
+}
+#ls-credit-card p {
+  position: absolute;
+  bottom: 8vh;
+  margin: 0;
+  font: 400 clamp(13px, 2vw, 19px)/1.4 "Times New Roman", Times, serif;
+  letter-spacing: .18em;
+  color: #b9ae98;
+}
+@keyframes creditCardExposure {
+  0% { opacity: 0; }
+  14% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: .92; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #ls-credit-card.is-active { animation: none; }
+}

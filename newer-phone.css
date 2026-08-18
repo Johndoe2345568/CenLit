@@ -1,0 +1,262 @@
+/* ============================================================
+   LAST SEEN — newer-phone.css
+   Newer touchscreen phone shown after the ending fade.
+   Has believable glass, bezel, speaker/sensor placement,
+   reflections, cracks (SVG), dried + wet blood (SVG),
+   contact shadows, and blood on the floor.
+   Shows the Dante missing-person alert on screen.
+   Distinct cool-white / blue-green glow vs the old green LCD.
+   ============================================================ */
+
+#ls-newer-phone {
+  z-index: 92;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse 70% 50% at 50% 50%,
+    rgba(80, 110, 130, 0.18) 0%,
+    rgba(20, 35, 50, 0.4) 35%,
+    #04060a 75%,
+    #020304 100%
+  );
+  transition: opacity 2200ms ease, visibility 0s linear 2200ms;
+}
+#ls-newer-phone.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 2200ms ease, visibility 0s linear 0s;
+}
+
+#ls-newer-phone .ls-newer-shell {
+  position: relative;
+  width: min(340px, 78vw);
+  height: min(720px, 88vh);
+  background:
+    linear-gradient(135deg,
+      #1a1d22 0%,
+      #0e1115 40%,
+      #050709 100%
+    );
+  border-radius: 28px;
+  box-shadow:
+    inset 0 0 0 2px rgba(70, 90, 110, 0.18),
+    inset 0 0 22px rgba(0, 0, 0, 0.85),
+    0 30px 80px -20px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(120, 140, 160, 0.15);
+  padding: 14px 10px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Speaker grill + front camera / sensor dots */
+#ls-newer-phone .ls-newer-shell::before {
+  content: "";
+  display: block;
+  width: 60%;
+  height: 6px;
+  background: repeating-linear-gradient(90deg,
+    rgba(70, 90, 110, 0.5) 0 2px,
+    transparent 2px 4px
+  );
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+#ls-newer-phone .ls-newer-shell::after {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #0a0d10;
+  box-shadow:
+    -8px 0 0 -1px #0a0d10,
+    -16px 0 0 -2px #0a0d10,
+    inset 0 0 2px rgba(80, 110, 140, 0.3);
+  margin-bottom: 8px;
+}
+
+#ls-newer-phone .ls-newer-screen {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  background:
+    linear-gradient(180deg, #0a1822 0%, #0c1c28 60%, #06121a 100%);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 0 1px rgba(80, 120, 150, 0.18),
+    inset 0 0 30px rgba(0, 0, 0, 0.6);
+}
+
+/* Glass reflection sweep (cool-white diagonal gloss) */
+#ls-newer-phone .ls-newer-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.02) 30%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.04) 70%,
+      rgba(255, 255, 255, 0.10) 100%
+    );
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Cracks SVG layer (above screen content, below alert) */
+#ls-newer-phone .ls-newer-cracks {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.92;
+}
+#ls-newer-phone .ls-newer-cracks img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Blood splatter SVG layer (on top of cracks) */
+#ls-newer-phone .ls-newer-blood {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0.78;
+}
+#ls-newer-phone .ls-newer-blood img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Dante alert — cool-white/blue-green glow distinct from old green LCD */
+#ls-newer-phone .ls-newer-alert {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 18px 14px 14px;
+  font-family: "Courier New", monospace;
+  color: #d6e8f4;
+  text-align: center;
+  background:
+    linear-gradient(180deg,
+      rgba(40, 60, 80, 0.5) 0%,
+      rgba(20, 35, 55, 0.7) 40%,
+      rgba(10, 20, 35, 0.85) 100%
+    );
+  border-radius: 18px;
+  overflow: hidden;
+  /* Subtle internal screen glow */
+  box-shadow: inset 0 0 60px rgba(80, 140, 180, 0.18);
+}
+
+#ls-newer-phone .ls-dante-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #b81a1a;
+  color: #fff;
+  padding: 8px 10px;
+  letter-spacing: 0.22em;
+  font-weight: 700;
+  font-size: 13px;
+  border-bottom: 2px solid #6b0000;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+#ls-newer-phone .ls-dante-flag { font-size: 14px; }
+
+#ls-newer-phone .ls-dante-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-y: auto;
+}
+#ls-newer-phone .ls-dante-body p { margin: 0; }
+#ls-newer-phone .ls-dante-category {
+  color: #ffce80; font-weight: 700; letter-spacing: 0.15em;
+  border-bottom: 1px dashed rgba(255, 200, 120, 0.4);
+  padding-bottom: 6px;
+}
+#ls-newer-phone .ls-dante-name {
+  color: #fff; font-weight: 700; letter-spacing: 0.1em;
+}
+#ls-newer-phone .ls-dante-message { color: #e0eef8; }
+#ls-newer-phone .ls-dante-time {
+  color: #ffd0a0; font-size: 11px; letter-spacing: 0.1em;
+  border-top: 1px dashed rgba(255, 200, 120, 0.3);
+  padding-top: 6px;
+}
+#ls-newer-phone .ls-dante-footer {
+  color: rgba(220, 235, 250, 0.5); font-size: 9px; margin-top: 4px;
+}
+
+/* Blood pool on the floor (extends below the newer phone) */
+#ls-newer-phone .ls-newer-floor-blood {
+  position: absolute;
+  bottom: 4%;
+  left: 50%;
+  transform: translateX(-50%) translateY(60%);
+  width: min(520px, 100vw);
+  height: 100px;
+  background:
+    radial-gradient(ellipse 50% 50% at 50% 50%,
+      rgba(40, 0, 0, 0.85) 0%,
+      rgba(60, 4, 4, 0.6) 30%,
+      rgba(40, 2, 2, 0.4) 60%,
+      transparent 100%
+    );
+  filter: blur(6px);
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Cool white-blue-green ambient glow around the newer phone screen */
+#ls-newer-phone::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 35% 55% at 50% 50%,
+    rgba(120, 180, 220, 0.12) 0%,
+    rgba(40, 80, 120, 0.06) 40%,
+    transparent 80%
+  );
+  pointer-events: none;
+  mix-blend-mode: screen;
+  animation: ls-newer-screen-breathe 5s ease-in-out infinite;
+}
+@keyframes ls-newer-screen-breathe {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #ls-newer-phone,
+  #ls-newer-phone.is-active { transition-duration: 400ms !important; }
+  #ls-newer-phone::before { animation: none !important; }
+}

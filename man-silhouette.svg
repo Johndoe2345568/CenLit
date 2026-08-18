@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  LAST SEEN — Man Silhouette
+  Original procedural SVG. A large, broad-shouldered male silhouette revealed
+  by a lightning strike from the window behind the player. The figure stands
+  still, centered, never lunges. No facial features are resolved.
+  Designed to overlay behind the player position; the lightning flash
+  is what reveals it via mix-blend / opacity transition.
+  License: CC0 / Public Domain — see IMAGE_CREDITS.md
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 900" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <radialGradient id="figureEdge" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="1"/>
+      <stop offset="78%" stop-color="#020406" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#070a0c" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="figureBlur" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2.2"/>
+    </filter>
+  </defs>
+
+  <!-- Body silhouette: tall, broad shoulders, tapering torso -->
+  <g filter="url(#figureBlur)">
+    <!-- Head -->
+    <ellipse cx="300" cy="150" rx="78" ry="92" fill="url(#figureEdge)"/>
+    <!-- Neck -->
+    <path d="M260,220 Q300,250 340,220 L348,260 L252,260 Z" fill="url(#figureEdge)"/>
+    <!-- Shoulders and torso (broad) -->
+    <path d="M120,260
+             Q170,240 260,250
+             L340,250
+             Q430,240 480,260
+             Q520,290 510,400
+             Q500,520 470,650
+             Q460,720 470,820
+             L130,820
+             Q140,720 130,650
+             Q100,520 90,400
+             Q80,290 120,260 Z"
+          fill="url(#figureEdge)"/>
+    <!-- Arms (slightly away from body) -->
+    <path d="M88,300 Q60,420 70,560 Q78,640 100,700 L150,690 Q138,610 132,540 Q126,420 148,310 Z"
+          fill="url(#figureEdge)"/>
+    <path d="M512,300 Q540,420 530,560 Q522,640 500,700 L450,690 Q462,610 468,540 Q474,420 452,310 Z"
+          fill="url(#figureEdge)"/>
+  </g>
+
+  <!-- Subtle key rim light on left shoulder (suggests backlight from window) -->
+  <path d="M120,260 Q170,240 260,250" stroke="#3a4a55" stroke-width="2" fill="none" opacity="0.4"/>
+  <path d="M88,300 Q60,420 70,560" stroke="#3a4a55" stroke-width="1.5" fill="none" opacity="0.3"/>
+</svg>

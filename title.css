@@ -1,0 +1,180 @@
+/* ============================================================
+   LAST SEEN — title.css
+   Title screen + opening cinematic.
+   Pitch-black background. Title "LAST SEEN" and a Play button.
+   Opening uses a warm candle-like glow (no visible candle).
+   ============================================================ */
+
+/* ---- Title screen ---- */
+#ls-title-screen {
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  z-index: 60;
+  /* subtle irregular flicker on the entire screen background */
+  animation: ls-title-flicker 7s steps(60, end) infinite;
+}
+
+@keyframes ls-title-flicker {
+  0%, 100% { background: #000; }
+  3%  { background: #020201; }
+  7%  { background: #000; }
+  9%  { background: #010100; }
+  14% { background: #000; }
+  18% { background: #020100; }
+  19% { background: #000; }
+  45% { background: #000; }
+  47% { background: #010100; }
+  49% { background: #000; }
+  72% { background: #000; }
+  74% { background: #020100; }
+  76% { background: #000; }
+}
+
+#ls-title-screen.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+#ls-title-text {
+  margin: 0;
+  font-family: "Times New Roman", Times, serif;
+  font-weight: 400;
+  font-size: clamp(40px, 11vw, 110px);
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
+  color: #e8e2d4;
+  text-shadow:
+    0 0 12px rgba(180, 140, 60, 0.22),
+    0 0 40px rgba(120, 80, 30, 0.12),
+    0 0 90px rgba(80, 50, 20, 0.08);
+  /* slight irregular exposure */
+  animation: ls-title-exposure 5s ease-in-out infinite;
+}
+
+@keyframes ls-title-exposure {
+  0%, 100% { opacity: 0.94; text-shadow: 0 0 12px rgba(180,140,60,0.22), 0 0 40px rgba(120,80,30,0.12), 0 0 90px rgba(80,50,20,0.08); }
+  35% { opacity: 1; text-shadow: 0 0 18px rgba(200,160,80,0.32), 0 0 60px rgba(140,100,40,0.18), 0 0 120px rgba(90,60,25,0.12); }
+  60% { opacity: 0.88; text-shadow: 0 0 10px rgba(170,130,55,0.18), 0 0 32px rgba(110,75,28,0.10), 0 0 70px rgba(70,45,20,0.06); }
+}
+
+#ls-title-play {
+  appearance: none;
+  background: transparent;
+  border: 1px solid rgba(232, 226, 212, 0.32);
+  color: #e8e2d4;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 18px;
+  letter-spacing: 0.3em;
+  padding: 14px 38px 14px 44px;
+  cursor: pointer;
+  transition: border-color 300ms ease, color 300ms ease, letter-spacing 300ms ease, box-shadow 400ms ease;
+  box-shadow: 0 0 0 rgba(180, 140, 60, 0);
+}
+#ls-title-play::before { content: ""; }
+#ls-title-play:hover,
+#ls-title-play:focus-visible {
+  border-color: rgba(232, 226, 212, 0.8);
+  color: #fff;
+  letter-spacing: 0.4em;
+  outline: none;
+  box-shadow: 0 0 24px rgba(180, 140, 60, 0.18);
+}
+#ls-title-play:focus-visible { outline: 1px dashed rgba(232, 226, 212, 0.5); outline-offset: 4px; }
+
+/* ---- Opening cinematic ---- */
+#ls-opening {
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 55;
+  overflow: hidden;
+}
+
+#ls-candle-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 55% 65% at 50% 65%,
+      rgba(255, 170, 70, 0.16) 0%,
+      rgba(220, 130, 40, 0.10) 30%,
+      rgba(140, 70, 20, 0.05) 55%,
+      rgba(0, 0, 0, 0) 80%
+    );
+  /* irregular flicker like a candle with no visible source */
+  animation: ls-candle-flicker 3.4s steps(40, end) infinite;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+@keyframes ls-candle-flicker {
+  0%, 100% { opacity: 0.78; transform: translateY(0) scale(1); }
+  5%  { opacity: 0.84; transform: translateY(-2px) scale(1.02); }
+  11% { opacity: 0.65; transform: translateY(1px) scale(0.99); }
+  17% { opacity: 0.92; transform: translateY(-1px) scale(1.01); }
+  24% { opacity: 0.7; transform: translateY(2px) scale(0.98); }
+  33% { opacity: 0.88; transform: translateY(0) scale(1); }
+  41% { opacity: 0.62; transform: translateY(-3px) scale(1.03); }
+  50% { opacity: 0.86; transform: translateY(0) scale(1); }
+  59% { opacity: 0.74; transform: translateY(2px) scale(0.99); }
+  68% { opacity: 0.9; transform: translateY(-1px) scale(1.01); }
+  77% { opacity: 0.66; transform: translateY(1px) scale(0.98); }
+  86% { opacity: 0.82; transform: translateY(-2px) scale(1.02); }
+  94% { opacity: 0.7; transform: translateY(0) scale(1); }
+}
+
+#ls-opening-text {
+  position: relative;
+  z-index: 2;
+  max-width: 80%;
+  text-align: center;
+  font-family: "Times New Roman", Times, serif;
+  color: #e8d8b4;
+  font-size: clamp(20px, 4.5vw, 38px);
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  text-shadow:
+    0 0 14px rgba(220, 150, 60, 0.32),
+    0 0 40px rgba(150, 90, 30, 0.18);
+  opacity: 0;
+  transition: opacity 1800ms ease-in-out, filter 1800ms ease-in-out;
+  filter: blur(8px);
+}
+#ls-opening-text.is-visible {
+  opacity: 1;
+  filter: blur(0);
+}
+#ls-opening-text.is-presenter {
+  font-size: clamp(16px, 3.2vw, 24px);
+  letter-spacing: 0.3em;
+  text-transform: none;
+  color: #c8b890;
+}
+#ls-opening-text.is-title-card {
+  font-size: clamp(48px, 13vw, 130px);
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
+  color: #f0e6c8;
+  text-shadow:
+    0 0 22px rgba(220, 160, 80, 0.4),
+    0 0 60px rgba(160, 100, 40, 0.22),
+    0 0 140px rgba(100, 60, 20, 0.12);
+}
+#ls-opening-text.is-fading {
+  opacity: 0;
+  filter: blur(6px);
+  transition: opacity 1400ms ease, filter 1400ms ease;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  #ls-title-screen,
+  #ls-title-text,
+  #ls-candle-glow { animation: none !important; }
+  #ls-opening-text { transition: opacity 400ms ease, filter 400ms ease !important; }
+}

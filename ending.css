@@ -1,0 +1,90 @@
+/* ============================================================
+   LAST SEEN — ending.css
+   Ending sequence overlays:
+     - "new message in inbox" notification banner
+     - Man silhouette revealed by lightning
+     - Black fade overlay (transition to newer phone)
+   Note: newer phone (cracked, bloodied) is styled in newer-phone.css.
+   ============================================================ */
+
+/* ---- Notification banner ("new message in inbox") ----
+   Takes over the vintage phone LCD area. */
+#ls-notification {
+  z-index: 65;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  /* Positioned over the phone LCD by JS; fallback here */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(360px, 88vw);
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.92);
+  border: 2px solid rgba(120, 200, 120, 0.6);
+  box-shadow:
+    0 0 0 1px rgba(80, 160, 80, 0.4),
+    0 0 30px rgba(80, 200, 100, 0.25);
+  color: #b8f0b8;
+  font-family: "Courier New", monospace;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-align: center;
+  padding: 14px 18px;
+  transition: opacity 400ms ease, visibility 0s linear 400ms;
+}
+#ls-notification.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 300ms ease, visibility 0s linear 0s;
+  animation: ls-notification-pulse 1.6s ease-in-out infinite;
+}
+@keyframes ls-notification-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(80,160,80,0.4), 0 0 24px rgba(80,200,100,0.2); border-color: rgba(120,200,120,0.6); }
+  50% { box-shadow: 0 0 0 1px rgba(120,220,120,0.6), 0 0 50px rgba(120,220,120,0.4); border-color: rgba(160,240,160,0.9); }
+}
+#ls-notification span {
+  display: block;
+}
+
+/* ---- Man silhouette (revealed by lightning during ending) ---- */
+#ls-man-silhouette {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  /* Centered, scaled to fill viewport height */
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+#ls-man-silhouette img {
+  height: 95vh;
+  width: auto;
+  max-width: 90vw;
+  display: block;
+  filter: drop-shadow(0 -10px 40px rgba(0,0,0,0.8));
+  transform: translateY(4vh);
+}
+#ls-man-silhouette.is-revealed {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 200ms ease-out, visibility 0s linear 0s;
+}
+#ls-man-silhouette.is-fading {
+  opacity: 0;
+  visibility: visible;
+  transition: opacity 1800ms ease-in, visibility 0s linear 1800ms;
+}
+
+/* ---- Ending fade (extends #ls-fade for the longer ending fade) ---- */
+body.ls-state-ending #ls-fade { z-index: 95; }
+
+@media (prefers-reduced-motion: reduce) {
+  #ls-notification.is-active { animation: none !important; }
+  #ls-man-silhouette.is-revealed,
+  #ls-man-silhouette.is-fading { transition-duration: 300ms !important; }
+}

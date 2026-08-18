@@ -1,0 +1,188 @@
+/* ============================================================
+   LAST SEEN — corridor.css
+   Left corridor view (Z to toggle). FNAF6-inspired smooth
+   camera pivot. Creepy hallway with rare psychological
+   events (eyes, shadow figures) that retreat under the
+   flashlight. Side-angled 4-cross window shadow.
+   ============================================================ */
+
+#ls-corridor {
+  background: #050709;
+  z-index: 35;
+  /* Default hidden by parent rule */
+  overflow: hidden;
+}
+
+/* Smooth pivot transition. We translate the corridor view in from
+   the left and fade the main scene. */
+#ls-corridor.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+#ls-corridor .ls-corridor-wall {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(120deg,
+      rgba(20, 25, 28, 0.6) 0%,
+      rgba(8, 11, 13, 0.95) 35%,
+      #04060a 70%,
+      #020304 100%
+    );
+}
+#ls-corridor .ls-corridor-floor {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 38%;
+  background:
+    linear-gradient(180deg,
+      rgba(15, 18, 20, 0) 0%,
+      rgba(6, 8, 10, 0.85) 35%,
+      #020304 100%
+    );
+  transform: perspective(700px) rotateX(58deg);
+  transform-origin: top center;
+  border-top: 1px solid rgba(50, 60, 70, 0.18);
+}
+#ls-corridor .ls-corridor-floor::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(40, 50, 55, 0.06) 0,
+    rgba(40, 50, 55, 0.06) 2px,
+    transparent 2px,
+    transparent 60px
+  );
+}
+
+/* Side-angled 4-cross window shadow (window is now on the left side
+   of the corridor view, so the cross shadow projects at an oblique angle). */
+#ls-corridor .ls-corridor-window-shadow {
+  position: absolute;
+  top: 8%;
+  left: -10%;
+  width: 70%;
+  height: 75%;
+  transform: skewX(-22deg) rotate(-3deg);
+  transform-origin: top left;
+  background:
+    linear-gradient(0deg,
+      rgba(20, 35, 50, 0) 0%,
+      rgba(35, 55, 75, 0.06) 50%,
+      rgba(20, 35, 50, 0) 100%
+    );
+  filter: blur(2px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0.65;
+  animation: ls-corridor-shadow-sway 18s ease-in-out infinite;
+}
+#ls-corridor .ls-corridor-window-shadow i {
+  position: absolute;
+  background: rgba(60, 80, 95, 0.06);
+  box-shadow: 0 0 14px rgba(60, 80, 95, 0.04);
+}
+/* Two vertical + two horizontal mullions, skewed */
+#ls-corridor .ls-corridor-window-shadow i:nth-child(1) { top: 0; bottom: 0; left: 25%; width: 4%; transform: skewX(22deg); }
+#ls-corridor .ls-corridor-window-shadow i:nth-child(2) { top: 0; bottom: 0; left: 60%; width: 4%; transform: skewX(22deg); }
+#ls-corridor .ls-corridor-window-shadow i:nth-child(3) { left: 0; right: 0; top: 30%; height: 4%; }
+#ls-corridor .ls-corridor-window-shadow i:nth-child(4) { left: 0; right: 0; top: 62%; height: 4%; }
+
+@keyframes ls-corridor-shadow-sway {
+  0%, 100% { transform: skewX(-22deg) rotate(-3deg) translateY(0); }
+  50% { transform: skewX(-24deg) rotate(-2.4deg) translateY(-6px); }
+}
+
+/* Lightning flash overlay for the corridor (separate from main scene's .storm-flash) */
+#ls-corridor .ls-corridor-storm-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 30% 20%,
+    rgba(220, 235, 255, 0.9) 0%,
+    rgba(180, 210, 240, 0.5) 30%,
+    rgba(60, 90, 130, 0.15) 60%,
+    transparent 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+#ls-corridor .ls-corridor-storm-flash.is-flashing {
+  animation: ls-corridor-flash 600ms steps(6, end) forwards;
+}
+@keyframes ls-corridor-flash {
+  0%   { opacity: 0; }
+  8%   { opacity: 1; }
+  16%  { opacity: 0.4; }
+  26%  { opacity: 0.9; }
+  42%  { opacity: 0.2; }
+  64%  { opacity: 0.5; }
+  100% { opacity: 0; }
+}
+
+/* Eyes (image-based). Hidden by default; surfaced via JS with bounded cooldown. */
+#ls-corridor .ls-corridor-eyes {
+  position: absolute;
+  top: 30%;
+  left: 8%;
+  width: 24%;
+  max-width: 220px;
+  opacity: 0;
+  filter: blur(2px) brightness(0.7);
+  transition: opacity 1200ms ease, filter 1200ms ease, transform 1200ms ease;
+  transform: translateY(8px);
+}
+#ls-corridor .ls-corridor-eyes img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+#ls-corridor .ls-corridor-eyes.is-visible {
+  opacity: 0.78;
+  filter: blur(0.6px) brightness(0.85);
+  transform: translateY(0);
+}
+/* When the flashlight is on AND pointing at the eyes, they retreat/close. */
+body.ls-flashlight-on.ls-corridor-eyes-lit #ls-corridor .ls-corridor-eyes.is-visible {
+  opacity: 0.06;
+  filter: blur(8px) brightness(0.4);
+  transform: translateY(-6px) scale(0.96);
+}
+
+/* Distant shadow figure (a shape that vanishes under the flashlight). */
+#ls-corridor .ls-corridor-figure {
+  position: absolute;
+  bottom: 18%;
+  right: 16%;
+  width: 90px;
+  height: 220px;
+  background: radial-gradient(ellipse 50% 60% at 50% 50%,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  filter: blur(3px);
+  transition: opacity 900ms ease, transform 1400ms ease;
+  transform: translateX(0);
+}
+#ls-corridor .ls-corridor-figure.is-visible {
+  opacity: 0.5;
+  transform: translateX(-12px);
+}
+body.ls-flashlight-on #ls-corridor .ls-corridor-figure.is-visible {
+  opacity: 0;
+  transform: translateX(40px);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  #ls-corridor .ls-corridor-window-shadow { animation: none !important; }
+  #ls-corridor .ls-corridor-storm-flash.is-flashing { animation: none !important; opacity: 0.5; transition: opacity 200ms ease; }
+  #ls-corridor .ls-corridor-eyes,
+  #ls-corridor .ls-corridor-figure { transition-duration: 200ms !important; }
+}

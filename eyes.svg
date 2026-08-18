@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 180" role="img" aria-label="Distant eyes in darkness">
+  <defs>
+    <radialGradient id="eye" cx="50%" cy="45%">
+      <stop offset="0" stop-color="#e7f5d9" stop-opacity=".96"/>
+      <stop offset=".28" stop-color="#a9c995" stop-opacity=".76"/>
+      <stop offset=".62" stop-color="#3e634e" stop-opacity=".38"/>
+      <stop offset="1" stop-color="#08100d" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="2.2"/></filter>
+  </defs>
+  <rect width="420" height="180" fill="none"/>
+  <g filter="url(#soft)">
+    <ellipse cx="134" cy="86" rx="45" ry="24" fill="url(#eye)"/>
+    <ellipse cx="286" cy="86" rx="45" ry="24" fill="url(#eye)"/>
+  </g>
+  <g fill="#07100b" opacity=".95">
+    <ellipse cx="134" cy="86" rx="9" ry="17"/>
+    <ellipse cx="286" cy="86" rx="9" ry="17"/>
+  </g>
+  <g fill="#efffe5" opacity=".75">
+    <circle cx="131" cy="80" r="2.4"/>
+    <circle cx="283" cy="80" r="2.4"/>
+  </g>
+  <path d="M73 75 Q134 35 195 75 M225 75 Q286 35 347 75" fill="none" stroke="#17251c" stroke-width="12" stroke-linecap="round" opacity=".76"/>
+</svg>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  LAST SEEN — Blood Splatter
+  Original procedural SVG. Dried and wet blood smears and splatter patterns
+  for the newer touchscreen phone. Combines:
+   - Wet drips (still running, with rounded bottoms)
+   - Dried smears (matte, irregular)
+   - Impact splatter (small droplets scattered around an impact center)
+  Designed to layer over the screen at low opacity, multiplied or screened.
+  License: CC0 / Public Domain — see IMAGE_CREDITS.md
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 1100" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <radialGradient id="wetBlood" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#3a0606" stop-opacity="0.95"/>
+      <stop offset="60%" stop-color="#5a0808" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#1a0202" stop-opacity="0.55"/>
+    </radialGradient>
+    <radialGradient id="driedBlood" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#4a1408" stop-opacity="0.75"/>
+      <stop offset="70%" stop-color="#2e0a04" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#1a0502" stop-opacity="0.2"/>
+    </radialGradient>
+    <filter id="bloodBlur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0.9"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#bloodBlur)">
+    <!-- Main impact smear over the screen -->
+    <path d="M220,180 Q280,140 360,180 Q420,220 410,310 Q400,400 340,440 Q280,460 220,420 Q160,380 170,290 Q190,210 220,180 Z"
+          fill="url(#wetBlood)"/>
+    <!-- Long vertical drip down the screen -->
+    <path d="M270,300 Q288,560 280,820 Q274,980 290,1060 L320,1060 Q332,980 326,820 Q318,560 300,300 Z"
+          fill="url(#wetBlood)"/>
+    <!-- Side smear (finger-wipe) -->
+    <path d="M380,250 Q470,300 510,420 Q540,520 470,560 Q400,580 360,500 Q330,420 380,250 Z"
+          fill="url(#driedBlood)" opacity="0.85"/>
+    <!-- Smaller drip -->
+    <path d="M180,420 Q195,620 188,820 Q183,940 200,1020 L222,1020 Q234,940 230,820 Q224,620 210,420 Z"
+          fill="url(#wetBlood)" opacity="0.8"/>
+
+    <!-- Splatter droplets around impact -->
+    <circle cx="140" cy="220" r="9" fill="url(#wetBlood)"/>
+    <circle cx="170" cy="160" r="5" fill="url(#wetBlood)"/>
+    <circle cx="460" cy="180" r="7" fill="url(#wetBlood)"/>
+    <circle cx="510" cy="240" r="4" fill="url(#wetBlood)"/>
+    <circle cx="100" cy="320" r="6" fill="url(#wetBlood)"/>
+    <circle cx="540" cy="380" r="5" fill="url(#wetBlood)"/>
+    <circle cx="80"  cy="500" r="4" fill="url(#wetBlood)"/>
+    <circle cx="560" cy="540" r="6" fill="url(#wetBlood)"/>
+    <circle cx="120" cy="640" r="5" fill="url(#wetBlood)"/>
+    <circle cx="500" cy="700" r="4" fill="url(#wetBlood)"/>
+    <circle cx="160" cy="780" r="7" fill="url(#wetBlood)"/>
+    <circle cx="440" cy="820" r="5" fill="url(#wetBlood)"/>
+    <circle cx="210" cy="940" r="6" fill="url(#wetBlood)"/>
+    <circle cx="380" cy="970" r="4" fill="url(#wetBlood)"/>
+
+    <!-- Micro-droplets (stipple) -->
+    <circle cx="90"  cy="260" r="2" fill="url(#wetBlood)"/>
+    <circle cx="110" cy="200" r="1.5" fill="url(#wetBlood)"/>
+    <circle cx="200" cy="140" r="2" fill="url(#wetBlood)"/>
+    <circle cx="350" cy="120" r="1.5" fill="url(#wetBlood)"/>
+    <circle cx="440" cy="140" r="2" fill="url(#wetBlood)"/>
+    <circle cx="530" cy="180" r="2" fill="url(#wetBlood)"/>
+    <circle cx="555" cy="290" r="1.5" fill="url(#wetBlood)"/>
+    <circle cx="565" cy="450" r="2" fill="url(#wetBlood)"/>
+    <circle cx="100" cy="400" r="1.5" fill="url(#wetBlood)"/>
+    <circle cx="80"  cy="600" r="2" fill="url(#wetBlood)"/>
+    <circle cx="90"  cy="720" r="1.5" fill="url(#wetBlood)"/>
+    <circle cx="130" cy="880" r="2" fill="url(#wetBlood)"/>
+    <circle cx="260" cy="980" r="1.5" fill="url(#wetBlood)"/>
+    <circle cx="430" cy="940" r="2" fill="url(#wetBlood)"/>
+    <circle cx="510" cy="820" r="1.5" fill="url(#wetBlood)"/>
+  </g>
+</svg>
