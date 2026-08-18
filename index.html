@@ -1566,17 +1566,1297 @@
   </style>
 
   <!-- ============== LAST SEEN — NARRATIVE OVERLAY STYLES ============== -->
-  <link rel="stylesheet" href="css/narrative.css">
-  <link rel="stylesheet" href="css/title.css">
-  <link rel="stylesheet" href="css/flashlight.css">
-  <link rel="stylesheet" href="css/corridor.css">
-  <link rel="stylesheet" href="css/storm-eas.css">
-  <link rel="stylesheet" href="css/ending.css">
-  <link rel="stylesheet" href="css/newer-phone.css">
-  <link rel="stylesheet" href="css/quality-fixes.css">
 
   <!-- Critical first-paint gate. The title must own the first frame before
        any legacy phone renderer or narrative module can initialize. -->
+
+  <style id="ls-bundled-support-styles">
+/* ============================================================
+   LAST SEEN — narrative.css
+   Top-level overlay container and shared state classes.
+   Sits above the existing <main class="scene"> layer.
+   All overlays default to invisible and aria-hidden.
+   Individual modules flip them on via state classes on
+   #ls-overlays or on themselves.
+   ============================================================ */
+
+#ls-overlays {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  /* Each child sets its own pointer-events: auto when interactive */
+}
+
+#ls-overlays > * {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 600ms ease, visibility 0s linear 600ms;
+}
+
+#ls-overlays > .is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 600ms ease, visibility 0s linear 0s;
+}
+
+#ls-overlays > .is-instant {
+  transition: opacity 0ms, visibility 0s;
+}
+
+/* Black fade overlay (fades entire viewport to black) */
+#ls-fade {
+  background: #000;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 90;
+  transition: opacity 1400ms ease, visibility 0s linear 1400ms;
+}
+#ls-fade.is-fading {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 1400ms ease, visibility 0s linear 0s;
+}
+#ls-fade.is-holding {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: none;
+}
+
+/* When the title screen is active, hide the main scene underneath
+   from screen readers and dim pointer events */
+body.ls-state-title main.scene,
+body.ls-state-opening main.scene,
+body.ls-state-ending main.scene {
+  visibility: hidden;
+  pointer-events: none;
+}
+body.ls-state-title main.scene {
+  opacity: 0;
+}
+
+/* Reduced motion: collapse all overlay transitions */
+@media (prefers-reduced-motion: reduce) {
+  #ls-overlays > *,
+  #ls-fade {
+    transition: opacity 200ms ease, visibility 0s linear 200ms !important;
+  }
+  #ls-overlays > .is-active { transition-duration: 200ms !important; }
+}
+
+
+/* ============================================================
+   LAST SEEN — title.css
+   Title screen + opening cinematic.
+   Pitch-black background. Title "LAST SEEN" and a Play button.
+   Opening uses a warm candle-like glow (no visible candle).
+   ============================================================ */
+
+/* ---- Title screen ---- */
+#ls-title-screen {
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  z-index: 60;
+  /* subtle irregular flicker on the entire screen background */
+  animation: ls-title-flicker 7s steps(60, end) infinite;
+}
+
+@keyframes ls-title-flicker {
+  0%, 100% { background: #000; }
+  3%  { background: #020201; }
+  7%  { background: #000; }
+  9%  { background: #010100; }
+  14% { background: #000; }
+  18% { background: #020100; }
+  19% { background: #000; }
+  45% { background: #000; }
+  47% { background: #010100; }
+  49% { background: #000; }
+  72% { background: #000; }
+  74% { background: #020100; }
+  76% { background: #000; }
+}
+
+#ls-title-screen.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+#ls-title-text {
+  margin: 0;
+  font-family: "Times New Roman", Times, serif;
+  font-weight: 400;
+  font-size: clamp(40px, 11vw, 110px);
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
+  color: #e8e2d4;
+  text-shadow:
+    0 0 12px rgba(180, 140, 60, 0.22),
+    0 0 40px rgba(120, 80, 30, 0.12),
+    0 0 90px rgba(80, 50, 20, 0.08);
+  /* slight irregular exposure */
+  animation: ls-title-exposure 5s ease-in-out infinite;
+}
+
+@keyframes ls-title-exposure {
+  0%, 100% { opacity: 0.94; text-shadow: 0 0 12px rgba(180,140,60,0.22), 0 0 40px rgba(120,80,30,0.12), 0 0 90px rgba(80,50,20,0.08); }
+  35% { opacity: 1; text-shadow: 0 0 18px rgba(200,160,80,0.32), 0 0 60px rgba(140,100,40,0.18), 0 0 120px rgba(90,60,25,0.12); }
+  60% { opacity: 0.88; text-shadow: 0 0 10px rgba(170,130,55,0.18), 0 0 32px rgba(110,75,28,0.10), 0 0 70px rgba(70,45,20,0.06); }
+}
+
+#ls-title-play {
+  appearance: none;
+  background: transparent;
+  border: 1px solid rgba(232, 226, 212, 0.32);
+  color: #e8e2d4;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 18px;
+  letter-spacing: 0.3em;
+  padding: 14px 38px 14px 44px;
+  cursor: pointer;
+  transition: border-color 300ms ease, color 300ms ease, letter-spacing 300ms ease, box-shadow 400ms ease;
+  box-shadow: 0 0 0 rgba(180, 140, 60, 0);
+}
+#ls-title-play::before { content: ""; }
+#ls-title-play:hover,
+#ls-title-play:focus-visible {
+  border-color: rgba(232, 226, 212, 0.8);
+  color: #fff;
+  letter-spacing: 0.4em;
+  outline: none;
+  box-shadow: 0 0 24px rgba(180, 140, 60, 0.18);
+}
+#ls-title-play:focus-visible { outline: 1px dashed rgba(232, 226, 212, 0.5); outline-offset: 4px; }
+
+/* ---- Opening cinematic ---- */
+#ls-opening {
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 55;
+  overflow: hidden;
+}
+
+#ls-candle-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 55% 65% at 50% 65%,
+      rgba(255, 170, 70, 0.16) 0%,
+      rgba(220, 130, 40, 0.10) 30%,
+      rgba(140, 70, 20, 0.05) 55%,
+      rgba(0, 0, 0, 0) 80%
+    );
+  /* irregular flicker like a candle with no visible source */
+  animation: ls-candle-flicker 3.4s steps(40, end) infinite;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+@keyframes ls-candle-flicker {
+  0%, 100% { opacity: 0.78; transform: translateY(0) scale(1); }
+  5%  { opacity: 0.84; transform: translateY(-2px) scale(1.02); }
+  11% { opacity: 0.65; transform: translateY(1px) scale(0.99); }
+  17% { opacity: 0.92; transform: translateY(-1px) scale(1.01); }
+  24% { opacity: 0.7; transform: translateY(2px) scale(0.98); }
+  33% { opacity: 0.88; transform: translateY(0) scale(1); }
+  41% { opacity: 0.62; transform: translateY(-3px) scale(1.03); }
+  50% { opacity: 0.86; transform: translateY(0) scale(1); }
+  59% { opacity: 0.74; transform: translateY(2px) scale(0.99); }
+  68% { opacity: 0.9; transform: translateY(-1px) scale(1.01); }
+  77% { opacity: 0.66; transform: translateY(1px) scale(0.98); }
+  86% { opacity: 0.82; transform: translateY(-2px) scale(1.02); }
+  94% { opacity: 0.7; transform: translateY(0) scale(1); }
+}
+
+#ls-opening-text {
+  position: relative;
+  z-index: 2;
+  max-width: 80%;
+  text-align: center;
+  font-family: "Times New Roman", Times, serif;
+  color: #e8d8b4;
+  font-size: clamp(20px, 4.5vw, 38px);
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  text-shadow:
+    0 0 14px rgba(220, 150, 60, 0.32),
+    0 0 40px rgba(150, 90, 30, 0.18);
+  opacity: 0;
+  transition: opacity 1800ms ease-in-out, filter 1800ms ease-in-out;
+  filter: blur(8px);
+}
+#ls-opening-text.is-visible {
+  opacity: 1;
+  filter: blur(0);
+}
+#ls-opening-text.is-presenter {
+  font-size: clamp(16px, 3.2vw, 24px);
+  letter-spacing: 0.3em;
+  text-transform: none;
+  color: #c8b890;
+}
+#ls-opening-text.is-title-card {
+  font-size: clamp(48px, 13vw, 130px);
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
+  color: #f0e6c8;
+  text-shadow:
+    0 0 22px rgba(220, 160, 80, 0.4),
+    0 0 60px rgba(160, 100, 40, 0.22),
+    0 0 140px rgba(100, 60, 20, 0.12);
+}
+#ls-opening-text.is-fading {
+  opacity: 0;
+  filter: blur(6px);
+  transition: opacity 1400ms ease, filter 1400ms ease;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  #ls-title-screen,
+  #ls-title-text,
+  #ls-candle-glow { animation: none !important; }
+  #ls-opening-text { transition: opacity 400ms ease, filter 400ms ease !important; }
+}
+
+
+/* ============================================================
+   LAST SEEN — flashlight.css
+   Cursor-following flashlight mask. Rendered as a Canvas
+   layer that draws a soft radial light wherever the cursor
+   is, with bounded flicker. Toggle on/off with F.
+   ============================================================ */
+
+#ls-flashlight {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 300ms ease, visibility 0s linear 300ms;
+  mix-blend-mode: screen;
+}
+
+#ls-flashlight.is-on {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 400ms ease, visibility 0s linear 0s;
+}
+
+/* When flashlight is on, the underlying room darkens further so the
+   flashlight cut is more dramatic. The flashlight Canvas itself is the
+   light; the surrounding darkness comes from a slight desaturation
+   applied to the scene layer via a body class. */
+body.ls-flashlight-on main.scene {
+  filter: brightness(0.55) saturate(0.8) contrast(1.05);
+  transition: filter 600ms ease;
+}
+body.ls-flashlight-off main.scene {
+  filter: none;
+  transition: filter 600ms ease;
+}
+
+/* Tiny "flashlight on" indicator (no visible tutorial text — just a small
+   dot in the corner that shows the flashlight state). Hidden in reduced
+   motion / touch primary contexts. */
+#ls-flashlight::after {
+  content: "";
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 240, 200, 0.7);
+  box-shadow: 0 0 10px rgba(255, 230, 160, 0.7);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+body.ls-flashlight-on #ls-flashlight::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #ls-flashlight { transition: opacity 200ms ease, visibility 0s linear 200ms !important; }
+  body.ls-flashlight-on main.scene { filter: brightness(0.7) saturate(0.9); }
+}
+
+
+/* ============================================================
+   LAST SEEN — corridor.css
+   Left corridor view (Z to toggle). FNAF6-inspired smooth
+   camera pivot. Creepy hallway with rare psychological
+   events (eyes, shadow figures) that retreat under the
+   flashlight. Side-angled 4-cross window shadow.
+   ============================================================ */
+
+#ls-corridor {
+  background: #050709;
+  z-index: 35;
+  /* Default hidden by parent rule */
+  overflow: hidden;
+}
+
+/* Smooth pivot transition. We translate the corridor view in from
+   the left and fade the main scene. */
+#ls-corridor.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+#ls-corridor .ls-corridor-wall {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(120deg,
+      rgba(20, 25, 28, 0.6) 0%,
+      rgba(8, 11, 13, 0.95) 35%,
+      #04060a 70%,
+      #020304 100%
+    );
+}
+#ls-corridor .ls-corridor-floor {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 38%;
+  background:
+    linear-gradient(180deg,
+      rgba(15, 18, 20, 0) 0%,
+      rgba(6, 8, 10, 0.85) 35%,
+      #020304 100%
+    );
+  transform: perspective(700px) rotateX(58deg);
+  transform-origin: top center;
+  border-top: 1px solid rgba(50, 60, 70, 0.18);
+}
+#ls-corridor .ls-corridor-floor::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(40, 50, 55, 0.06) 0,
+    rgba(40, 50, 55, 0.06) 2px,
+    transparent 2px,
+    transparent 60px
+  );
+}
+
+/* Side-angled 4-cross window shadow (window is now on the left side
+   of the corridor view, so the cross shadow projects at an oblique angle). */
+#ls-corridor .ls-corridor-window-shadow {
+  position: absolute;
+  top: 8%;
+  left: -10%;
+  width: 70%;
+  height: 75%;
+  transform: skewX(-22deg) rotate(-3deg);
+  transform-origin: top left;
+  background:
+    linear-gradient(0deg,
+      rgba(20, 35, 50, 0) 0%,
+      rgba(35, 55, 75, 0.06) 50%,
+      rgba(20, 35, 50, 0) 100%
+    );
+  filter: blur(2px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0.65;
+  animation: ls-corridor-shadow-sway 18s ease-in-out infinite;
+}
+#ls-corridor .ls-corridor-window-shadow i {
+  position: absolute;
+  background: rgba(60, 80, 95, 0.06);
+  box-shadow: 0 0 14px rgba(60, 80, 95, 0.04);
+}
+/* Two vertical + two horizontal mullions, skewed */
+#ls-corridor .ls-corridor-window-shadow i:nth-child(1) { top: 0; bottom: 0; left: 25%; width: 4%; transform: skewX(22deg); }
+#ls-corridor .ls-corridor-window-shadow i:nth-child(2) { top: 0; bottom: 0; left: 60%; width: 4%; transform: skewX(22deg); }
+#ls-corridor .ls-corridor-window-shadow i:nth-child(3) { left: 0; right: 0; top: 30%; height: 4%; }
+#ls-corridor .ls-corridor-window-shadow i:nth-child(4) { left: 0; right: 0; top: 62%; height: 4%; }
+
+@keyframes ls-corridor-shadow-sway {
+  0%, 100% { transform: skewX(-22deg) rotate(-3deg) translateY(0); }
+  50% { transform: skewX(-24deg) rotate(-2.4deg) translateY(-6px); }
+}
+
+/* Lightning flash overlay for the corridor (separate from main scene's .storm-flash) */
+#ls-corridor .ls-corridor-storm-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 30% 20%,
+    rgba(220, 235, 255, 0.9) 0%,
+    rgba(180, 210, 240, 0.5) 30%,
+    rgba(60, 90, 130, 0.15) 60%,
+    transparent 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+#ls-corridor .ls-corridor-storm-flash.is-flashing {
+  animation: ls-corridor-flash 600ms steps(6, end) forwards;
+}
+@keyframes ls-corridor-flash {
+  0%   { opacity: 0; }
+  8%   { opacity: 1; }
+  16%  { opacity: 0.4; }
+  26%  { opacity: 0.9; }
+  42%  { opacity: 0.2; }
+  64%  { opacity: 0.5; }
+  100% { opacity: 0; }
+}
+
+/* Eyes (image-based). Hidden by default; surfaced via JS with bounded cooldown. */
+#ls-corridor .ls-corridor-eyes {
+  position: absolute;
+  top: 30%;
+  left: 8%;
+  width: 24%;
+  max-width: 220px;
+  opacity: 0;
+  filter: blur(2px) brightness(0.7);
+  transition: opacity 1200ms ease, filter 1200ms ease, transform 1200ms ease;
+  transform: translateY(8px);
+}
+#ls-corridor .ls-corridor-eyes img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+#ls-corridor .ls-corridor-eyes.is-visible {
+  opacity: 0.78;
+  filter: blur(0.6px) brightness(0.85);
+  transform: translateY(0);
+}
+/* When the flashlight is on AND pointing at the eyes, they retreat/close. */
+body.ls-flashlight-on.ls-corridor-eyes-lit #ls-corridor .ls-corridor-eyes.is-visible {
+  opacity: 0.06;
+  filter: blur(8px) brightness(0.4);
+  transform: translateY(-6px) scale(0.96);
+}
+
+/* Distant shadow figure (a shape that vanishes under the flashlight). */
+#ls-corridor .ls-corridor-figure {
+  position: absolute;
+  bottom: 18%;
+  right: 16%;
+  width: 90px;
+  height: 220px;
+  background: radial-gradient(ellipse 50% 60% at 50% 50%,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  filter: blur(3px);
+  transition: opacity 900ms ease, transform 1400ms ease;
+  transform: translateX(0);
+}
+#ls-corridor .ls-corridor-figure.is-visible {
+  opacity: 0.5;
+  transform: translateX(-12px);
+}
+body.ls-flashlight-on #ls-corridor .ls-corridor-figure.is-visible {
+  opacity: 0;
+  transform: translateX(40px);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  #ls-corridor .ls-corridor-window-shadow { animation: none !important; }
+  #ls-corridor .ls-corridor-storm-flash.is-flashing { animation: none !important; opacity: 0.5; transition: opacity 200ms ease; }
+  #ls-corridor .ls-corridor-eyes,
+  #ls-corridor .ls-corridor-figure { transition-duration: 200ms !important; }
+}
+
+
+/* ============================================================
+   LAST SEEN — storm-eas.css
+   Philippine-style fictional emergency alert that takes over
+   the vintage phone screen at the 120-second mark. Local
+   eas.mp3 plays. Alert states one consistent town / province
+   (Saint Francis, Ilocos Region) and uses the phone's current
+   time as the timestamp.
+   ============================================================ */
+
+#ls-eas {
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  /* EAS alert is positioned over the phone LCD, not the full viewport */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(80, 4, 4, 0.95);
+  color: #ffd9d9;
+  font-family: "Courier New", monospace;
+  padding: 8px;
+  transition: opacity 400ms ease, visibility 0s linear 400ms;
+}
+
+#ls-eas.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 300ms ease, visibility 0s linear 0s;
+}
+
+/* Position the EAS alert ON the phone LCD area (overlay the LCD) */
+#ls-eas {
+  position: absolute;
+  /* Calculated dynamically by JS to match the LCD frame, but provide
+     sensible fallback values for desktop. */
+  top: 50%;
+  left: 50%;
+  width: min(420px, 90vw);
+  height: min(320px, 70vh);
+  transform: translate(-50%, -50%);
+  border: 4px solid #ffe0e0;
+  box-shadow: 0 0 0 4px #600, 0 0 60px rgba(255, 80, 80, 0.4);
+}
+
+#ls-eas .ls-eas-header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  background: #b81a1a;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  padding: 6px 10px;
+  letter-spacing: 0.2em;
+  font-size: 14px;
+  border-bottom: 2px solid #600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+#ls-eas .ls-eas-flag { font-size: 16px; }
+
+#ls-eas .ls-eas-body {
+  position: absolute;
+  top: 44px;
+  left: 0; right: 0;
+  bottom: 0;
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+#ls-eas .ls-eas-body p { margin: 0; line-height: 1.4; }
+#ls-eas .ls-eas-body p#ls-eas-category {
+  font-size: 16px; font-weight: 700; letter-spacing: 0.15em;
+  color: #fff3a0;
+  border-bottom: 1px dashed rgba(255, 220, 80, 0.4);
+  padding-bottom: 6px;
+}
+#ls-eas .ls-eas-body p#ls-eas-area {
+  font-size: 14px; color: #ffe0e0; letter-spacing: 0.08em;
+}
+#ls-eas .ls-eas-body p#ls-eas-message {
+  font-size: 13px; color: #fff; flex: 1; overflow-y: auto;
+  line-height: 1.5;
+}
+#ls-eas .ls-eas-body p#ls-eas-time {
+  font-size: 12px; color: #ffd0a0; letter-spacing: 0.12em;
+  border-top: 1px dashed rgba(255, 200, 120, 0.3);
+  padding-top: 6px;
+}
+#ls-eas .ls-eas-footer {
+  font-size: 10px; color: rgba(255, 220, 200, 0.6);
+  text-align: center; letter-spacing: 0.04em; margin-top: 4px;
+}
+
+/* Pulsing red border while the alert is active */
+#ls-eas.is-active {
+  animation: ls-eas-pulse 1.4s ease-in-out infinite;
+}
+@keyframes ls-eas-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px #600, 0 0 30px rgba(255, 80, 80, 0.3); }
+  50% { box-shadow: 0 0 0 4px #800, 0 0 70px rgba(255, 100, 100, 0.55); }
+}
+
+/* Lightning flash overlay (re-used .storm-flash element already exists in main scene).
+   Here we add a four-cross window shadow projector that becomes visible only
+   during a lightning strike in either view. The element is positioned in the
+   main scene; it gets .is-flashing via JS when lightning fires. */
+/* NOTE: The existing .window-shadow in main scene is the front-view four-cross
+   shadow. It is normally dim; lightning brightens it via .is-flashing class
+   toggled by storm-eas.js. */
+.window-shadow.is-flashing { filter: brightness(2.4) saturate(1.2) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  #ls-eas.is-active { animation: none !important; }
+  #ls-eas { transition-duration: 200ms !important; }
+}
+
+
+/* ============================================================
+   LAST SEEN — ending.css
+   Ending sequence overlays:
+     - "new message in inbox" notification banner
+     - Man silhouette revealed by lightning
+     - Black fade overlay (transition to newer phone)
+   Note: newer phone (cracked, bloodied) is styled in newer-phone.css.
+   ============================================================ */
+
+/* ---- Notification banner ("new message in inbox") ----
+   Takes over the vintage phone LCD area. */
+#ls-notification {
+  z-index: 65;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  /* Positioned over the phone LCD by JS; fallback here */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(360px, 88vw);
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.92);
+  border: 2px solid rgba(120, 200, 120, 0.6);
+  box-shadow:
+    0 0 0 1px rgba(80, 160, 80, 0.4),
+    0 0 30px rgba(80, 200, 100, 0.25);
+  color: #b8f0b8;
+  font-family: "Courier New", monospace;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-align: center;
+  padding: 14px 18px;
+  transition: opacity 400ms ease, visibility 0s linear 400ms;
+}
+#ls-notification.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 300ms ease, visibility 0s linear 0s;
+  animation: ls-notification-pulse 1.6s ease-in-out infinite;
+}
+@keyframes ls-notification-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(80,160,80,0.4), 0 0 24px rgba(80,200,100,0.2); border-color: rgba(120,200,120,0.6); }
+  50% { box-shadow: 0 0 0 1px rgba(120,220,120,0.6), 0 0 50px rgba(120,220,120,0.4); border-color: rgba(160,240,160,0.9); }
+}
+#ls-notification span {
+  display: block;
+}
+
+/* ---- Man silhouette (revealed by lightning during ending) ---- */
+#ls-man-silhouette {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  /* Centered, scaled to fill viewport height */
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+#ls-man-silhouette img {
+  height: 95vh;
+  width: auto;
+  max-width: 90vw;
+  display: block;
+  filter: drop-shadow(0 -10px 40px rgba(0,0,0,0.8));
+  transform: translateY(4vh);
+}
+#ls-man-silhouette.is-revealed {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 200ms ease-out, visibility 0s linear 0s;
+}
+#ls-man-silhouette.is-fading {
+  opacity: 0;
+  visibility: visible;
+  transition: opacity 1800ms ease-in, visibility 0s linear 1800ms;
+}
+
+/* ---- Ending fade (extends #ls-fade for the longer ending fade) ---- */
+body.ls-state-ending #ls-fade { z-index: 95; }
+
+@media (prefers-reduced-motion: reduce) {
+  #ls-notification.is-active { animation: none !important; }
+  #ls-man-silhouette.is-revealed,
+  #ls-man-silhouette.is-fading { transition-duration: 300ms !important; }
+}
+
+
+/* ============================================================
+   LAST SEEN — newer-phone.css
+   Newer touchscreen phone shown after the ending fade.
+   Has believable glass, bezel, speaker/sensor placement,
+   reflections, cracks (SVG), dried + wet blood (SVG),
+   contact shadows, and blood on the floor.
+   Shows the Dante missing-person alert on screen.
+   Distinct cool-white / blue-green glow vs the old green LCD.
+   ============================================================ */
+
+#ls-newer-phone {
+  z-index: 92;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse 70% 50% at 50% 50%,
+    rgba(80, 110, 130, 0.18) 0%,
+    rgba(20, 35, 50, 0.4) 35%,
+    #04060a 75%,
+    #020304 100%
+  );
+  transition: opacity 2200ms ease, visibility 0s linear 2200ms;
+}
+#ls-newer-phone.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 2200ms ease, visibility 0s linear 0s;
+}
+
+#ls-newer-phone .ls-newer-shell {
+  position: relative;
+  width: min(340px, 78vw);
+  height: min(720px, 88vh);
+  background:
+    linear-gradient(135deg,
+      #1a1d22 0%,
+      #0e1115 40%,
+      #050709 100%
+    );
+  border-radius: 28px;
+  box-shadow:
+    inset 0 0 0 2px rgba(70, 90, 110, 0.18),
+    inset 0 0 22px rgba(0, 0, 0, 0.85),
+    0 30px 80px -20px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(120, 140, 160, 0.15);
+  padding: 14px 10px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Speaker grill + front camera / sensor dots */
+#ls-newer-phone .ls-newer-shell::before {
+  content: "";
+  display: block;
+  width: 60%;
+  height: 6px;
+  background: repeating-linear-gradient(90deg,
+    rgba(70, 90, 110, 0.5) 0 2px,
+    transparent 2px 4px
+  );
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+#ls-newer-phone .ls-newer-shell::after {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #0a0d10;
+  box-shadow:
+    -8px 0 0 -1px #0a0d10,
+    -16px 0 0 -2px #0a0d10,
+    inset 0 0 2px rgba(80, 110, 140, 0.3);
+  margin-bottom: 8px;
+}
+
+#ls-newer-phone .ls-newer-screen {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  background:
+    linear-gradient(180deg, #0a1822 0%, #0c1c28 60%, #06121a 100%);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 0 1px rgba(80, 120, 150, 0.18),
+    inset 0 0 30px rgba(0, 0, 0, 0.6);
+}
+
+/* Glass reflection sweep (cool-white diagonal gloss) */
+#ls-newer-phone .ls-newer-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.02) 30%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.04) 70%,
+      rgba(255, 255, 255, 0.10) 100%
+    );
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Cracks SVG layer (above screen content, below alert) */
+#ls-newer-phone .ls-newer-cracks {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.92;
+}
+#ls-newer-phone .ls-newer-cracks img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Blood splatter SVG layer (on top of cracks) */
+#ls-newer-phone .ls-newer-blood {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0.78;
+}
+#ls-newer-phone .ls-newer-blood img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Dante alert — cool-white/blue-green glow distinct from old green LCD */
+#ls-newer-phone .ls-newer-alert {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 18px 14px 14px;
+  font-family: "Courier New", monospace;
+  color: #d6e8f4;
+  text-align: center;
+  background:
+    linear-gradient(180deg,
+      rgba(40, 60, 80, 0.5) 0%,
+      rgba(20, 35, 55, 0.7) 40%,
+      rgba(10, 20, 35, 0.85) 100%
+    );
+  border-radius: 18px;
+  overflow: hidden;
+  /* Subtle internal screen glow */
+  box-shadow: inset 0 0 60px rgba(80, 140, 180, 0.18);
+}
+
+#ls-newer-phone .ls-dante-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #b81a1a;
+  color: #fff;
+  padding: 8px 10px;
+  letter-spacing: 0.22em;
+  font-weight: 700;
+  font-size: 13px;
+  border-bottom: 2px solid #6b0000;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+#ls-newer-phone .ls-dante-flag { font-size: 14px; }
+
+#ls-newer-phone .ls-dante-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-y: auto;
+}
+#ls-newer-phone .ls-dante-body p { margin: 0; }
+#ls-newer-phone .ls-dante-category {
+  color: #ffce80; font-weight: 700; letter-spacing: 0.15em;
+  border-bottom: 1px dashed rgba(255, 200, 120, 0.4);
+  padding-bottom: 6px;
+}
+#ls-newer-phone .ls-dante-name {
+  color: #fff; font-weight: 700; letter-spacing: 0.1em;
+}
+#ls-newer-phone .ls-dante-message { color: #e0eef8; }
+#ls-newer-phone .ls-dante-time {
+  color: #ffd0a0; font-size: 11px; letter-spacing: 0.1em;
+  border-top: 1px dashed rgba(255, 200, 120, 0.3);
+  padding-top: 6px;
+}
+#ls-newer-phone .ls-dante-footer {
+  color: rgba(220, 235, 250, 0.5); font-size: 9px; margin-top: 4px;
+}
+
+/* Blood pool on the floor (extends below the newer phone) */
+#ls-newer-phone .ls-newer-floor-blood {
+  position: absolute;
+  bottom: 4%;
+  left: 50%;
+  transform: translateX(-50%) translateY(60%);
+  width: min(520px, 100vw);
+  height: 100px;
+  background:
+    radial-gradient(ellipse 50% 50% at 50% 50%,
+      rgba(40, 0, 0, 0.85) 0%,
+      rgba(60, 4, 4, 0.6) 30%,
+      rgba(40, 2, 2, 0.4) 60%,
+      transparent 100%
+    );
+  filter: blur(6px);
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Cool white-blue-green ambient glow around the newer phone screen */
+#ls-newer-phone::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 35% 55% at 50% 50%,
+    rgba(120, 180, 220, 0.12) 0%,
+    rgba(40, 80, 120, 0.06) 40%,
+    transparent 80%
+  );
+  pointer-events: none;
+  mix-blend-mode: screen;
+  animation: ls-newer-screen-breathe 5s ease-in-out infinite;
+}
+@keyframes ls-newer-screen-breathe {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #ls-newer-phone,
+  #ls-newer-phone.is-active { transition-duration: 400ms !important; }
+  #ls-newer-phone::before { animation: none !important; }
+}
+
+
+/* LAST SEEN — quality-fixes.css
+   Consolidated final overrides. This file must remain loaded last.
+*/
+
+/* -------------------------------------------------------------------------
+   MAIN-SCENE DARKNESS
+   ------------------------------------------------------------------------- */
+
+/* Remove the old global body vignette from the playable room. Darkness is
+   owned by the room-dimmer and the flashlight compositor, so the LCD can be
+   raised independently. */
+body.ls-state-main::before { display: none !important; }
+
+/* With F off, the room is almost completely crushed. The selector uses
+   :not(.ls-flashlight-on) so it also works on the very first main frame before
+   the explicit flashlight-off class has been restored. */
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene {
+  --room-light: .006 !important;
+  --beam-light: .003 !important;
+  --set-light: .008 !important;
+  --sheen-light: .002 !important;
+  --darkness: .998 !important;
+  filter: none !important;
+  background: #000 !important;
+}
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .room-dimmer {
+  opacity: .998 !important;
+  background: rgba(0, 2, 3, .998) !important;
+}
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .room-set,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .rain-window,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .aparador-silhouette,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .wall-frame,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .desk-papers,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .window-shadow,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .lamp-bloom,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .light-beam,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .rain-sheen,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .moth-field {
+  opacity: .004 !important;
+  filter: brightness(.08) !important;
+}
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .phone-aura {
+  display: none !important;
+}
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .phone-wrap {
+  opacity: .88 !important;
+  filter: brightness(.12) contrast(1.2) drop-shadow(0 18px 24px rgba(0,0,0,.96)) !important;
+}
+
+/* The LCD remains visible for the entire time the vintage phone is powered,
+   not only during the short key-wake class. The handset shell remains dark. */
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene.phone-powered .lcd-frame,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .phone.is-lit .lcd-frame {
+  filter: brightness(9) contrast(1.38) saturate(.72) !important;
+  box-shadow: 0 0 34px rgba(162,222,148,.42), inset 0 0 18px rgba(226,255,202,.45) !important;
+}
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene.phone-powered .lcd-frame::before,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .phone.is-lit .lcd-frame::before {
+  opacity: .86;
+}
+
+/* When F is on, the canvas mask provides the dark surround; let the beam
+   reveal the actual scene and do not double-dim it with room-dimmer. */
+body.ls-state-main.ls-flashlight-on main.scene .room-dimmer {
+  opacity: 0 !important;
+  background: transparent !important;
+}
+body.ls-state-main.ls-flashlight-on main.scene {
+  filter: brightness(.86) saturate(.9) contrast(1.08) !important;
+}
+body.ls-state-main.ls-flashlight-on main.scene .phone-wrap { opacity: 1 !important; }
+
+/* -------------------------------------------------------------------------
+   NATURAL LIGHTNING
+   ------------------------------------------------------------------------- */
+
+#ls-lightning-exposure {
+  z-index: 46 !important;
+  background:
+    radial-gradient(ellipse 54% 76% at 8% 15%, rgba(238,249,255,.95) 0%, rgba(220,239,249,.62) 19%, rgba(178,211,226,.22) 47%, transparent 75%),
+    linear-gradient(104deg, rgba(224,243,250,.3), transparent 48%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0;
+}
+#ls-lightning-exposure.is-active {
+  opacity: 1;
+  visibility: visible;
+  animation: naturalLightning 1.12s steps(9,end) both;
+}
+#ls-lightning-exposure.is-corridor {
+  background:
+    radial-gradient(ellipse 70% 80% at 6% 30%, rgba(238,249,255,.94) 0%, rgba(206,231,243,.54) 24%, rgba(150,190,211,.18) 53%, transparent 78%),
+    linear-gradient(92deg, rgba(218,241,250,.24), transparent 57%);
+}
+@keyframes naturalLightning {
+  0% { opacity: 0; }
+  3% { opacity: .2; }
+  6% { opacity: .92; }
+  10% { opacity: .08; }
+  15% { opacity: 1; }
+  22% { opacity: .28; }
+  31% { opacity: .78; }
+  43% { opacity: .14; }
+  58% { opacity: .42; }
+  100% { opacity: 0; }
+}
+body.ls-state-main.ls-lightning-active::before { display: none !important; }
+body.ls-state-main.ls-lightning-active main.scene .room-dimmer {
+  opacity: 0 !important;
+  background: transparent !important;
+}
+body.ls-state-main.ls-lightning-active main.scene {
+  filter: brightness(3.4) contrast(1.2) saturate(.74) !important;
+}
+body.ls-state-main.ls-lightning-active main.scene .room-set { filter: brightness(3.1) contrast(1.18) saturate(.7) !important; }
+body.ls-state-main.ls-lightning-active main.scene .rain-window { filter: brightness(7) contrast(1.22) !important; }
+body.ls-state-main.ls-lightning-active main.scene .window-shadow {
+  opacity: 1 !important;
+  filter: brightness(10) contrast(1.42) blur(1.6px) !important;
+}
+body.ls-state-main.ls-lightning-active main.scene .phone-wrap,
+body.ls-state-main.ls-lightning-active main.scene .tape-object,
+body.ls-state-main.ls-lightning-active main.scene .desk-papers,
+body.ls-state-main.ls-lightning-active main.scene .aparador-silhouette {
+  filter: brightness(3.2) contrast(1.2) !important;
+}
+body.ls-state-main.ls-lightning-secondary main.scene {
+  filter: brightness(2.1) contrast(1.1) !important;
+}
+body.ls-state-main.ls-lightning-secondary #ls-lightning-exposure {
+  animation-duration: .36s;
+  opacity: .55;
+}
+
+body.ls-corridor-active #ls-corridor .ls-corridor-storm-flash.is-flashing {
+  opacity: .92 !important;
+  filter: hue-rotate(12deg) brightness(1.65) contrast(1.18);
+  transform: skewX(-14deg) translateX(-4%);
+  mix-blend-mode: screen;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #ls-lightning-exposure.is-active { animation: naturalLightningReduced 700ms ease both; }
+  @keyframes naturalLightningReduced { 0% { opacity:0; } 35% { opacity:.44; } 100% { opacity:0; } }
+  body.ls-state-main.ls-lightning-active main.scene { filter: brightness(1.8) contrast(1.1) !important; }
+}
+
+/* -------------------------------------------------------------------------
+   FLASHLIGHT COMPOSITOR
+   ------------------------------------------------------------------------- */
+#ls-flashlight { mix-blend-mode: normal !important; }
+
+/* -------------------------------------------------------------------------
+   PHONE-ONLY OVERLAYS AND CASSETTE STACKING
+   ------------------------------------------------------------------------- */
+body.ls-corridor-active #ls-eas.is-active,
+body.ls-corridor-active #ls-notification.is-active,
+body.ls-corridor-active #ls-inbox-takeover.is-active {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+body.tape-modal-open #ls-overlays { z-index: 100 !important; }
+body.tape-modal-open main.scene { z-index: 200 !important; }
+body.tape-modal-open .cassette-player { z-index: 1200 !important; }
+
+/* EAS, notification, and Inbox surfaces use the vintage LCD rather than a
+   neon modern warning card. */
+#ls-eas,
+#ls-notification,
+#ls-inbox-takeover {
+  image-rendering: pixelated;
+  font-family: "Courier New", monospace !important;
+  text-transform: uppercase;
+  border: 2px solid #10180e !important;
+  border-radius: 2px !important;
+  color: #10180e !important;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(16,24,14,.065) 4px),
+    #a5b092 !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(224,236,208,.28),
+    inset 0 0 18px rgba(20,32,18,.24),
+    0 0 18px rgba(105,142,90,.14) !important;
+  text-shadow: none !important;
+}
+#ls-eas .ls-eas-header,
+#ls-inbox-takeover .ls-inbox-header {
+  color: #a5b092 !important;
+  background: #10180e !important;
+  border: 0 !important;
+  border-bottom: 1px solid #10180e !important;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+#ls-eas .ls-eas-flag { color: #a5b092 !important; }
+#ls-eas .ls-eas-body,
+#ls-inbox-takeover,
+#ls-notification { font-size: clamp(7px, 1.35vw, 11px) !important; line-height: 1.28 !important; }
+#ls-eas .ls-eas-body p,
+#ls-inbox-takeover > div,
+#ls-notification span { color: #10180e !important; }
+#ls-eas .ls-eas-body p#ls-eas-category { color: #10180e !important; font-size: inherit; }
+#ls-eas.is-active { animation: lcdTakeoverFlicker 2.8s steps(2,end) infinite !important; }
+#ls-notification { padding: 0 !important; display: grid; place-items: center; }
+#ls-notification.is-active { animation: lcdTakeoverFlicker 2.8s steps(2,end) infinite !important; }
+@keyframes lcdTakeoverFlicker {
+  0%, 100% { filter: brightness(1); }
+  48% { filter: brightness(.92); }
+  51% { filter: brightness(1.08); }
+}
+#ls-inbox-takeover {
+  display: none;
+  z-index: 72;
+  padding: 5px 6px;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 3px;
+  overflow: hidden;
+}
+#ls-inbox-takeover.is-active { display: grid; opacity: 1; visibility: visible; pointer-events: auto; }
+#ls-inbox-takeover .ls-inbox-header { padding: 3px; text-align: center; }
+#ls-inbox-takeover .ls-inbox-meta { font-size: .72em; border-bottom: 1px solid rgba(16,24,14,.45); padding-bottom: 3px; }
+#ls-inbox-takeover .ls-inbox-message {
+  display: grid;
+  place-items: center;
+  font-size: clamp(11px, 2.2vw, 17px);
+  font-weight: 900;
+  text-transform: none;
+  text-align: center;
+}
+#ls-inbox-takeover .ls-inbox-footer { font-size: .75em; text-align: right; }
+
+/* Newer-phone prep during the black hold. */
+#ls-newer-phone.is-preparing {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Final title card before returning to the interactive title screen. */
+#ls-credit-card {
+  z-index: 94 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: #000;
+  color: #e8e2d4;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+#ls-credit-card.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  animation: creditCardExposure 5.8s ease-in-out both;
+}
+#ls-credit-card h2 {
+  margin: 0;
+  font-family: "Times New Roman", Times, serif;
+  font-size: clamp(42px, 10vw, 104px);
+  font-weight: 400;
+  letter-spacing: .38em;
+  text-indent: .38em;
+  text-shadow: 0 0 20px rgba(180,140,60,.22), 0 0 60px rgba(120,80,30,.12);
+}
+#ls-credit-card p {
+  position: absolute;
+  bottom: 8vh;
+  margin: 0;
+  font: 400 clamp(13px, 2vw, 19px)/1.4 "Times New Roman", Times, serif;
+  letter-spacing: .18em;
+  color: #b9ae98;
+}
+@keyframes creditCardExposure {
+  0% { opacity: 0; }
+  14% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: .92; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #ls-credit-card.is-active { animation: none; }
+}
+
+  </style>
   <style id="ls-critical-boot">
     html, body { background: #000 !important; }
     body.ls-state-title main.scene,
@@ -1786,7 +3066,7 @@
       <div class="ls-corridor-window-shadow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       <div class="ls-corridor-storm-flash" aria-hidden="true"></div>
       <div class="ls-corridor-eyes" aria-hidden="true">
-        <img src="assets/images/eyes.svg" alt="" />
+        <img src="eyes.svg" alt="" />
       </div>
       <div class="ls-corridor-figure" aria-hidden="true"></div>
     </div>
@@ -1810,10 +3090,10 @@
       <div class="ls-newer-shell">
         <div class="ls-newer-screen">
           <div class="ls-newer-cracks" aria-hidden="true">
-            <img src="assets/images/screen-cracks.svg" alt="" />
+            <img src="screen-cracks.svg" alt="" />
           </div>
           <div class="ls-newer-blood" aria-hidden="true">
-            <img src="assets/images/blood-splatter.svg" alt="" />
+            <img src="blood-splatter.svg" alt="" />
           </div>
           <div class="ls-newer-alert" role="alertdialog" aria-modal="true" aria-labelledby="ls-dante-title">
             <div class="ls-dante-header">
@@ -1834,7 +3114,7 @@
 
     <!-- Man silhouette (revealed by lightning during ending) -->
     <div id="ls-man-silhouette" aria-hidden="true">
-      <img src="assets/images/man-silhouette.svg" alt="" />
+      <img src="man-silhouette.svg" alt="" />
     </div>
 
     <!-- Notification banner: 'new message in inbox' -->
@@ -3801,12 +5081,1826 @@
     })();
   </script>
 <!-- ============== LAST SEEN — NARRATIVE MODULES ============== -->
-<script src="js/audio-manager.js"></script>
-<script src="js/narrative.js"></script>
-<script src="js/title.js"></script>
-<script src="js/flashlight.js"></script>
-<script src="js/corridor.js"></script>
-<script src="js/storm-eas.js"></script>
-<script src="js/ending.js"></script>
+
+  <script id="ls-bundled-support-scripts">
+/* ============================================================
+   LAST SEEN — audio-manager.js
+   Loads the seven user-provided MP3 files with Web Audio synth
+   fallback when a file is absent or undecodable. Exposes a single
+   `window.LS_AUDIO` API. Never plays without a user gesture.
+   Never stacks duplicate ambience / thunder / EAS layers.
+   ============================================================ */
+
+(function () {
+  "use strict";
+
+  // The single-file GitHub build keeps the seven MP3 files beside index.html.
+  const AUDIO_DIR = "";
+  const FILES = {
+    title: "ambiencetitlle.mp3",        // exact spelling preserved
+    ambience: "ambience.mp3",
+    thunder1: "thunder1.mp3",
+    thunder2: "thunder2.mp3",
+    thunder3: "thunder3.mp3",
+    eas: "eas.mp3",
+    ending: "ambienceending.mp3"
+  };
+
+  // Tracks: { audio: HTMLAudioElement, ok: bool, tried: bool }
+  const tracks = {};
+  let audioCtx = null;
+  let unlocked = false;
+  let masterGain = null; // shared master gain for synthesized layers
+
+  // Active synth nodes (so we can stop them cleanly)
+  const synth = {
+    titleNodes: null,
+    ambienceNodes: null,
+    endingNodes: null,
+    easNodes: null,
+    thunderGain: null
+  };
+
+  function ensureContext() {
+    if (audioCtx) return audioCtx;
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      audioCtx = new AC();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = 0.5;
+      masterGain.connect(audioCtx.destination);
+      return audioCtx;
+    } catch (_) { return null; }
+  }
+
+  function unlock() {
+    if (unlocked) return;
+    ensureContext();
+    if (audioCtx && audioCtx.state === "suspended") {
+      audioCtx.resume().catch(() => {});
+    }
+    unlocked = true;
+  }
+
+  // Attempt to load a single MP3 file. Returns a Promise that resolves
+  // to { audio: HTMLAudioElement|null, ok: bool }.
+  function loadFile(key, filename) {
+    return new Promise(resolve => {
+      const url = AUDIO_DIR + filename;
+      const audio = new Audio();
+      audio.preload = "auto";
+      audio.src = url;
+      audio.loop = true; // ambience tracks loop by default; EAS may be one-shot
+      audio.load();
+      const result = { audio, ok: false, tried: true };
+
+      const onCanPlay = () => {
+        result.ok = true;
+        cleanup();
+        // Try a tiny probe play to verify decode (some browsers lie about canplaythrough)
+        // We don't actually start playback here — just resolve.
+        resolve(result);
+      };
+      const onError = () => {
+        result.ok = false;
+        cleanup();
+        resolve(result);
+      };
+      const cleanup = () => {
+        audio.removeEventListener("canplaythrough", onCanPlay);
+        audio.removeEventListener("canplay", onCanPlay);
+        audio.removeEventListener("error", onError);
+        window.clearTimeout(timeout);
+      };
+      // Allow GitHub Pages and slower mobile connections enough time to decode
+      // a real MP3. A slow file is not the same as a missing file.
+      const timeout = window.setTimeout(() => {
+        if (!result.ok) onError();
+      }, 10000);
+
+      audio.addEventListener("canplaythrough", onCanPlay);
+      audio.addEventListener("canplay", onCanPlay);
+      audio.addEventListener("error", onError);
+    });
+  }
+
+  async function preloadAll() {
+    const entries = Object.entries(FILES);
+    await Promise.all(entries.map(async ([key, filename]) => {
+      const r = await loadFile(key, filename);
+      tracks[key] = r;
+    }));
+    return tracks;
+  }
+
+  // ---------- Helpers for HTMLAudioElement playback ----------
+
+  function stopHtmlAudio(audio) {
+    if (!audio) return;
+    try { audio.pause(); } catch (_) {}
+    try { audio.currentTime = 0; } catch (_) {}
+  }
+
+  function fadeHtmlAudio(audio, target, ms) {
+    if (!audio) return;
+    const start = audio.volume;
+    const t0 = performance.now();
+    function step(now) {
+      const k = Math.min(1, (now - t0) / ms);
+      audio.volume = start + (target - start) * k;
+      if (k < 1) requestAnimationFrame(step);
+      else if (target === 0) { try { audio.pause(); } catch (_) {} }
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ---------- Synth fallbacks ----------
+  // (condensed equivalents of the existing IIFE's Web Audio code,
+  //  kept private to this module so we don't conflict with the
+  //  original inline audio IIFE when it is disabled.)
+
+  function createNoiseBuffer(ctx, seconds) {
+    const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * seconds), ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < data.length; i++) {
+      const white = Math.random() * 2 - 1;
+      last = last * 0.985 + white * 0.015;
+      data[i] = last * 2.2;
+    }
+    return buffer;
+  }
+
+  // Title ambience: warm low drone + soft breathy noise + slow flicker LFO
+  function startTitleSynth() {
+    const ctx = ensureContext(); if (!ctx) return;
+    stopTitleSynth();
+    const master = ctx.createGain(); master.gain.value = 0.32; master.connect(masterGain);
+    const hum = ctx.createOscillator(); hum.type = "sine"; hum.frequency.value = 78;
+    const humGain = ctx.createGain(); humGain.gain.value = 0.05; hum.connect(humGain).connect(master);
+    // warm breathy noise
+    const noise = ctx.createBufferSource(); noise.buffer = createNoiseBuffer(ctx, 4); noise.loop = true;
+    const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 320;
+    const noiseGain = ctx.createGain(); noiseGain.gain.value = 0.018;
+    noise.connect(lp).connect(noiseGain).connect(master);
+    // flicker LFO on humGain
+    const lfo = ctx.createOscillator(); lfo.type = "sine"; lfo.frequency.value = 0.7;
+    const lfoDepth = ctx.createGain(); lfoDepth.gain.value = 0.025;
+    lfo.connect(lfoDepth).connect(humGain.gain);
+    hum.start(); noise.start(); lfo.start();
+    synth.titleNodes = { master, hum, noise, lfo, humGain, noiseGain };
+  }
+  function stopTitleSynth() {
+    if (!synth.titleNodes) return;
+    const n = synth.titleNodes;
+    try { n.hum.stop(); } catch (_) {}
+    try { n.noise.stop(); } catch (_) {}
+    try { n.lfo.stop(); } catch (_) {}
+    try { n.master.disconnect(); } catch (_) {}
+    synth.titleNodes = null;
+  }
+
+  // Main ambience: hum + filtered rain noise + distant cricket
+  function startAmbienceSynth() {
+    const ctx = ensureContext(); if (!ctx) return;
+    stopAmbienceSynth();
+    const master = ctx.createGain(); master.gain.value = 0.4; master.connect(masterGain);
+    const hum = ctx.createOscillator(); hum.type = "sine"; hum.frequency.value = 59.8;
+    const humGain = ctx.createGain(); humGain.gain.value = 0.012; hum.connect(humGain).connect(master);
+    const noise = ctx.createBufferSource(); noise.buffer = createNoiseBuffer(ctx, 3); noise.loop = true;
+    const airFilter = ctx.createBiquadFilter(); airFilter.type = "lowpass"; airFilter.frequency.value = 1150;
+    const airGain = ctx.createGain(); airGain.gain.value = 0.007;
+    noise.connect(airFilter).connect(airGain).connect(master);
+    const rainFilter = ctx.createBiquadFilter(); rainFilter.type = "highpass"; rainFilter.frequency.value = 1350;
+    const rainGain = ctx.createGain(); rainGain.gain.value = 0.038;
+    noise.connect(rainFilter).connect(rainGain).connect(master);
+    const cricket = ctx.createOscillator(); cricket.type = "sine"; cricket.frequency.value = 3550;
+    const cricketGain = ctx.createGain(); cricketGain.gain.value = 0.0001;
+    cricket.connect(cricketGain).connect(master);
+    hum.start(); noise.start(); cricket.start();
+    synth.ambienceNodes = { master, hum, noise, cricket, humGain, airGain, rainGain, cricketGain };
+  }
+  function stopAmbienceSynth() {
+    if (!synth.ambienceNodes) return;
+    const n = synth.ambienceNodes;
+    try { n.hum.stop(); } catch (_) {}
+    try { n.noise.stop(); } catch (_) {}
+    try { n.cricket.stop(); } catch (_) {}
+    try { n.master.disconnect(); } catch (_) {}
+    synth.ambienceNodes = null;
+  }
+
+  // Ending ambience: lower, more hollow, with slow swell
+  function startEndingSynth() {
+    const ctx = ensureContext(); if (!ctx) return;
+    stopEndingSynth();
+    const master = ctx.createGain(); master.gain.value = 0.34; master.connect(masterGain);
+    const hum = ctx.createOscillator(); hum.type = "sine"; hum.frequency.value = 47;
+    const humGain = ctx.createGain(); humGain.gain.value = 0.06; hum.connect(humGain).connect(master);
+    const noise = ctx.createBufferSource(); noise.buffer = createNoiseBuffer(ctx, 5); noise.loop = true;
+    const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 220;
+    const noiseGain = ctx.createGain(); noiseGain.gain.value = 0.025;
+    noise.connect(lp).connect(noiseGain).connect(master);
+    // slow swell on master
+    const swell = ctx.createOscillator(); swell.type = "sine"; swell.frequency.value = 0.13;
+    const swellDepth = ctx.createGain(); swellDepth.gain.value = 0.06;
+    swell.connect(swellDepth).connect(master.gain);
+    hum.start(); noise.start(); swell.start();
+    synth.endingNodes = { master, hum, noise, swell, humGain, noiseGain };
+  }
+  function stopEndingSynth() {
+    if (!synth.endingNodes) return;
+    const n = synth.endingNodes;
+    try { n.hum.stop(); } catch (_) {}
+    try { n.noise.stop(); } catch (_) {}
+    try { n.swell.stop(); } catch (_) {}
+    try { n.master.disconnect(); } catch (_) {}
+    synth.endingNodes = null;
+  }
+
+  // EAS alarm: alternating 990 Hz / 850 Hz tones (simplified attention signal)
+  function startEASSynth() {
+    const ctx = ensureContext(); if (!ctx) return;
+    stopEASSynth();
+    const master = ctx.createGain(); master.gain.value = 0.0; master.connect(masterGain);
+    const osc = ctx.createOscillator(); osc.type = "square"; osc.frequency.value = 990;
+    const osc2 = ctx.createOscillator(); osc2.type = "square"; osc2.frequency.value = 850;
+    osc.connect(master); osc2.connect(master);
+    osc.start(); osc2.start();
+    // alternate 990 / 850 every 0.5s for that classic EAS feel
+    let toggle = false;
+    const interval = setInterval(() => {
+      if (!synth.easNodes) { clearInterval(interval); return; }
+      toggle = !toggle;
+      const t = ctx.currentTime;
+      osc.frequency.setValueAtTime(toggle ? 990 : 850, t);
+      osc2.frequency.setValueAtTime(toggle ? 850 : 990, t);
+    }, 500);
+    // fade in
+    master.gain.setValueAtTime(0, ctx.currentTime);
+    master.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.2);
+    synth.easNodes = { master, osc, osc2, interval };
+  }
+  function stopEASSynth() {
+    if (!synth.easNodes) return;
+    const n = synth.easNodes;
+    try { clearInterval(n.interval); } catch (_) {}
+    try { n.osc.stop(); } catch (_) {}
+    try { n.osc2.stop(); } catch (_) {}
+    try { n.master.disconnect(); } catch (_) {}
+    synth.easNodes = null;
+  }
+
+  // Synthesized thunder: ~2.8s low rumble with random modulation
+  function playThunderSynth() {
+    const ctx = ensureContext(); if (!ctx) return;
+    const duration = 2.8;
+    const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * duration), ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < data.length; i++) {
+      const t = i / data.length;
+      const rumble = (Math.random() * 2 - 1) * Math.pow(1 - t, 2.2);
+      data[i] = rumble * (0.7 + 0.3 * Math.sin(i / 210));
+    }
+    const source = ctx.createBufferSource(); source.buffer = buffer;
+    const filter = ctx.createBiquadFilter(); filter.type = "lowpass"; filter.frequency.value = 210;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.13, ctx.currentTime + 0.16);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+    source.connect(filter).connect(gain).connect(masterGain);
+    source.start();
+  }
+
+  // ---------- Public API ----------
+
+  // Playback can be requested before a slow GitHub Pages connection has
+  // finished preloading. Wait for the actual file instead of permanently
+  // choosing the synth fallback just because the first click was early.
+  function withTrack(key, onReady, onMissing) {
+    const existing = tracks[key];
+    if (existing) {
+      if (existing.ok) onReady(existing);
+      else onMissing();
+      return;
+    }
+    loadFile(key, FILES[key]).then(result => {
+      tracks[key] = result;
+      if (result && result.ok) onReady(result);
+      else onMissing();
+    }).catch(onMissing);
+  }
+
+  const api = {
+    preload: preloadAll,
+    unlock,
+    isUnlocked: () => unlocked,
+
+    // Title ambience (ambiencetitlle.mp3)
+    playTitle() {
+      unlock();
+      withTrack("title", t => {
+        stopAmbienceSynth(); stopEndingSynth();
+        try { t.audio.currentTime = 0; } catch (_) {}
+        t.audio.volume = 0;
+        t.audio.loop = true;
+        t.audio.play().then(() => fadeHtmlAudio(t.audio, 0.45, 1800)).catch(() => startTitleSynth());
+      }, startTitleSynth);
+    },
+    stopTitle(fadeMs = 1200) {
+      const t = tracks.title;
+      if (t && t.ok && t.audio && !t.audio.paused) {
+        fadeHtmlAudio(t.audio, 0, fadeMs);
+      }
+      stopTitleSynth();
+    },
+
+    // Main room ambience (ambience.mp3)
+    playAmbience() {
+      unlock();
+      withTrack("ambience", t => {
+        stopTitleSynth(); stopEndingSynth();
+        try { t.audio.currentTime = 0; } catch (_) {}
+        t.audio.volume = 0;
+        t.audio.loop = true;
+        t.audio.play().then(() => fadeHtmlAudio(t.audio, 0.45, 2500)).catch(() => startAmbienceSynth());
+      }, startAmbienceSynth);
+    },
+    stopAmbience(fadeMs = 1200) {
+      const t = tracks.ambience;
+      if (t && t.ok && t.audio && !t.audio.paused) {
+        fadeHtmlAudio(t.audio, 0, fadeMs);
+      }
+      stopAmbienceSynth();
+    },
+
+    // Thunder (thunder1/2/3.mp3 — random variant)
+    playThunder(variant) {
+      unlock();
+      const key = variant || (["thunder1","thunder2","thunder3"][Math.floor(Math.random()*3)]);
+      withTrack(key, t => {
+        try { t.audio.currentTime = 0; } catch (_) {}
+        t.audio.loop = false;
+        t.audio.volume = 0.9;
+        t.audio.play().catch(() => playThunderSynth());
+      }, playThunderSynth);
+    },
+
+    // EAS alarm (eas.mp3)
+    playEAS() {
+      unlock();
+      withTrack("eas", t => {
+        try { t.audio.currentTime = 0; } catch (_) {}
+        t.audio.loop = true; // loop the klaxon until stopped
+        t.audio.volume = 0.7;
+        t.audio.play().catch(() => startEASSynth());
+      }, startEASSynth);
+    },
+    stopEAS(fadeMs = 800) {
+      const t = tracks.eas;
+      if (t && t.ok && t.audio && !t.audio.paused) {
+        fadeHtmlAudio(t.audio, 0, fadeMs);
+      }
+      stopEASSynth();
+    },
+
+    // Ending ambience (ambienceending.mp3)
+    playEnding() {
+      unlock();
+      withTrack("ending", t => {
+        stopAmbienceSynth(); stopTitleSynth();
+        try { t.audio.currentTime = 0; } catch (_) {}
+        t.audio.volume = 0;
+        t.audio.loop = true;
+        t.audio.play().then(() => fadeHtmlAudio(t.audio, 0.4, 3500)).catch(() => startEndingSynth());
+      }, startEndingSynth);
+    },
+    stopEnding(fadeMs = 1500) {
+      const t = tracks.ending;
+      if (t && t.ok && t.audio && !t.audio.paused) {
+        fadeHtmlAudio(t.audio, 0, fadeMs);
+      }
+      stopEndingSynth();
+    },
+
+    // Hard-stop everything (pagehide / replay)
+    stopAll() {
+      Object.values(tracks).forEach(t => { if (t && t.audio) stopHtmlAudio(t.audio); });
+      stopTitleSynth(); stopAmbienceSynth(); stopEndingSynth(); stopEASSynth();
+    },
+
+    // Diagnostic — used by QA
+    listTracks() {
+      const result = {};
+      for (const k of Object.keys(FILES)) {
+        const t = tracks[k];
+        result[k] = { filename: FILES[k], ok: t ? t.ok : false, tried: t ? t.tried : false };
+      }
+      return result;
+    }
+  };
+
+  // Disable the original inline IIFE's native ambience/scheduler chain so it
+  // doesn't fight us. We only disable the AMBIENCE schedulers; keypad/power
+  // tones (which are short one-shots) still come from the inline IIFE.
+  window.LS_NATIVE_AMBIENCE_DISABLED = true;
+
+  // Try to stop any native ambience the inline IIFE may have already started.
+  try {
+    if (window.LASTSEEN && typeof window.LASTSEEN.stopAmbience === "function") {
+      window.LASTSEEN.stopAmbience();
+    }
+  } catch (_) {}
+
+  window.LS_AUDIO = api;
+
+  // Begin preloading immediately. We don't need to wait for unlock — the
+  // <audio> elements will fetch their sources in the background.
+  preloadAll().then(() => {
+    if (window.console && console.debug) {
+      const status = api.listTracks();
+      console.debug("[LS_AUDIO] preload complete", status);
+    }
+  });
+
+  // Unlock on first user gesture
+  const unlockOnce = () => {
+    unlock();
+    document.removeEventListener("pointerdown", unlockOnce);
+    document.removeEventListener("keydown", unlockOnce);
+  };
+  document.addEventListener("pointerdown", unlockOnce);
+  document.addEventListener("keydown", unlockOnce);
+
+  // Stop everything on pagehide
+  window.addEventListener("pagehide", () => api.stopAll(), { once: true });
+})();
+
+
+/* ============================================================
+   LAST SEEN — narrative.js
+   Top-level narrative state machine. Coordinates state transitions,
+   audio layering, body classes for CSS targeting, and replay cleanup.
+   Sub-modules (title, flashlight, corridor, storm-eas, ending) listen
+   to ls:narrativeState events and react to the new state.
+   ============================================================ */
+
+(function () {
+  "use strict";
+
+  // Authoritative narrative states. The corridor is a *flag* inside
+  // the main state, not a separate state — Z toggles the flag without
+  // leaving "main", preserving the 120s timer and audio continuity.
+  const STATES = {
+    TITLE: "title",
+    OPENING: "opening",
+    MAIN: "main",
+    ENDING: "ending"
+  };
+
+  let current = null;
+  let started = false;
+  let mainTimerStart = 0;       // performance.now() when main scene fade completed
+  let mainSceneFadeTimeout = null;
+
+  // Sub-state flags (read-only to listeners; mutated by sub-modules)
+  const flags = {
+    flashlightOn: false,
+    corridorActive: false,
+    easActive: false,
+    notificationActive: false,
+    naditoOpened: false,
+    manRevealed: false,
+    newerPhoneActive: false,
+    danteAlertActive: false,
+    cassCodeAccepted: false,
+    cassPlayed: false,
+    cassReturned: false
+  };
+
+  function setState(name) {
+    if (current === name) return;
+    const prev = current;
+    current = name;
+    // Update body class for CSS targeting
+    document.body.classList.remove(
+      "ls-state-title", "ls-state-opening", "ls-state-main", "ls-state-ending"
+    );
+    document.body.classList.add("ls-state-" + name);
+    // Dispatch event for sub-modules
+    document.dispatchEvent(new CustomEvent("ls:narrativeState", {
+      detail: { from: prev, to: name, flags: { ...flags } }
+    }));
+    // Audio transitions
+    if (name === STATES.TITLE) {
+      // Title ambience handled by title.js on its own — but ensure
+      // ending/ambience are stopped.
+      try { window.LS_AUDIO.stopAmbience(); } catch (_) {}
+      try { window.LS_AUDIO.stopEnding(); } catch (_) {}
+    } else if (name === STATES.OPENING) {
+      // ambiencetitlle.mp3 already started by title.js — keep playing
+    } else if (name === STATES.MAIN) {
+      // Crossfade title ambience -> main ambience handled by storm-eas.js
+      // when the main-scene fade completes. Here we just signal the
+      // transition; storm-eas.js schedules the actual crossfade + 120s timer.
+    } else if (name === STATES.ENDING) {
+      // Ending ambience handled by ending.js
+    }
+  }
+
+  function getState() { return current; }
+  function getFlags() { return { ...flags }; }
+
+  function setFlag(name, value) {
+    if (!(name in flags)) return;
+    flags[name] = value;
+    // Notify flag change
+    document.dispatchEvent(new CustomEvent("ls:flagChange", {
+      detail: { flag: name, value: value, state: current, flags: { ...flags } }
+    }));
+  }
+
+  // ---------- State entry handlers ----------
+
+  function enterTitle() {
+    setState(STATES.TITLE);
+    // Ensure the title screen is visible (the CSS default is opacity:0;
+    // the .is-active class is what makes it visible — see css/narrative.css).
+    const titleEl = document.getElementById("ls-title-screen");
+    if (titleEl) {
+      titleEl.classList.add("is-active");
+      titleEl.setAttribute("aria-hidden", "false");
+    }
+    // Hide every other top-level overlay.
+    ["ls-opening", "ls-corridor", "ls-eas", "ls-newer-phone",
+     "ls-man-silhouette", "ls-notification", "ls-inbox-takeover",
+     "ls-credit-card", "ls-lightning-exposure", "ls-fade"
+    ].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.remove("is-active", "is-revealed", "is-fading", "is-flashing", "is-holding");
+        el.setAttribute("aria-hidden", "true");
+      }
+    });
+    // Reset all flags here.
+    flags.flashlightOn = false;
+    flags.corridorActive = false;
+    flags.easActive = false;
+    flags.notificationActive = false;
+    flags.naditoOpened = false;
+    flags.manRevealed = false;
+    flags.newerPhoneActive = false;
+    flags.danteAlertActive = false;
+    flags.cassCodeAccepted = false;
+    flags.cassPlayed = false;
+    flags.cassReturned = false;
+  }
+
+  function enterOpening() {
+    setState(STATES.OPENING);
+  }
+
+  function enterMain() {
+    setState(STATES.MAIN);
+    mainTimerStart = performance.now();
+  }
+
+  function enterEnding() {
+    setState(STATES.ENDING);
+  }
+
+  // ---------- Replay (full reset back to title) ----------
+
+  function replay() {
+    // Clear all sub-module state
+    try { window.LS_AUDIO.stopAll(); } catch (_) {}
+    // Hide every overlay
+    document.querySelectorAll("#ls-overlays > *").forEach(el => {
+      el.classList.remove("is-active", "is-fading", "is-revealed", "is-flashing", "is-hidden");
+      el.setAttribute("aria-hidden", "true");
+    });
+    // Reset body classes
+    document.body.classList.remove(
+      "ls-state-title", "ls-state-opening", "ls-state-main", "ls-state-ending",
+      "ls-flashlight-on", "ls-flashlight-off", "ls-corridor-active"
+    );
+    // Reset flags
+    Object.keys(flags).forEach(k => {
+      flags[k] = false;
+    });
+    // Reset the vintage phone back to off
+    try {
+      if (window.LASTSEEN && typeof window.LASTSEEN.powerOff === "function") {
+        window.LASTSEEN.powerOff();
+      }
+    } catch (_) {}
+    // Re-enter title
+    setTimeout(() => {
+      enterTitle();
+      // (enterTitle already adds .is-active to the title screen)
+      // Restart title ambience after a short delay (audio unlocked already)
+      setTimeout(() => {
+        try { window.LS_AUDIO.playTitle(); } catch (_) {}
+      }, 200);
+    }, 1200);
+  }
+
+  // ---------- Public API ----------
+
+  window.LS_NARRATIVE = {
+    STATES,
+    getState,
+    getFlags,
+    setFlag,
+    setState,
+    enterTitle,
+    enterOpening,
+    enterMain,
+    enterEnding,
+    replay,
+    get mainTimerStart() { return mainTimerStart; },
+    set mainTimerStart(v) { mainTimerStart = v; }
+  };
+
+  // ---------- Bootstrap ----------
+
+  // Wait for DOMContentLoaded, then enter title state
+  function start() {
+    if (started) return;
+    started = true;
+    enterTitle();
+    // Initial title ambience is started by title.js once the user clicks Play
+    // (we need a user gesture to unlock audio).
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start, { once: true });
+  } else {
+    start();
+  }
+
+  // ---------- Cross-module event bridging ----------
+
+  // When the user accepts the cassette code, set the flag
+  document.addEventListener("ls:cassetteCodeAccepted", () => {
+    setFlag("cassCodeAccepted", true);
+  });
+
+  // When the user plays the cassette, set the flag
+  document.addEventListener("ls:cassettePlayed", () => {
+    setFlag("cassPlayed", true);
+  });
+
+  // When the cassette is returned to the desk AFTER code accepted
+  document.addEventListener("ls:cassetteReturned", () => {
+    setFlag("cassReturned", true);
+    // Trigger ending only if all three conditions are met:
+    // code accepted + cassette played + cassette returned
+    if (flags.cassCodeAccepted && flags.cassPlayed && flags.cassReturned) {
+      // Dispatch event for ending.js to surface the notification
+      document.dispatchEvent(new CustomEvent("ls:triggerNotification"));
+    }
+  });
+
+  // When the Nadito na ako message is opened, set the flag
+  document.addEventListener("ls:naditoMessageOpened", () => {
+    if (flags.naditoOpened) return;
+    setFlag("naditoOpened", true);
+    // Dispatch event for ending.js to start the 10s timer
+    document.dispatchEvent(new CustomEvent("ls:triggerEndingSequence"));
+  });
+
+  // When the user presses the title Play button, hand off to title.js
+  // (title.js will call window.LS_NARRATIVE.enterOpening() at the right moment)
+
+  // Page hide — full cleanup
+  window.addEventListener("pagehide", () => {
+    try { window.LS_AUDIO.stopAll(); } catch (_) {}
+  }, { once: true });
+})();
+
+
+/* ============================================================
+   LAST SEEN — title.js
+   Pitch-black title screen + opening cinematic.
+   - Title: only "LAST SEEN" and a Play button visible.
+   - Opening: ambiencetitlle.mp3, warm candle-like glow (no visible
+     candle), stark beats "Nuyda productions presents:" then "LAST SEEN",
+     then exactly three Filipino pages in order. Click/Enter/Space to
+     advance (no visible "continue" text). After last page, fade into
+     the main scene with NO hard cut, then dispatch ls:openingComplete
+     so storm-eas.js can start the 120-second timer.
+   ============================================================ */
+
+(function () {
+  "use strict";
+
+  const titleScreen = document.getElementById("ls-title-screen");
+  const titleText = document.getElementById("ls-title-text");
+  const playBtn = document.getElementById("ls-title-play");
+  const opening = document.getElementById("ls-opening");
+  const openingText = document.getElementById("ls-opening-text");
+  const candleGlow = document.getElementById("ls-candle-glow");
+  const fadeEl = document.getElementById("ls-fade");
+
+  if (!titleScreen || !playBtn || !opening || !openingText) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // The EXACT opening strings from the spec. Do not reorder, translate,
+  // or "fix" them.
+  const PRESENTER = "Nuyda productions presents:";
+  const TITLE_CARD = "LAST SEEN";
+  const PAGES = [
+    "Pagkatapos mo Kunin ang iyong certificates sa bahay ng iyong ina may nakita Ikaw na voice tape kasama sa drawer",
+    "Inuwi mo ito at pagkatapos nakita mo na may PIN para ito'y maparingan",
+    "Kaya naiisipan mo pumunta sa abandona na bahay ng iyong Tito , dito mo nahanap ang isang cellphone"
+  ];
+
+  let inOpening = false;
+  let openingAdvanceToken = 0; // increments when state changes
+  let titleAmbienceStarted = false;
+
+  function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // Race a timeout against a user-gesture advance (click/Enter/Space).
+  // Whichever fires first wins; the loser is a no-op.
+  function holdUntilGestureOrTimeout(minMs, maxMs) {
+    const myToken = ++openingAdvanceToken;
+    let resolved = false;
+    return new Promise(resolve => {
+      let elapsed = 0;
+      const tick = 100;
+      const interval = setInterval(() => {
+        if (myToken !== openingAdvanceToken) {
+          // state changed; abort
+          clearInterval(interval);
+          if (!resolved) { resolved = true; resolve("aborted"); }
+          return;
+        }
+        elapsed += tick;
+        if (elapsed >= maxMs) {
+          clearInterval(interval);
+          if (!resolved) { resolved = true; resolve("timeout"); }
+        }
+      }, tick);
+
+      const onGesture = () => {
+        if (resolved) return;
+        if (myToken !== openingAdvanceToken) return;
+        // Enforce minimum hold — if user mashes too fast, ignore until min
+        if (elapsed < minMs) return;
+        clearInterval(interval);
+        document.removeEventListener("pointerdown", onGesture);
+        document.removeEventListener("keydown", onKey, true);
+        resolved = true;
+        resolve("gesture");
+      };
+      const onKey = (e) => {
+        if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+          e.preventDefault();
+          onGesture();
+        }
+      };
+      document.addEventListener("pointerdown", onGesture, { passive: true });
+      document.addEventListener("keydown", onKey, true);
+    });
+  }
+
+  async function showBeat(text, opts = {}) {
+    openingText.className = "";
+    openingText.textContent = text;
+    if (opts.presenter) openingText.classList.add("is-presenter");
+    if (opts.titleCard) openingText.classList.add("is-title-card");
+    // Force reflow for transition to take effect
+    void openingText.offsetWidth;
+    openingText.classList.add("is-visible");
+    // Hold
+    await holdUntilGestureOrTimeout(opts.min || 2400, opts.max || 5000);
+    // Fade out
+    openingText.classList.add("is-fading");
+    openingText.classList.remove("is-visible");
+    await wait(reducedMotion ? 250 : 1300);
+    openingText.classList.remove("is-fading");
+  }
+
+  async function runOpening() {
+    if (inOpening) return;
+    inOpening = true;
+
+    // Start ambiencetitlle.mp3 (or synth fallback)
+    try { window.LS_AUDIO.playTitle(); } catch (_) {}
+    titleAmbienceStarted = true;
+
+    // Show opening overlay + candle glow
+    opening.classList.add("is-active");
+    opening.setAttribute("aria-hidden", "false");
+    candleGlow.style.opacity = "";
+    // Tiny initial delay so the ambience lands
+    await wait(reducedMotion ? 200 : 900);
+
+    // Beat 1: presenter
+    await showBeat(PRESENTER, {
+      presenter: true,
+      min: reducedMotion ? 1200 : 2400,
+      max: reducedMotion ? 2500 : 4600
+    });
+
+    // Beat 2: title card
+    await showBeat(TITLE_CARD, {
+      titleCard: true,
+      min: reducedMotion ? 1500 : 3200,
+      max: reducedMotion ? 3000 : 6000
+    });
+
+    // Pages 1..3 (exact order, exact strings)
+    for (let i = 0; i < PAGES.length; i++) {
+      await showBeat(PAGES[i], {
+        min: reducedMotion ? 1800 : 3800,
+        max: reducedMotion ? 3600 : 8000
+      });
+    }
+
+    // Fade to black, then transition into main scene with no hard cut.
+    // The candle glow lingers briefly then dims.
+    fadeEl.classList.add("is-fading");
+    await wait(reducedMotion ? 400 : 1400);
+    fadeEl.classList.add("is-holding");
+    // Hide opening overlay
+    opening.classList.remove("is-active");
+    opening.setAttribute("aria-hidden", "true");
+    candleGlow.style.opacity = "0";
+
+    // Keep the screen fully black while the audio layers crossfade. The
+    // narrative MAIN state and its 120-second timer are not entered until
+    // the black hold is finished, so the timer cannot start early.
+    try { window.LS_AUDIO.stopTitle(800); } catch (_) {}
+    try { window.LS_AUDIO.playAmbience(); } catch (_) {}
+    await wait(reducedMotion ? 300 : 700);
+
+    // Fade up from black into the main scene, then hand off ownership.
+    fadeEl.classList.remove("is-holding");
+    fadeEl.classList.remove("is-fading");
+    try { window.LS_NARRATIVE.enterMain(); } catch (_) {}
+    // Dispatch event for storm-eas.js to start the 120s timer + storm schedulers
+    document.dispatchEvent(new CustomEvent("ls:openingComplete"));
+    inOpening = false;
+  }
+
+  function onPlayClick() {
+    if (inOpening) return;
+    // Hide title screen
+    titleScreen.classList.remove("is-active");
+    titleScreen.setAttribute("aria-hidden", "true");
+    // Brief black beat between title and opening
+    setTimeout(() => {
+      try { window.LS_NARRATIVE.enterOpening(); } catch (_) {}
+      runOpening();
+    }, reducedMotion ? 200 : 800);
+  }
+
+  // ---------- Wire up ----------
+
+  playBtn.addEventListener("click", onPlayClick);
+  playBtn.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+      e.preventDefault();
+      onPlayClick();
+    }
+  });
+
+  // On narrative state changes back to TITLE (replay), re-show the title.
+  document.addEventListener("ls:narrativeState", (e) => {
+    const to = e.detail.to;
+    if (to === "title") {
+      titleScreen.classList.add("is-active");
+      titleScreen.setAttribute("aria-hidden", "false");
+      inOpening = false;
+      // Restart title ambience after a short delay (audio unlocked already)
+      setTimeout(() => {
+        try { window.LS_AUDIO.playTitle(); } catch (_) {}
+      }, 400);
+    }
+  });
+
+  // Expose nothing — title.js is self-contained.
+})();
+
+
+/* LAST SEEN — flashlight.js
+   A real 2D flashlight compositor, not a brightness sticker.
+
+   The canvas draws an opaque near-black room veil, then uses Canvas
+   destination-out compositing to cut a transparent aperture through that veil.
+   The actual scene is therefore visible through the beam while the rest of
+   the room remains occluded. A separate warm optical spill and a narrow
+   hotspot provide restrained light response. F is the only flashlight toggle;
+   there is no double-click or two-finger toggle.
+*/
+(function () {
+  "use strict";
+
+  const canvas = document.getElementById("ls-flashlight");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d", { alpha: true });
+  if (!ctx) return;
+
+  const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches || false;
+  let on = false;
+  let targetX = innerWidth * .5;
+  let targetY = innerHeight * .5;
+  let currentX = targetX;
+  let currentY = targetY;
+  let rafId = 0;
+  let dpr = 1;
+  let radius = 260;
+  let flicker = 1;
+  let flickerTarget = 1;
+  let nextFlicker = 0;
+
+  // The first playable room frame is intentionally unlit. F is the only
+  // control that can open the flashlight.
+  document.body.classList.add("ls-flashlight-off");
+
+  function resize() {
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = Math.max(1, Math.round(innerWidth * dpr));
+    canvas.height = Math.max(1, Math.round(innerHeight * dpr));
+    canvas.style.width = `${innerWidth}px`;
+    canvas.style.height = `${innerHeight}px`;
+    radius = Math.max(150, Math.min(innerWidth, innerHeight) * .235);
+    currentX = Math.min(innerWidth, Math.max(0, currentX));
+    currentY = Math.min(innerHeight, Math.max(0, currentY));
+  }
+
+  function setTarget(x, y) {
+    targetX = Math.min(innerWidth, Math.max(0, x));
+    targetY = Math.min(innerHeight, Math.max(0, y));
+  }
+
+  resize();
+  window.addEventListener("resize", resize, { passive: true });
+
+  // Track the cursor even while the light is off, so activating F reveals the
+  // place the player is actually pointing at instead of snapping from center.
+  document.addEventListener("pointermove", event => {
+    setTarget(event.clientX, event.clientY);
+  }, { passive: true });
+
+  // Touch can aim the already-enabled flashlight, but never toggles it.
+  document.addEventListener("pointerdown", event => {
+    if (!on) return;
+    if (event.target.closest("button, [data-key], input, [role=dialog]")) return;
+    setTarget(event.clientX, event.clientY);
+  }, { passive: true });
+
+  function updateFlicker(now) {
+    if (reducedMotion) { flicker = 1; return; }
+    if (now >= nextFlicker) {
+      // Real flashlights have small electrical/exposure changes, not strobing.
+      flickerTarget = .91 + Math.random() * .09;
+      nextFlicker = now + 180 + Math.random() * 720;
+    }
+    flicker += (flickerTarget - flicker) * .08;
+  }
+
+  function radial(ctx2, x, y, inner, outer, stops) {
+    const gradient = ctx2.createRadialGradient(x, y, inner, x, y, outer);
+    for (const [offset, color] of stops) gradient.addColorStop(offset, color);
+    return gradient;
+  }
+
+  function drawFlashlight(now) {
+    if (!on) { rafId = 0; return; }
+    updateFlicker(now);
+
+    const lerp = reducedMotion ? 1 : .14;
+    currentX += (targetX - currentX) * lerp;
+    currentY += (targetY - currentY) * lerp;
+
+    // Work in CSS pixels after the DPR transform. This avoids a soft scaled
+    // mask and keeps the transparent aperture aligned with the pointer.
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+    const r = radius * flicker;
+    const outer = r * 1.62;
+
+    // 1. Opaque veil: this is what makes the room genuinely dark outside the
+    // beam instead of merely adding a bright radial gradient over everything.
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = "rgba(0, 2, 3, .93)";
+    ctx.fillRect(0, 0, innerWidth, innerHeight);
+
+    // 2. Transparent aperture: destination-out removes the veil where the
+    // flashlight reaches, exposing the actual room below this canvas.
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.fillStyle = radial(ctx, currentX, currentY, 0, outer, [
+      [0, "rgba(0,0,0,1)"],
+      [.38, "rgba(0,0,0,.99)"],
+      [.64, "rgba(0,0,0,.9)"],
+      [.83, "rgba(0,0,0,.48)"],
+      [1, "rgba(0,0,0,0)"]
+    ]);
+    ctx.fillRect(0, 0, innerWidth, innerHeight);
+
+    // 3. Interior optical spill: a restrained warm hotspot and a wider haze
+    // are drawn only inside the aperture. These are light response layers,
+    // not the visibility mechanism.
+    ctx.globalCompositeOperation = "screen";
+    ctx.fillStyle = radial(ctx, currentX, currentY, 0, r * .86, [
+      [0, `rgba(255,244,220,${.22 * flicker})`],
+      [.22, `rgba(255,228,185,${.12 * flicker})`],
+      [.68, `rgba(191,172,133,${.035 * flicker})`],
+      [1, "rgba(0,0,0,0)"]
+    ]);
+    ctx.fillRect(0, 0, innerWidth, innerHeight);
+
+    // Small hotspot feather: makes nearby edges read as illuminated without
+    // turning the whole screen white.
+    ctx.fillStyle = radial(ctx, currentX, currentY, 0, r * .28, [
+      [0, `rgba(255,250,237,${.12 * flicker})`],
+      [.7, `rgba(242,219,178,${.025 * flicker})`],
+      [1, "rgba(0,0,0,0)"]
+    ]);
+    ctx.fillRect(0, 0, innerWidth, innerHeight);
+
+    ctx.globalCompositeOperation = "source-over";
+    rafId = requestAnimationFrame(drawFlashlight);
+  }
+
+  function toggle(force) {
+    const next = typeof force === "boolean" ? force : !on;
+    if (next === on) return;
+    on = next;
+    canvas.classList.toggle("is-on", on);
+    canvas.setAttribute("aria-hidden", String(!on));
+    document.body.classList.toggle("ls-flashlight-on", on);
+    document.body.classList.toggle("ls-flashlight-off", !on);
+    try { window.LS_NARRATIVE?.setFlag("flashlightOn", on); } catch (_) {}
+
+    if (on) {
+      if (!rafId) rafId = requestAnimationFrame(drawFlashlight);
+    } else {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = 0;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = "source-over";
+    }
+  }
+
+  document.addEventListener("keydown", event => {
+    if (event.repeat) return;
+    if (event.key !== "f" && event.key !== "F") return;
+    const active = document.activeElement;
+    if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || active.isContentEditable)) return;
+    const state = window.LS_NARRATIVE?.getState?.();
+    if (state !== "main") return;
+    if (window.LS_CORRIDOR?.isActive?.() && window.LS_STORM?.isEasActive?.()) return;
+    event.preventDefault();
+    toggle();
+  });
+
+  document.addEventListener("ls:narrativeState", event => {
+    if (event.detail.to !== "main") {
+      toggle(false);
+    } else if (!on) {
+      // Replay removes transient body classes; restore the explicit dark
+      // flashlight-off state before the room becomes visible again.
+      document.body.classList.add("ls-flashlight-off");
+      document.body.classList.remove("ls-flashlight-on");
+    }
+  });
+
+  window.LS_FLASHLIGHT = {
+    toggle,
+    isOn: () => on,
+    getPosition: () => ({ x: currentX, y: currentY, radius })
+  };
+})();
+
+
+/* ============================================================
+   LAST SEEN — corridor.js
+   Z-key smooth turn from main view into left corridor and back.
+   FNAF6-inspired continuous pivot feeling (no asset/code/ui
+   copying). Toggle behavior: Z once → corridor; Z again → main.
+   Ignores key-repeat while held. No overlapping transitions.
+   Rare, cooldown-controlled psychological events:
+   image-based eyes, distant shadow figure. No jumpscares.
+   Eyes retreat/close/fade when directly illuminated by the
+   flashlight.
+   ============================================================ */
+
+(function () {
+  "use strict";
+
+  const corridor = document.getElementById("ls-corridor");
+  if (!corridor) return;
+  const eyesEl = corridor.querySelector(".ls-corridor-eyes");
+  const figureEl = corridor.querySelector(".ls-corridor-figure");
+  const stormFlashEl = corridor.querySelector(".ls-corridor-storm-flash");
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let active = false;
+  let transitioning = false;
+  let zHeld = false; // ignore key-repeat while held
+  let eventScheduler = null;
+  let eyeVisibilityTimeout = null;
+  let figureVisibilityTimeout = null;
+
+  // ---------- Toggle ----------
+  function turnTo(target) {
+    if (transitioning) return;
+    if (target === active) return;
+    // Only allow corridor turn during main scene
+    const state = (window.LS_NARRATIVE && window.LS_NARRATIVE.getState) ? window.LS_NARRATIVE.getState() : null;
+    if (state !== "main") return;
+    // Don't allow during modal interactions
+    if (document.querySelector('[role="dialog"].is-open, [role="dialog"][aria-hidden="false"]')) return;
+
+    transitioning = true;
+    active = target;
+    if (active) {
+      corridor.classList.add("is-active");
+      corridor.setAttribute("aria-hidden", "false");
+      document.body.classList.add("ls-corridor-active");
+      try { window.LS_NARRATIVE.setFlag("corridorActive", true); } catch (_) {}
+      startEventScheduler();
+    } else {
+      corridor.classList.remove("is-active");
+      corridor.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("ls-corridor-active");
+      try { window.LS_NARRATIVE.setFlag("corridorActive", false); } catch (_) {}
+      stopEventScheduler();
+      // Force hide any active events
+      if (eyesEl) eyesEl.classList.remove("is-visible");
+      if (figureEl) figureEl.classList.remove("is-visible");
+    }
+    // Wait for the CSS transition to settle
+    setTimeout(() => { transitioning = false; }, reducedMotion ? 200 : 800);
+  }
+
+  // ---------- Z key binding ----------
+  document.addEventListener("keydown", (e) => {
+    // Ignore inside text inputs
+    const active = document.activeElement;
+    if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || active.isContentEditable)) return;
+    if (e.key === "z" || e.key === "Z") {
+      if (zHeld) return; // ignore key-repeat
+      if (e.repeat) { zHeld = true; return; }
+      zHeld = true;
+      // Only operate in main scene
+      const state = (window.LS_NARRATIVE && window.LS_NARRATIVE.getState) ? window.LS_NARRATIVE.getState() : null;
+      if (state !== "main") return;
+      if (document.querySelector('[role="dialog"].is-open, [role="dialog"][aria-hidden="false"]')) return;
+      e.preventDefault();
+      turnTo(!window.LS_CORRIDOR.isActive());
+    }
+  });
+  document.addEventListener("keyup", (e) => {
+    if (e.key === "z" || e.key === "Z") {
+      zHeld = false;
+    }
+  });
+
+  // Touch fallback for corridor: three-finger tap toggles corridor
+  // (icon-only, no visible tutorial text)
+  let threeFingerCount = 0;
+  let threeFingerTimer = null;
+  document.addEventListener("pointerdown", (e) => {
+    const state = (window.LS_NARRATIVE && window.LS_NARRATIVE.getState) ? window.LS_NARRATIVE.getState() : null;
+    if (state !== "main") return;
+    if (e.target.closest("button, [data-key], input, [role=dialog]")) return;
+    threeFingerCount++;
+    if (threeFingerCount === 1) {
+      threeFingerTimer = setTimeout(() => { threeFingerCount = 0; }, 500);
+    } else if (threeFingerCount === 3) {
+      clearTimeout(threeFingerTimer);
+      threeFingerCount = 0;
+      turnTo(!window.LS_CORRIDOR.isActive());
+    }
+  }, { passive: true });
+  document.addEventListener("pointerup", () => {
+    setTimeout(() => { threeFingerCount = 0; }, 100);
+  }, { passive: true });
+
+  // ---------- Rare psychological event scheduler ----------
+  // Eyes appear briefly and retreat. Figure crosses distantly. Both with
+  // cooldowns. NO jumpscares, NO screams.
+
+  function startEventScheduler() {
+    if (eventScheduler) return;
+    scheduleNextEvent();
+  }
+  function stopEventScheduler() {
+    if (eventScheduler) clearTimeout(eventScheduler);
+    eventScheduler = null;
+    if (eyeVisibilityTimeout) { clearTimeout(eyeVisibilityTimeout); eyeVisibilityTimeout = null; }
+    if (figureVisibilityTimeout) { clearTimeout(figureVisibilityTimeout); figureVisibilityTimeout = null; }
+  }
+
+  function scheduleNextEvent() {
+    if (!active) return;
+    // Bounded cooldown: 25-65s between events (rare)
+    const next = 25000 + Math.random() * 40000;
+    eventScheduler = setTimeout(() => {
+      if (!active) return;
+      // Choose an event
+      const roll = Math.random();
+      if (roll < 0.6) {
+        showEyes();
+      } else {
+        showFigure();
+      }
+      scheduleNextEvent();
+    }, reducedMotion ? next * 0.5 : next);
+  }
+
+  function showEyes() {
+    if (!eyesEl) return;
+    // Briefly visible, then fades
+    eyesEl.classList.add("is-visible");
+    const duration = reducedMotion ? 1500 : 4000 + Math.random() * 3000;
+    eyeVisibilityTimeout = setTimeout(() => {
+      eyesEl.classList.remove("is-visible");
+      eyeVisibilityTimeout = null;
+    }, duration);
+  }
+
+  function showFigure() {
+    if (!figureEl) return;
+    figureEl.classList.add("is-visible");
+    const duration = reducedMotion ? 1000 : 2500 + Math.random() * 2000;
+    figureVisibilityTimeout = setTimeout(() => {
+      figureEl.classList.remove("is-visible");
+      figureVisibilityTimeout = null;
+    }, duration);
+  }
+
+  // ---------- Flashlight detection on eyes ----------
+  // When the flashlight is on AND its current position overlaps the eyes'
+  // bounding box, mark the body with `ls-corridor-eyes-lit` so the CSS
+  // fades the eyes out (retreat / close).
+  function checkEyesIllumination() {
+    if (!active || !eyesEl) return;
+    if (!window.LS_FLASHLIGHT || !window.LS_FLASHLIGHT.isOn()) {
+      document.body.classList.remove("ls-corridor-eyes-lit");
+      return;
+    }
+    const pos = window.LS_FLASHLIGHT.getPosition();
+    const rect = eyesEl.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+    // Distance from flashlight center to eyes center
+    const ecx = rect.left + rect.width / 2;
+    const ecy = rect.top + rect.height / 2;
+    const dist = Math.hypot(pos.x - ecx, pos.y - ecy);
+    // If within 1.4x radius, eyes are lit
+    if (dist < pos.radius * 1.4) {
+      document.body.classList.add("ls-corridor-eyes-lit");
+    } else {
+      document.body.classList.remove("ls-corridor-eyes-lit");
+    }
+  }
+
+  // Throttled rAF loop for illumination check
+  let checkRaf = null;
+  function illuminationLoop() {
+    checkEyesIllumination();
+    if (active) {
+      checkRaf = requestAnimationFrame(illuminationLoop);
+    } else {
+      checkRaf = null;
+    }
+  }
+  document.addEventListener("ls:flagChange", (e) => {
+    if (e.detail.flag === "corridorActive") {
+      if (e.detail.value && !checkRaf) {
+        checkRaf = requestAnimationFrame(illuminationLoop);
+      } else if (!e.detail.value && checkRaf) {
+        cancelAnimationFrame(checkRaf);
+        checkRaf = null;
+        document.body.classList.remove("ls-corridor-eyes-lit");
+      }
+    }
+  });
+
+  // ---------- Lightning flash in corridor ----------
+  // When storm-eas.js dispatches ls:lightning, also flash the corridor
+  // storm flash element if the corridor is active.
+  document.addEventListener("ls:lightning", () => {
+    if (!active || !stormFlashEl) return;
+    stormFlashEl.classList.remove("is-flashing");
+    void stormFlashEl.offsetWidth;
+    stormFlashEl.classList.add("is-flashing");
+  });
+
+  // ---------- Narrative state gating ----------
+  document.addEventListener("ls:narrativeState", (e) => {
+    if (e.detail.to !== "main") {
+      // Force corridor off when leaving main scene
+      turnTo(false);
+    }
+  });
+
+  // ---------- Public API ----------
+  window.LS_CORRIDOR = {
+    isActive: () => active,
+    turnTo
+  };
+})();
+
+
+/* LAST SEEN — storm-eas.js
+   Owns the post-opening 120-second timer, LCD-native EAS takeover,
+   bounded 25–90 second lightning, brighter environmental exposure, and
+   thunder playback. Phone-only UI is queued while the camera is in the
+   corridor and cannot render there.
+*/
+(function () {
+  "use strict";
+
+  const eas = document.getElementById("ls-eas");
+  const scene = document.querySelector("main.scene");
+  const lcdFrame = document.querySelector(".lcd-frame");
+  const flash = document.querySelector(".storm-flash");
+  const windowShadow = document.querySelector(".window-shadow");
+  const exposure = document.getElementById("ls-lightning-exposure");
+  const area = document.getElementById("ls-eas-area");
+  const message = document.getElementById("ls-eas-message");
+  const time = document.getElementById("ls-eas-time");
+
+  if (!eas || !scene) return;
+
+  const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches || false;
+  const MAIN_DELAY = 120000;
+  const EAS_HOLD = 15000;
+
+  let mainTimer = null;
+  let lightningTimer = null;
+  let easTimer = null;
+  let active = false;
+  let stormStarted = false;
+  let easQueued = false;
+  let strikeToken = 0;
+
+  const LOCATION = "SAINT FRANCIS AREA · ISABELA";
+  const PHONE_TIME = "07:12 · 16-02-1999";
+
+  function isCorridor() {
+    return Boolean(window.LS_CORRIDOR?.isActive?.() || window.LS_NARRATIVE?.getFlags?.().corridorActive);
+  }
+
+  function positionOnPhone() {
+    if (!lcdFrame) return;
+    const rect = lcdFrame.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    eas.style.inset = "auto";
+    eas.style.right = "auto";
+    eas.style.bottom = "auto";
+    eas.style.left = `${rect.left + rect.width / 2}px`;
+    eas.style.top = `${rect.top + rect.height / 2}px`;
+    eas.style.width = `${rect.width}px`;
+    eas.style.height = `${rect.height}px`;
+    eas.style.transform = "translate(-50%, -50%)";
+  }
+
+  function populate() {
+    if (area) area.textContent = LOCATION;
+    if (message) message.textContent = "Malakas na pag-ulan at hangin. Manatili sa loob ng bahay. Mag-ingat sa pagbaha at pagguho sa mga kalsada.";
+    if (time) time.textContent = `ISSUED ${PHONE_TIME}`;
+  }
+
+  function setTakeover(on) {
+    if (on) {
+      if (isCorridor()) { easQueued = true; return false; }
+      populate();
+      positionOnPhone();
+      eas.classList.add("is-active");
+      eas.setAttribute("aria-hidden", "false");
+      try { window.LS_NARRATIVE.setFlag("easActive", true); } catch (_) {}
+      return true;
+    }
+    eas.classList.remove("is-active");
+    eas.setAttribute("aria-hidden", "true");
+    try { window.LS_NARRATIVE.setFlag("easActive", false); } catch (_) {}
+    return false;
+  }
+
+  function flashWorld() {
+    const token = ++strikeToken;
+    const duration = reducedMotion ? 900 : 1200;
+    const fromCorridor = isCorridor();
+    document.body.classList.remove("ls-lightning-active", "ls-lightning-secondary");
+    scene.classList.remove("ls-lightning-active", "ls-lightning-secondary");
+    if (flash) flash.classList.remove("is-flashing");
+    if (windowShadow) windowShadow.classList.remove("is-flashing");
+    if (exposure) exposure.classList.remove("is-active", "is-corridor");
+    void scene.offsetWidth;
+
+    // Main exposure burst: this brightens the actual room layers and window
+    // frame, while the Canvas flashlight remains a separate occlusion system.
+    document.body.classList.add("ls-lightning-active");
+    scene.classList.add("ls-lightning-active");
+    if (flash) flash.classList.add("is-flashing");
+    if (windowShadow) windowShadow.classList.add("is-flashing");
+    if (exposure) {
+      exposure.classList.toggle("is-corridor", fromCorridor);
+      exposure.classList.add("is-active");
+    }
+    document.dispatchEvent(new CustomEvent("ls:lightning", {
+      detail: { source: "window", location: LOCATION }
+    }));
+
+    // A short secondary pulse gives the strike a natural electrical rhythm.
+    const secondaryDelay = reducedMotion ? 260 : 150 + Math.random() * 280;
+    const secondary = window.setTimeout(() => {
+      if (token !== strikeToken) return;
+      document.body.classList.add("ls-lightning-secondary");
+      scene.classList.add("ls-lightning-secondary");
+    }, secondaryDelay);
+
+    const variant = `thunder${1 + Math.floor(Math.random() * 3)}`;
+    const thunderDelay = reducedMotion ? 220 : 420 + Math.random() * 2800;
+    window.setTimeout(() => {
+      if (token !== strikeToken) return;
+      try { window.LS_AUDIO.playThunder(variant); } catch (_) {}
+    }, thunderDelay);
+
+    window.setTimeout(() => {
+      if (token !== strikeToken) return;
+      window.clearTimeout(secondary);
+      document.body.classList.remove("ls-lightning-active", "ls-lightning-secondary");
+      scene.classList.remove("ls-lightning-active", "ls-lightning-secondary");
+      if (flash) flash.classList.remove("is-flashing");
+      if (windowShadow) windowShadow.classList.remove("is-flashing");
+      if (exposure) exposure.classList.remove("is-active", "is-corridor");
+    }, duration);
+  }
+
+  function scheduleLightning(first = false) {
+    if (!active) return;
+    if (lightningTimer) window.clearTimeout(lightningTimer);
+    const min = 25000;
+    const max = first ? 45000 : 90000;
+    lightningTimer = window.setTimeout(() => {
+      if (active) flashWorld();
+      scheduleLightning(false);
+    }, min + Math.random() * (max - min));
+  }
+
+  function displayEas() {
+    if (!active || !stormStarted) return;
+    if (isCorridor()) { easQueued = true; return; }
+    easQueued = false;
+    try {
+      if (window.LASTSEEN && !window.LASTSEEN.getPowered()) window.LASTSEEN.powerOn();
+    } catch (_) {}
+    setTakeover(true);
+    try { window.LS_AUDIO.playEAS(); } catch (_) {}
+    if (easTimer) window.clearTimeout(easTimer);
+    easTimer = window.setTimeout(() => {
+      setTakeover(false);
+      try { window.LS_AUDIO.stopEAS(); } catch (_) {}
+    }, EAS_HOLD);
+  }
+
+  function showEas() {
+    if (!active || stormStarted) return;
+    stormStarted = true;
+    if (isCorridor()) {
+      easQueued = true;
+      try { window.LS_AUDIO.playEAS(); } catch (_) {}
+    } else {
+      displayEas();
+    }
+    scheduleLightning(true);
+  }
+
+  function stopStorm() {
+    active = false;
+    stormStarted = false;
+    easQueued = false;
+    if (mainTimer) window.clearTimeout(mainTimer);
+    if (lightningTimer) window.clearTimeout(lightningTimer);
+    if (easTimer) window.clearTimeout(easTimer);
+    mainTimer = lightningTimer = easTimer = null;
+    setTakeover(false);
+    try { window.LS_AUDIO.stopEAS(); } catch (_) {}
+    document.body.classList.remove("ls-lightning-active", "ls-lightning-secondary");
+    scene.classList.remove("ls-lightning-active", "ls-lightning-secondary");
+    if (flash) flash.classList.remove("is-flashing");
+    if (windowShadow) windowShadow.classList.remove("is-flashing");
+    if (exposure) exposure.classList.remove("is-active", "is-corridor");
+  }
+
+  function startAfterOpening() {
+    stopStorm();
+    active = true;
+    try { window.LS_NARRATIVE.mainTimerStart = performance.now(); } catch (_) {}
+    mainTimer = window.setTimeout(showEas, MAIN_DELAY);
+  }
+
+  document.addEventListener("ls:openingComplete", startAfterOpening);
+  document.addEventListener("ls:narrativeState", event => {
+    if (event.detail.to !== "main") stopStorm();
+  });
+  document.addEventListener("ls:flagChange", event => {
+    if (event.detail.flag !== "corridorActive") return;
+    if (event.detail.value) {
+      // Hide the takeover immediately when the phone leaves the camera view,
+      // but keep it queued so it can return when the room is visible again.
+      if (eas.classList.contains("is-active")) {
+        easQueued = true;
+        setTakeover(false);
+      }
+    } else if (easQueued && stormStarted) {
+      displayEas();
+    }
+  });
+  window.addEventListener("resize", () => {
+    if (eas.classList.contains("is-active")) positionOnPhone();
+  }, { passive: true });
+
+  window.LS_STORM = {
+    startAfterOpening,
+    stop: stopStorm,
+    flash: flashWorld,
+    isActive: () => active,
+    isEasActive: () => eas.classList.contains("is-active")
+  };
+})();
+
+
+/* LAST SEEN — ending.js
+   Ending state machine: notification -> actual Inbox insertion -> pixel LCD
+   message -> ten-second realization -> black fade -> newer phone -> replay.
+*/
+(function () {
+  "use strict";
+
+  const notification = document.getElementById("ls-notification");
+  const inboxTakeover = document.getElementById("ls-inbox-takeover");
+  const messageReader = document.getElementById("messageReader");
+  const readerBody = document.getElementById("readerBody");
+  const man = document.getElementById("ls-man-silhouette");
+  const newerPhone = document.getElementById("ls-newer-phone");
+  const danteTime = document.querySelector(".ls-dante-time");
+  const creditCard = document.getElementById("ls-credit-card");
+  const fade = document.getElementById("ls-fade");
+  const lcdFrame = document.querySelector(".lcd-frame");
+
+  if (!notification || !inboxTakeover || !man || !newerPhone || !creditCard || !fade) return;
+
+  const MESSAGE = "Nadito na ako";
+  const PHONE_TIME = "07:12 · 16-02-1999";
+  let notificationOpen = false;
+  let notificationPending = false;
+  let messageOpened = false;
+  let messageVisible = false;
+  let endingStarted = false;
+  const timers = new Set();
+
+  function later(fn, ms) {
+    const id = window.setTimeout(() => {
+      timers.delete(id);
+      fn();
+    }, ms);
+    timers.add(id);
+    return id;
+  }
+
+  function clearTimers() {
+    timers.forEach(id => window.clearTimeout(id));
+    timers.clear();
+  }
+
+  function isCorridor() {
+    return Boolean(window.LS_CORRIDOR?.isActive?.() || window.LS_NARRATIVE?.getFlags?.().corridorActive);
+  }
+
+  function positionOverPhone(element) {
+    if (!lcdFrame || !element) return;
+    const rect = lcdFrame.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    element.style.inset = "auto";
+    element.style.right = "auto";
+    element.style.bottom = "auto";
+    element.style.left = `${rect.left + rect.width / 2}px`;
+    element.style.top = `${rect.top + rect.height / 2}px`;
+    element.style.width = `${rect.width}px`;
+    element.style.height = `${rect.height}px`;
+    element.style.transform = "translate(-50%, -50%)";
+  }
+
+  function setFlag(name, value) {
+    try { window.LS_NARRATIVE.setFlag(name, value); } catch (_) {}
+  }
+
+  function injectInbox() {
+    document.dispatchEvent(new CustomEvent("ls:injectInboxMessage"));
+  }
+
+  function hideNotification(keepPending = false) {
+    notification.classList.remove("is-active");
+    notification.setAttribute("aria-hidden", "true");
+    notificationOpen = false;
+    if (!keepPending) notificationPending = false;
+    setFlag("notificationActive", false);
+  }
+
+  function hideInboxMessage() {
+    inboxTakeover.classList.remove("is-active");
+    inboxTakeover.setAttribute("aria-hidden", "true");
+    inboxTakeover.tabIndex = -1;
+    messageVisible = false;
+  }
+
+  function showNotification() {
+    if (endingStarted || notificationOpen) return;
+    injectInbox();
+    if (isCorridor()) {
+      notificationPending = true;
+      return;
+    }
+    notificationPending = false;
+    positionOverPhone(notification);
+    notification.classList.add("is-active");
+    notification.setAttribute("aria-hidden", "false");
+    notification.tabIndex = 0;
+    notificationOpen = true;
+    setFlag("notificationActive", true);
+    notification.focus?.({ preventScroll: true });
+  }
+
+  function showInboxMessage() {
+    // Kept as a safe fallback for an external phone implementation, but the
+    // normal path opens the real Inbox list through the legacy phone renderer.
+    if (endingStarted || !messageOpened || isCorridor()) return;
+    positionOverPhone(inboxTakeover);
+    inboxTakeover.classList.add("is-active");
+    inboxTakeover.setAttribute("aria-hidden", "false");
+    inboxTakeover.tabIndex = 0;
+    messageVisible = true;
+    inboxTakeover.focus?.({ preventScroll: true });
+  }
+
+  function openMessage() {
+    if (!notificationOpen || endingStarted || isCorridor()) return;
+    hideNotification();
+    // Do not reveal the message directly after the notification click. The
+    // message has already been inserted into the actual Inbox archive; hand
+    // control back to the pixel phone so the player opens Inbox and selects it.
+    document.dispatchEvent(new CustomEvent("ls:openEndingInbox"));
+  }
+
+  function revealMan() {
+    if (endingStarted) return;
+    endingStarted = true;
+    hideNotification();
+    hideInboxMessage();
+    if (messageReader) {
+      messageReader.classList.remove("is-open");
+      messageReader.setAttribute("aria-hidden", "true");
+    }
+
+    man.classList.add("is-revealed");
+    try { window.LS_STORM?.flash?.(); } catch (_) {
+      document.dispatchEvent(new CustomEvent("ls:lightning", { detail: { source: "window" } }));
+    }
+    // A secondary reflection gives the silhouette a readable, frightening
+    // hold without turning the reveal into a jump scare.
+    later(() => { try { window.LS_STORM?.flash?.(); } catch (_) {} }, 720);
+
+    // Hold the realization, then commit to a real full black interval.
+    later(() => {
+      fade.classList.add("is-fading", "is-holding");
+    }, 1800);
+    later(showNewerPhone, 3600);
+  }
+
+  function showNewerPhone() {
+    try { window.LS_NARRATIVE.enterEnding(); } catch (_) {}
+    try { window.LS_AUDIO.stopAmbience(900); } catch (_) {}
+    try { window.LS_AUDIO.playEnding(); } catch (_) {}
+    if (danteTime) danteTime.textContent = PHONE_TIME;
+
+    // Keep the new phone prepared underneath the black screen. It fades in
+    // only after the old room has actually completed its black transition.
+    newerPhone.classList.add("is-active", "is-preparing");
+    newerPhone.setAttribute("aria-hidden", "false");
+    man.classList.remove("is-revealed");
+
+    later(() => {
+      fade.classList.remove("is-holding", "is-fading");
+      newerPhone.classList.remove("is-preparing");
+      try { window.LS_AUDIO.playEAS(); } catch (_) {}
+    }, 1100);
+
+    // Let the final alert remain readable before the credit card.
+    later(() => {
+      try { window.LS_AUDIO.stopEAS(); } catch (_) {}
+      showCreditCard();
+    }, 15500);
+  }
+
+  function showCreditCard() {
+    // A complete black transition separates the newer phone from the final
+    // credit card. The credit card then precedes the interactive title screen.
+    fade.classList.add("is-fading", "is-holding");
+    newerPhone.classList.remove("is-active", "is-preparing");
+    newerPhone.setAttribute("aria-hidden", "true");
+    later(() => {
+      creditCard.classList.add("is-active");
+      creditCard.setAttribute("aria-hidden", "false");
+      fade.classList.remove("is-holding", "is-fading");
+    }, 1500);
+    later(() => {
+      try { window.LS_NARRATIVE.replay(); } catch (_) { window.location.reload(); }
+    }, 6500);
+  }
+
+  function onNotificationClick(event) {
+    event.preventDefault();
+    openMessage();
+  }
+
+  function onNotificationKey(event) {
+    if (event.key !== "Enter" && event.key !== " " && event.key !== "Spacebar") return;
+    event.preventDefault();
+    openMessage();
+  }
+
+  notification.addEventListener("click", onNotificationClick);
+  notification.addEventListener("keydown", onNotificationKey);
+
+  document.addEventListener("ls:triggerNotification", showNotification);
+  document.addEventListener("ls:triggerEndingSequence", () => {
+    if (messageOpened && !endingStarted) later(revealMan, 10000);
+  });
+
+  // If a legacy phone reader opens the message through the underlying archive,
+  // retain the same ending gate but keep the visible message pixel-styled.
+  document.addEventListener("ls:naditoMessageOpened", () => {
+    if (messageOpened) return;
+    messageOpened = true;
+    hideNotification();
+    setFlag("naditoOpened", true);
+    // The ten-second reveal starts from the actual Inbox message-open event.
+    later(revealMan, 10000);
+  });
+
+  // Never leave a phone-only takeover floating over the hallway. Queue it and
+  // reveal it only after the camera is back in the room.
+  document.addEventListener("ls:flagChange", event => {
+    if (event.detail.flag !== "corridorActive") return;
+    if (event.detail.value) {
+      if (notificationOpen) hideNotification(true);
+      if (messageVisible) hideInboxMessage();
+    } else {
+      if (notificationPending && !messageOpened) showNotification();
+      if (messageOpened && !endingStarted) showInboxMessage();
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    if (notificationOpen) positionOverPhone(notification);
+    if (messageVisible) positionOverPhone(inboxTakeover);
+  }, { passive: true });
+
+  document.addEventListener("ls:narrativeState", event => {
+    if (event.detail.to !== "title") return;
+    clearTimers();
+    hideNotification();
+    hideInboxMessage();
+      newerPhone.classList.remove("is-active", "is-preparing");
+      newerPhone.setAttribute("aria-hidden", "true");
+      creditCard.classList.remove("is-active");
+      creditCard.setAttribute("aria-hidden", "true");
+      man.classList.remove("is-revealed", "is-fading");
+      fade.classList.remove("is-fading", "is-holding");
+    document.dispatchEvent(new CustomEvent("ls:removeEndingInboxMessage"));
+    notificationOpen = false;
+    notificationPending = false;
+    messageOpened = false;
+    messageVisible = false;
+    endingStarted = false;
+  });
+
+  window.LS_ENDING = {
+    showNotification,
+    openMessage,
+    revealMan,
+    showNewerPhone,
+    reset: clearTimers
+  };
+})();
+
+  </script>
 </body>
 </html>
