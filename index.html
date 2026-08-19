@@ -3764,246 +3764,12 @@ body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-a
   }
 }
 
-
-/* ========== ENHANCEMENT PACK ========== */
-#ls-title-skip-hint {
-  position: relative; z-index: 2; margin: 0;
-  color: rgba(232,226,212,.38);
-  font: 700 10px/1 "Courier New", monospace;
-  letter-spacing: .22em;
-}
-#ls-title-play { position: relative; overflow: hidden; }
-#ls-title-play::after {
-  content: "";
-  position: absolute; left: 14px; top: 50%;
-  width: 2px; height: 16px; margin-top: -8px;
-  background: #e8d8b0;
-  box-shadow: 0 0 8px rgba(232,200,120,.55);
-  animation: playHeadTick 1.6s steps(2) infinite;
-}
-@keyframes playHeadTick {
-  0%, 49% { opacity: .15; transform: translateY(-3px); }
-  50%, 100% { opacity: .9; transform: translateY(3px); }
-}
-#ls-opening-text.is-visible {
-  padding: 18px 22px;
-  background:
-    repeating-linear-gradient(0deg, transparent 0 3px, rgba(80,50,20,.05) 4px),
-    repeating-linear-gradient(90deg, transparent 0 7px, rgba(255,230,180,.03) 8px),
-    rgba(20,12,6,.18);
-  box-shadow: inset 0 0 40px rgba(0,0,0,.25);
-}
-.ls-controls-skip {
-  margin: 22px 0 0;
-  color: #8a8374;
-  font: 700 10px/1.5 "Courier New", monospace;
-  letter-spacing: .08em;
-}
-
-.reader-lcd {
-  background:
-    repeating-linear-gradient(0deg, transparent 0 4px, rgba(20,40,20,.06) 5px),
-    #b5c4a5 !important;
-}
-.reader-lcd::before {
-  content: "";
-  position: absolute; inset: 0; pointer-events: none; z-index: 2;
-  background: linear-gradient(90deg, rgba(40,80,40,.08), transparent 8% 92%, rgba(40,80,40,.08));
-  mix-blend-mode: multiply;
-}
-
-.left-spool { --spool-s: var(--spool-l, 1); transform: scale(var(--spool-s)); transform-origin: center; }
-.right-spool { --spool-s: var(--spool-r, .72); transform: scale(var(--spool-s)); transform-origin: center; }
-.cassette-3d.is-playing .left-spool,
-.cassette-3d.is-playing .right-spool {
-  animation: spoolScaleSpin 1.15s linear infinite;
-}
-@keyframes spoolScaleSpin {
-  from { transform: scale(var(--spool-s, 1)) rotate(0deg); }
-  to { transform: scale(var(--spool-s, 1)) rotate(360deg); }
-}
-.tape-ribbon {
-  position: absolute; left: 24%; right: 24%; top: 44%; height: 16%;
-  background: repeating-linear-gradient(90deg, #4a3420 0 3px, #2c1e12 3px 6px);
-  box-shadow: inset 0 0 6px #000;
-  opacity: .88;
-}
-.cassette-3d.is-playing .tape-ribbon {
-  animation: ribbonMove .32s linear infinite;
-}
-@keyframes ribbonMove {
-  from { background-position: 0 0; }
-  to { background-position: 12px 0; }
-}
-.cassette.is-askew {
-  transform: rotate(21deg) translate(10px, 8px) scale(var(--scene-scale, 1)) !important;
-}
-
-.desk-note {
-  position: absolute; z-index: 5;
-  left: 18%; bottom: 9%;
-  width: 118px; height: 78px;
-  border: 1px solid rgba(160,140,100,.35);
-  background: #cfc3a0; color: #3a2e22;
-  font: 800 9px/1.2 "Courier New", monospace;
-  transform: rotate(-8deg);
-  cursor: pointer;
-  box-shadow: 6px 8px 14px rgba(0,0,0,.45);
-}
-body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) .desk-note {
-  opacity: .06 !important;
-  filter: brightness(.08) !important;
-}
-body.ls-state-main.ls-flashlight-on .desk-note { opacity: 1; filter: none; }
-
-#ls-behind-you {
-  position: absolute; z-index: 6; left: 6%; bottom: 0;
-  width: min(160px, 18vw); height: 78%;
-  opacity: 0; pointer-events: none;
-  background: radial-gradient(circle at 50% 12%, #000 0 18px, transparent 19px),
-    linear-gradient(90deg, transparent 10%, #000 28% 72%, transparent 90%);
-  clip-path: polygon(36% 0,64% 0,78% 16%,74% 52%,100% 100%,58% 100%,50% 56%,42% 100%,0 100%,26% 52%,22% 16%);
-}
-#ls-behind-you.is-seen { opacity: .92; }
-
-.ls-hall-rain-window {
-  position: absolute; z-index: 6; left: 2%; top: 16%;
-  width: 16%; height: 34%;
-  border: 7px solid #080a0a;
-  background: linear-gradient(180deg, #0a161b, #071013);
-  transform: skewY(4deg);
-  box-shadow: inset 0 0 20px #000;
-}
-.ls-hall-rain-window::before { content:""; position:absolute; left:48%; top:0; bottom:0; width:5px; background:#080a0a; }
-.ls-hall-rain-window::after { content:""; position:absolute; left:0; right:0; top:48%; height:5px; background:#080a0a; }
-.ls-hall-switch {
-  position: absolute; z-index: 14; right: 7%; top: 38%;
-  width: 18px; height: 28px; padding: 0;
-  border: 2px solid #0a0c0c; background: #1a1f1e;
-  cursor: pointer; pointer-events: auto;
-}
-.ls-hall-switch::after {
-  content:""; position:absolute; left:3px; right:3px; top:4px; height:10px;
-  background: #2c3331;
-}
-.ls-hall-name {
-  position: absolute; z-index: 7; left: 30%; top: 34%;
-  font: 900 22px/1 "Courier New", monospace;
-  color: rgba(20,14,10,.55);
-  letter-spacing: .2em;
-  transform: rotate(-6deg);
-  pointer-events: none;
-}
-.ls-hall-smear {
-  position: absolute; z-index: 7; bottom: 12%; width: 12%; height: 28%;
-  opacity: 0;
-  background: radial-gradient(ellipse at 50% 80%, rgba(10,8,6,.7), transparent 70%);
-  filter: blur(3px);
-}
-#ls-corridor.hall-aftermath .ls-hall-smear { opacity: .7; }
-#ls-corridor.figure-left.hall-aftermath .ls-hall-smear { left: 12%; }
-#ls-corridor.figure-right.hall-aftermath .ls-hall-smear { right: 12%; left: auto; }
-#ls-corridor.hall-aftermath .ls-hall-frame { transform: rotate(28deg) translate(8px, 12px); }
-.ls-wet-prints {
-  position: absolute; inset: 0; z-index: 5;
-  width: 100%; height: 100%; pointer-events: none;
-}
-.ls-hall-sheen {
-  position: absolute; left: 20%; right: 20%; bottom: 0; height: 42%; z-index: 4;
-  background: linear-gradient(180deg, transparent, rgba(150,180,190,.08));
-  mix-blend-mode: screen; pointer-events: none;
-}
-#ls-corridor .ls-hall-end-door {
-  animation: doorBreathe 3.6s ease-in-out infinite;
-}
-#ls-corridor.hall-door-still .ls-hall-end-door { animation: none; }
-@keyframes doorBreathe {
-  0%,100% { transform: translateX(0); }
-  50% { transform: translateX(5px); }
-}
-#ls-corridor.psych-crawl .ls-hall-crawler.is-crossing {
-  opacity: .7;
-  animation: crawlAcross 4.8s ease forwards;
-}
-@keyframes crawlAcross {
-  from { transform: translate(-30%, -10px); }
-  to { transform: translate(80%, 18px); }
-}
-body.ls-lightning-active #ls-lightning-exposure.is-active {
-  box-shadow: inset 3px 0 0 rgba(255,40,70,.18), inset -3px 0 0 rgba(40,255,255,.14);
-}
-body.ls-figure-held::after {
-  content: "";
-  position: fixed; inset: 0; z-index: 41; pointer-events: none;
-  background: radial-gradient(ellipse at 50% 50%, transparent 28%, rgba(0,0,0,.58) 100%);
-  animation: heldPulse 1.15s ease-in-out infinite;
-}
-@keyframes heldPulse {
-  0%,100% { opacity: .72; }
-  50% { opacity: 1; }
-}
-body.ls-flashlight-on { cursor: none; }
-body.ls-flashlight-on button,
-body.ls-flashlight-on input,
-body.ls-flashlight-on .cassette-player,
-body.ls-flashlight-on #ls-force-audio,
-body.ls-flashlight-on #ls-fullscreen,
-body.ls-flashlight-on #ls-evidence,
-body.ls-flashlight-on #ls-mobile-controls,
-body.ls-flashlight-on .desk-note,
-body.ls-flashlight-on .ls-hall-switch { cursor: pointer; }
-
-#ls-evidence {
-  position: fixed; z-index: 88; top: 10px; left: 50%;
-  transform: translateX(-50%);
-  display: flex; gap: 8px; padding: 6px 10px;
-  border: 1px solid rgba(200,190,160,.28);
-  background: rgba(6,8,7,.72);
-  backdrop-filter: blur(8px);
-  font: 800 9px/1 "Courier New", monospace;
-  letter-spacing: .12em; color: #6a6558;
-}
-#ls-evidence[hidden] { display: none !important; }
-#ls-evidence b.is-got { color: #e6dcc0; }
-#ls-fullscreen {
-  position: fixed; z-index: 5000; right: 14px; bottom: 62px;
-  min-width: 64px; min-height: 34px;
-  border: 1px solid rgba(205,215,204,.4);
-  color: #e7eee7; background: rgba(8,13,12,.9);
-  font: 800 9px "Courier New", monospace; letter-spacing: .1em;
-  cursor: pointer;
-}
-#ls-force-audio.is-armed {
-  min-width: 42px; width: 42px; font-size: 0; padding: 9px 0;
-}
-#ls-force-audio.is-armed::before { content: "♪"; font-size: 16px; color: #bde5c8; }
-
-body.ls-phone-drain-1 .physical-key { filter: brightness(.86); }
-body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
-
-@media (max-width: 1100px) {
-  .rain-ambience-badge span { display: none; }
-  #ls-force-audio:not(.is-armed) { min-width: 42px; font-size: 0; padding: 9px 0; }
-  #ls-force-audio:not(.is-armed)::before { content: "♪"; font-size: 15px; }
-  #ls-fullscreen { right: 10px; bottom: 108px; min-width: 42px; font-size: 0; }
-  #ls-fullscreen::before { content: "⛶"; font-size: 14px; }
-}
-
-#ls-newer-phone .ls-newer-cracks svg,
-#ls-newer-phone .ls-newer-blood svg,
-#ls-man-silhouette svg {
-  width: 100%; height: 100%; display: block;
-}
-#ls-man-silhouette svg { height: 95vh; width: auto; max-width: 90vw; }
-
   </style>
 
   <script>
     // Prevent the legacy inline ambience and lightning schedulers from
     // starting before the title/opening controller takes ownership.
     window.LS_NATIVE_AMBIENCE_DISABLED = true;
-    window.LS_PHONE = { signalBars: 4, clock: "07:12", drain: 0, easDropped: false };
-    window.LS_KEYS = { flashlight: "F", turn: "Z", evidence: "I" };
   </script>
 </head>
 <body class="ls-state-title">
@@ -4029,8 +3795,6 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
       <div class="ambient-grain"></div>
     </div>
 
-    <button class="desk-note" id="deskNote" type="button" aria-label="Read the folded desk note">NOTE</button>
-    <div id="ls-behind-you" aria-hidden="true"></div>
     <button class="desk-object cassette" id="cassetteObject" type="button" aria-label="Open the voice tape subtitle player">
       <span class="cassette-label">4 my one &amp; onli lab ATO</span>
     </button>
@@ -4114,7 +3878,6 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
     <div id="ls-title-screen" class="is-active" role="dialog" aria-modal="true" aria-labelledby="ls-title-text">
       <h1 id="ls-title-text">LAST SEEN</h1>
       <button id="ls-title-play" type="button" aria-label="Play">▶</button>
-      <p id="ls-title-skip-hint">HOLD ENTER TO SKIP</p>
     </div>
 
     <!-- Opening cinematic (candle-lit Filipino text pages) -->
@@ -4124,13 +3887,10 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
       <section id="ls-controls-page" aria-label="Game controls" aria-hidden="true">
         <div class="ls-controls-card">
           <h2>CONTROLS</h2>
-          <div class="ls-control-row" data-desktop-control><span class="ls-control-key" data-bind="flashlight">F</span><span><b>FLASHLIGHT</b><small>Toggle your flashlight. Aim with the pointer.</small></span></div>
-          <div class="ls-control-row" data-desktop-control><span class="ls-control-key" data-bind="turn">Z</span><span><b>TURN AROUND</b><small>Look into the hallway, or turn back to the phone.</small></span></div>
-          <div class="ls-control-row" data-desktop-control><span class="ls-control-key" data-bind="evidence">I</span><span><b>EVIDENCE</b><small>Show or hide the film strip of things you have found.</small></span></div>
-          <div class="ls-control-row" data-desktop-control><span class="ls-control-key">FS</span><span><b>FULLSCREEN</b><small>Fill the laptop screen. Esc exits.</small></span></div>
+          <div class="ls-control-row" data-desktop-control><span class="ls-control-key">F</span><span><b>FLASHLIGHT</b><small>Toggle your flashlight. Aim with the pointer.</small></span></div>
+          <div class="ls-control-row" data-desktop-control><span class="ls-control-key">Z</span><span><b>TURN AROUND</b><small>Look into the hallway, or turn back to the phone.</small></span></div>
           <div class="ls-control-row" data-mobile-control hidden><span class="ls-control-key">☼</span><span><b>FLASHLIGHT</b><small>Tap the flashlight button, then drag to aim.</small></span></div>
           <div class="ls-control-row" data-mobile-control hidden><span class="ls-control-key">↶</span><span><b>TURN AROUND</b><small>Tap TURN to face the hallway or the phone.</small></span></div>
-          <p class="ls-controls-skip">On the title, hold Enter to skip the opening.</p>
           <button id="ls-controls-continue" type="button">I UNDERSTAND</button>
         </div>
       </section>
@@ -4171,16 +3931,10 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
       <div class="ls-hall-peeker" aria-hidden="true"></div>
       <div class="ls-hall-crawler" aria-hidden="true"></div>
       <div class="ls-corridor-floor"></div>
-      <div class="ls-hall-rain-window" aria-hidden="true"><i></i><i></i><i></i></div>
-      <button type="button" class="ls-hall-switch" id="lsHallSwitch" aria-label="Hall light switch"></button>
-      <div class="ls-hall-name" aria-hidden="true">ATO</div>
-      <div class="ls-hall-smear" aria-hidden="true"></div>
-      <canvas class="ls-wet-prints" id="lsWetPrints" aria-hidden="true"></canvas>
-      <div class="ls-hall-sheen" aria-hidden="true"></div>
       <div class="ls-corridor-window-shadow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       <div class="ls-corridor-storm-flash" aria-hidden="true"></div>
       <div class="ls-corridor-eyes" aria-hidden="true">
-        <svg viewBox="0 0 80 24" aria-hidden="true"><rect x="10" y="7" width="16" height="10" rx="1" fill="#e03a28"/><ellipse cx="62" cy="12" rx="9" ry="6" fill="#e03a28"/><rect x="16" y="9" width="4" height="6" fill="#140000"/><circle cx="62" cy="12" r="2.2" fill="#140000"/></svg>
+        <svg viewBox="0 0 80 24" aria-hidden="true"><ellipse cx="18" cy="12" rx="9" ry="6" fill="#e03a28"/><ellipse cx="62" cy="12" rx="9" ry="6" fill="#e03a28"/><circle cx="18" cy="12" r="2.2" fill="#140000"/><circle cx="62" cy="12" r="2.2" fill="#140000"/></svg>
       </div>
       <div class="ls-corridor-figure" aria-hidden="true" data-side="right">
         <svg viewBox="0 0 220 520" aria-hidden="true"><g fill="#030304"><ellipse cx="108" cy="52" rx="32" ry="38"/><path d="M96 84c-2 10-1 18 2 24h22c3-6 4-14 2-24z"/><path d="M38 112c22-10 46-14 70-12 28 2 52 10 74 22 6 18 10 48 8 78-2 28-8 54-10 86l-8 196h-34l-6-188c-2-8-10-12-16-10l-8 198H76L68 284c-4-34-10-64-14-96-4-30-8-56-16-76z"/><path d="M40 128c-18 36-28 78-26 122 2 28 8 54 18 86l22-6c-8-30-14-58-16-88-2-36 4-72 18-104z"/><path d="M180 130c16 34 24 76 20 118-2 30-10 58-18 88l22 8c12-34 20-66 22-98 4-44-4-86-22-122z"/></g></svg>
@@ -4212,10 +3966,10 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
       <div class="ls-newer-shell">
         <div class="ls-newer-screen">
           <div class="ls-newer-cracks" aria-hidden="true">
-            <svg viewBox="0 0 200 400" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="rgba(220,235,255,.75)" stroke-width="1.1"><path d="M110 0 L118 70 L90 160 L140 250 L100 400"/><path d="M118 70 L170 90 L198 140"/><path d="M90 160 L40 190 L0 230"/><path d="M140 250 L180 300 L160 360"/><path d="M100 40 L70 80 L80 120"/></g></svg>
+            <img src="screen-cracks.svg" alt="" />
           </div>
           <div class="ls-newer-blood" aria-hidden="true">
-            <svg viewBox="0 0 200 400" preserveAspectRatio="none" aria-hidden="true"><g fill="#5a0a0a" fill-opacity=".75"><ellipse cx="150" cy="40" rx="40" ry="22"/><ellipse cx="30" cy="220" rx="28" ry="50"/><path d="M120 0 C160 40 170 90 130 130 C180 110 190 70 200 40 L200 0 Z"/><path d="M40 300 c10 30 6 60 0 90 h-20 c4-30 0-60 8-90z"/></g></svg>
+            <img src="blood-splatter.svg" alt="" />
           </div>
           <div class="ls-newer-alert" role="alertdialog" aria-modal="true" aria-labelledby="ls-dante-title">
             <div class="ls-dante-header">
@@ -4236,7 +3990,7 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
 
     <!-- Man silhouette (revealed by lightning during ending) -->
     <div id="ls-man-silhouette" aria-hidden="true">
-      <svg viewBox="0 0 220 520" aria-hidden="true"><g fill="#030304"><ellipse cx="108" cy="52" rx="32" ry="38"/><path d="M96 84c-2 10-1 18 2 24h22c3-6 4-14 2-24z"/><path d="M38 112c22-10 46-14 70-12 28 2 52 10 74 22 6 18 10 48 8 78-2 28-8 54-10 86l-8 196h-34l-6-188c-2-8-10-12-16-10l-8 198H76L68 284c-4-34-10-64-14-96-4-30-8-56-16-76z"/><path d="M40 128c-18 36-28 78-26 122 2 28 8 54 18 86l22-6c-8-30-14-58-16-88-2-36 4-72 18-104z"/><path d="M180 130c16 34 24 76 20 118-2 30-10 58-18 88l22 8c12-34 20-66 22-98 4-44-4-86-22-122z"/></g></svg>
+      <img src="man-silhouette.svg" alt="" />
     </div>
 
     <!-- Notification banner: 'new message in inbox' -->
@@ -4280,7 +4034,6 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
               <div class="spool-window" aria-hidden="true">
                 <span class="spool left-spool"><i></i></span>
                 <span class="tape-bridge"></span>
-                <i class="tape-ribbon" aria-hidden="true"></i>
                 <span class="spool right-spool"><i></i></span>
               </div>
               <i class="tape-screw ts1"></i><i class="tape-screw ts2"></i><i class="tape-screw ts3"></i><i class="tape-screw ts4"></i>
@@ -4288,7 +4041,7 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
 
             <section class="tape-face tape-back" aria-label="Back side of cassette">
               <div class="back-ridges" aria-hidden="true"></div>
-              <div class="back-label"><small>SIDE B · PERSONAL RECORDING</small><b>VOICE MAIL PIN</b><strong>0412</strong><span>WRITE IT DOWN</span></div>
+              <div class="back-label"><small>SIDE B · PERSONAL RECORDING</small></div>
               <div class="back-window" aria-hidden="true"><i></i><i></i></div>
               <i class="tape-screw ts1"></i><i class="tape-screw ts2"></i><i class="tape-screw ts3"></i><i class="tape-screw ts4"></i>
             </section>
@@ -4540,24 +4293,15 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
       }
 
       function drawSignalBattery(showMessage = false) {
-        const bars = Math.max(0, Math.min(4, (window.LS_PHONE && window.LS_PHONE.signalBars) || 4));
-        const drain = (window.LS_PHONE && window.LS_PHONE.drain) || 0;
         ctx.fillStyle = LCD_INK;
-        for (let i = 0; i < bars; i++) ctx.fillRect(1 + i * 3, 5 - i, 2, 2 + i);
-        if (bars < 4) {
-          ctx.strokeStyle = LCD_INK;
-          for (let i = bars; i < 4; i++) ctx.strokeRect(1 + i * 3, 5 - i, 2, 2 + i);
-        }
+        for (let i = 0; i < 4; i++) ctx.fillRect(1 + i * 3, 5 - i, 2, 2 + i);
         drawText("G", 15, 0);
-        const clock = (window.LS_PHONE && window.LS_PHONE.clock) || "07:12";
-        drawText(clock, 22, 0);
-        if (showMessage) drawEnvelope(54, 1);
+        if (showMessage) drawEnvelope(39, 1);
         ctx.strokeStyle = LCD_INK;
         ctx.lineWidth = 1;
         ctx.strokeRect(70, 1, 11, 6);
         ctx.fillRect(81, 3, 2, 2);
-        const fill = drain >= 2 ? 2 : drain === 1 ? 4 : 7;
-        ctx.fillRect(72, 3, fill, 2);
+        ctx.fillRect(72, 3, 7, 2);
       }
 
       function drawEnvelope(x, y) {
@@ -4637,25 +4381,6 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
       }
       document.addEventListener("ls:injectInboxMessage", injectEndingInboxMessage);
       document.addEventListener("ls:removeEndingInboxMessage", removeEndingInboxMessage);
-      document.addEventListener("ls:injectEasMessage", () => {
-        if (inbox.some(m => m.from === "PAGASA")) return;
-        const clock = (window.LS_PHONE && window.LS_PHONE.clock) || "07:12";
-        inbox.unshift({ from: "PAGASA", date: "16-02", time: clock, unread: true,
-          text: "Malakas na pag-ulan at hangin. Manatili sa loob ng bahay. Mag-ingat sa pagbaha." });
-        if (powered) render();
-      });
-      document.addEventListener("ls:injectGhostSms", () => {
-        if (inbox.some(m => /nasa labas/i.test(m.text))) return;
-        const clock = (window.LS_PHONE && window.LS_PHONE.clock) || "07:12";
-        inbox.unshift({ from: "UNKNOWN", date: "16-02", time: clock, unread: true, text: "nasa labas ako" });
-        if (powered) { playMessageTone(); render(); }
-      });
-      document.addEventListener("ls:injectMissedCall", () => {
-        if (callLogs.missed.some(e => e.name === "TITO ATO")) return;
-        const clock = (window.LS_PHONE && window.LS_PHONE.clock) || "07:12";
-        callLogs.missed.unshift({ name: "TITO ATO", date: "16-02", time: clock, number: "0917 000 0412" });
-        if (powered) render();
-      });
       document.addEventListener("ls:openEndingInbox", () => {
         if (!powered) powerOn();
         openMessageFolder("INBOX", inbox, "from");
@@ -4880,13 +4605,11 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
 
       function playPhysicalKeyTone(key) {
         if (!keypadTones || !powered) return;
-        const decay = .05 + Math.random() * .045;
-        const vol = .01 + Math.random() * .006;
-        if (DTMF[key]) playDualTone(DTMF[key][0], DTMF[key][1], decay, vol);
-        else if (key === "navi") playTone(880, decay, .02 + Math.random()*.006);
-        else if (key === "clear") playTone(470, decay, .019);
-        else if (key === "up") playTone(660, .03 + Math.random()*.02, .016);
-        else if (key === "down") playTone(590, .03 + Math.random()*.02, .016);
+        if (DTMF[key]) playDualTone(DTMF[key][0], DTMF[key][1]);
+        else if (key === "navi") playTone(880, .055, .022);
+        else if (key === "clear") playTone(470, .05, .021);
+        else if (key === "up") playTone(660, .035, .018);
+        else if (key === "down") playTone(590, .035, .018);
       }
 
       function playPowerTone(on) {
@@ -5200,12 +4923,6 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
         try { window.LS_AUDIO?.unduckAmbience?.(400); } catch (_) {}
       }
 
-      function updateSpoolBalance() {
-        const n = Math.max(1, cassetteCues.length);
-        const p = Math.min(1, cassetteIndex / n);
-        cassette3d.style.setProperty("--spool-l", (1.06 - p * .48).toFixed(3));
-        cassette3d.style.setProperty("--spool-r", (.6 + p * .48).toFixed(3));
-      }
       function updateCassetteSubtitle() {
         const subtitle = cassetteIndex < cassetteCues.length
           ? cassetteCues[cassetteIndex]
@@ -5214,18 +4931,15 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
         cassetteSubtitle.textContent = subtitle;
         cassetteCounter.textContent = time;
         cassetteSubtitleTime.textContent = time;
-        updateSpoolBalance();
       }
 
       function stopCassettePlayback() {
-        const was = cassettePlaying;
         window.clearInterval(cassetteTimer);
         cassetteTimer = null;
         cassettePlaying = false;
         cassette3d.classList.remove("is-playing");
         cassettePlayer.classList.remove("tape-playing");
         stopTapeMurmurs();
-        if (was) try { window.LS_FX?.tapeClunk?.(true); } catch (_) {}
       }
 
       function playCassetteSubtitles() {
@@ -5238,7 +4952,6 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
         globalSubtitles.classList.add("is-visible");
         globalSubtitles.setAttribute("aria-hidden","false");
         startTapeMurmurs();
-        try { window.LS_FX?.tapeClunk?.(); } catch (_) {}
         document.dispatchEvent(new CustomEvent("ls:cassettePlayed"));
         updateCassetteSubtitle();
         cassetteTimer = window.setInterval(() => {
@@ -5422,7 +5135,6 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
         const sourceRect = cassetteObject.getBoundingClientRect();
         document.body.classList.add("tape-modal-open");
         cassetteObject.classList.add("is-picked-up");
-        cassetteObject.classList.remove("is-askew");
         cassettePlayer.classList.remove("is-open","is-closing");
         cassettePlayer.classList.add("is-preparing");
         cassettePlayer.setAttribute("aria-hidden","false");
@@ -5446,9 +5158,7 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
 
       async function closeCassettePlayer(returnFocus = true) {
         if (!cassetteOpen || cassetteTransitioning) return;
-        const droppedPlaying = cassettePlaying;
         stopCassettePlayback();
-        cassetteObject.classList.toggle("is-askew", droppedPlaying);
         globalSubtitles.classList.remove("is-visible");
         globalSubtitles.setAttribute("aria-hidden","true");
         cassetteTransitioning = true;
@@ -5487,8 +5197,6 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
         render();
         playPowerTone(true);
         document.dispatchEvent(new CustomEvent("ls:phonePowerOn"));
-        window.LS_PHONE = window.LS_PHONE || {};
-        window.LS_PHONE.poweredAt = performance.now();
         window.clearTimeout(bootTimer);
         bootTimer = window.setTimeout(() => {
           if (powered && state.view === "boot") {
@@ -5764,7 +5472,7 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
       function openClock() {
         openList("CLOCK", [
           { label: "ALARM CLOCK", count: "OFF", action: () => openDetail("ALARM", "ALARM CLOCK OFF") },
-          { label: "CLOCK SETTINGS", action: () => openDetail("CLOCK", "16-02-1999 " + ((window.LS_PHONE && window.LS_PHONE.clock) || "07:12") + " 24-HOUR FORMAT") }
+          { label: "CLOCK SETTINGS", action: () => openDetail("CLOCK", "16-02-1999 07:12 24-HOUR FORMAT") }
         ]);
       }
 
@@ -6298,24 +6006,10 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
         getPowered: () => powered,
         sceneElement, phoneElement, lcd: canvas, cassetteObject, cassettePlayer,
         stopAmbience, stopTapeMurmurs, startAmbience, powerOn, powerOff,
-        playTone, beep, playMessageTone, playErrorTone, playPowerTone,
-        render, inbox, callLogs,
-        openLooseReader: (title, meta, text) => {
-          readerTitle.textContent = title;
-          readerMeta.textContent = meta;
-          readerBody.textContent = text;
-          messageReader.classList.add("is-open");
-          messageReader.setAttribute("aria-hidden", "false");
-          readerOpen = true;
-          readerClose.focus();
-        }
+        playTone, beep, playMessageTone, playErrorTone, playPowerTone
       };
     })();
   </script>
-<div id="ls-evidence" aria-label="Evidence" hidden>
-  <b data-ev="phone">PHONE</b><b data-ev="tape">TAPE</b><b data-ev="pin">0412</b><b data-ev="nadito">SMS</b>
-</div>
-<button id="ls-fullscreen" type="button" title="Fullscreen">FULL</button>
 <button id="ls-force-audio" type="button" aria-live="polite" title="Force the correct soundtrack for the current scene">ENABLE SOUND</button>
 <!-- ============== LAST SEEN — NARRATIVE MODULES ============== -->
 
@@ -7274,8 +6968,6 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
   async function runOpening() {
     if (inOpening) return;
     inOpening = true;
-    const skipBeats = Boolean(window.__lsSkipBeats);
-    window.__lsSkipBeats = false;
 
     // Start ambiencetitlle.mp3 (or synth fallback)
     try { window.LS_AUDIO.playTitle(); } catch (_) {}
@@ -7286,11 +6978,8 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
     opening.setAttribute("aria-hidden", "false");
     candleGlow.style.opacity = "";
     // Tiny initial delay so the ambience lands
-    await wait(reducedMotion ? 200 : (skipBeats ? 200 : 900));
+    await wait(reducedMotion ? 200 : 900);
 
-    if (skipBeats) {
-      // jump to the controls card
-    } else {
     // Beat 1: presenter
     await showBeat(PRESENTER, {
       presenter: true,
@@ -7311,7 +7000,6 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
         min: reducedMotion ? 1800 : 3800,
         max: reducedMotion ? 3600 : 8000
       });
-    }
     }
 
     // A dedicated controls page is the final opening beat, immediately before
@@ -7385,14 +7073,10 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
 
   playBtn.addEventListener("click", onPlayClick);
   playBtn.addEventListener("keydown", (e) => {
-    if (e.key === " " || e.key === "Spacebar") {
+    if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
       e.preventDefault();
       onPlayClick();
     }
-  });
-  document.addEventListener("ls:skipOpening", () => {
-    window.__lsSkipBeats = true;
-    if (!inOpening) onPlayClick();
   });
 
   // On narrative state changes back to TITLE (replay), re-show the title.
@@ -7443,17 +7127,6 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
   let flicker = 1;
   let flickerTarget = 1;
   let nextFlicker = 0;
-  let torchOnSince = 0;
-  let torchUsed = 0;
-  let torchDead = false;
-  let torchCoolUntil = 0;
-  const TORCH_MAX = 90000;
-  const dust = Array.from({ length: 22 }, () => ({
-    a: Math.random() * Math.PI * 2,
-    d: Math.random(),
-    s: .4 + Math.random() * 1.4,
-    z: .6 + Math.random() * 1.6
-  }));
 
   // The first playable room frame is intentionally unlit. F is the only
   // control that can open the flashlight.
@@ -7562,27 +7235,6 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
     ]);
     ctx.fillRect(0, 0, innerWidth, innerHeight);
 
-    ctx.globalCompositeOperation = "screen";
-    const used = torchUsed + (torchOnSince ? (now - torchOnSince) : 0);
-    if (used > TORCH_MAX - 8000) flicker *= .82 + Math.random() * .2;
-    dust.forEach(m => {
-      const ang = m.a + now * 0.00012 * m.s;
-      const rad = r * (0.12 + m.d * 0.78);
-      const x = currentX + Math.cos(ang) * rad;
-      const y = currentY + Math.sin(ang) * rad * 0.72;
-      const sz = m.z;
-      ctx.fillStyle = `rgba(255,236,200,${0.045 * flicker})`;
-      ctx.beginPath();
-      ctx.arc(x, y, sz, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    if (used >= TORCH_MAX) {
-      torchDead = true;
-      toggle(false);
-      return;
-    }
-
     ctx.globalCompositeOperation = "source-over";
     rafId = requestAnimationFrame(drawFlashlight);
   }
@@ -7590,30 +7242,12 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
   function toggle(force) {
     const next = typeof force === "boolean" ? force : !on;
     if (next === on) return;
-    const now = performance.now();
-    if (next) {
-      if (torchDead || now < torchCoolUntil || torchUsed >= TORCH_MAX) {
-        try { window.LS_FX?.flashlightClick?.(true); } catch (_) {}
-        return;
-      }
-      torchOnSince = now;
-    } else {
-      if (torchOnSince) torchUsed += now - torchOnSince;
-      torchOnSince = 0;
-      if (torchDead) {
-        torchCoolUntil = now + 4500;
-        torchDead = false;
-        torchUsed = 0;
-      }
-    }
     on = next;
     canvas.classList.toggle("is-on", on);
     canvas.setAttribute("aria-hidden", String(!on));
     document.body.classList.toggle("ls-flashlight-on", on);
     document.body.classList.toggle("ls-flashlight-off", !on);
-    document.body.classList.toggle("ls-torch-dead", torchDead);
     try { window.LS_NARRATIVE?.setFlag("flashlightOn", on); } catch (_) {}
-    try { window.LS_FX?.flashlightClick?.(false); } catch (_) {}
 
     if (on) {
       if (!rafId) rafId = requestAnimationFrame(drawFlashlight);
@@ -7649,12 +7283,10 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
     }
   });
 
-  document.addEventListener("ls:fitted", resize);
   window.LS_FLASHLIGHT = {
     toggle,
     isOn: () => on,
-    getPosition: () => ({ x: currentX, y: currentY, radius }),
-    resize
+    getPosition: () => ({ x: currentX, y: currentY, radius })
   };
 })();
 
@@ -7690,10 +7322,7 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
   let figureLitMs = 0;
   let figureLastTs = 0;
   let eyesLitMs = 0;
-  let lastFigureSide = null;
-  let crawlerUsed = false;
-  let doorLitMs = 0;
-  const anomalyClasses = ["psych-red-eyes","psych-silhouette","psych-peek","psych-crawl","psych-door","psych-hands","figure-left","figure-right","hall-aftermath","hall-visit-1","hall-visit-2","hall-visit-3","hall-visit-4","hall-door-still"];
+  const anomalyClasses = ["psych-red-eyes","psych-silhouette","psych-peek","psych-crawl","psych-door","psych-hands","figure-left","figure-right"];
 
   function prepareUnobservedHallway() {
     visitCount++;
@@ -7701,48 +7330,22 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
     figureLitMs = 0;
     figureLastTs = 0;
     eyesLitMs = 0;
-    doorLitMs = 0;
     corridor.classList.remove(...anomalyClasses);
-    document.body.classList.remove("ls-corridor-eyes-lit", "ls-corridor-figure-lit", "ls-figure-held");
-    corridor.classList.add("hall-visit-" + Math.min(4, visitCount));
+    document.body.classList.remove("ls-corridor-eyes-lit", "ls-corridor-figure-lit");
     if (figureEl) {
       figureEl.style.cssText = "";
       figureEl.classList.remove("is-visible", "is-fleeing", "is-held");
-      if (Math.random() < .25) {
-        let side = Math.random() < .5 ? "left" : "right";
-        if (lastFigureSide && side === lastFigureSide) side = side === "left" ? "right" : "left";
-        lastFigureSide = side;
-        figureEl.dataset.side = side;
-        figureEl.classList.add("is-visible");
-        corridor.classList.add("psych-silhouette", "figure-" + side);
-      }
+      const side = Math.random() < .5 ? "left" : "right";
+      figureEl.dataset.side = side;
+      figureEl.classList.add("is-visible");
+      corridor.classList.add("psych-silhouette", "figure-" + side);
     }
 
-    if (visitCount === 1) {
-      /* first look: almost empty */
-    } else if (visitCount === 2) {
-      corridor.classList.add("psych-hands");
-    } else if (visitCount === 3) {
-      corridor.classList.add("psych-hands", "psych-door");
-    } else {
-      corridor.classList.add("psych-hands");
-      if (Math.random() < .45) corridor.classList.add("psych-door");
-      if (Math.random() < .35) corridor.classList.add("psych-peek");
-    }
     if (Math.random() < .32) corridor.classList.add("psych-red-eyes");
-    if (!crawlerUsed && visitCount >= 2 && Math.random() < .28) {
-      crawlerUsed = true;
-      corridor.classList.add("psych-crawl");
-      const crawler = corridor.querySelector(".ls-hall-crawler");
-      if (crawler) {
-        crawler.classList.remove("is-crossing");
-        void crawler.offsetWidth;
-        crawler.classList.add("is-crossing");
-      }
-    }
-    const nameEl = corridor.querySelector(".ls-hall-name");
-    if (nameEl) nameEl.textContent = Math.random() < .5 ? "ATO" : "DANTE";
-    if (corridor.dataset.scar === "1") corridor.classList.add("hall-aftermath");
+    if (Math.random() < .4) corridor.classList.add("psych-hands");
+    if (Math.random() < .28) corridor.classList.add("psych-peek");
+    if (Math.random() < .22) corridor.classList.add("psych-crawl");
+    if (Math.random() < .18) corridor.classList.add("psych-door");
 
     if (visitCount > 1 && Math.random() < .32) {
       try { window.LASTSEEN?.playTone?.(42 + Math.random()*13, .75, .009, "sine"); } catch (_) {}
@@ -7767,17 +7370,16 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
       corridor.setAttribute("aria-hidden", "false");
       document.body.classList.add("ls-corridor-active");
       try { window.LS_NARRATIVE.setFlag("corridorActive", true); } catch (_) {}
-      try { window.LS_FX?.turnWhoosh?.(); window.LS_FX?.startFootScuff?.(); } catch (_) {}
+      // Appearances are rolled once per deliberate turn, never on a timer.
     } else {
       corridor.classList.remove("is-active");
       corridor.setAttribute("aria-hidden", "true");
-      document.body.classList.remove("ls-corridor-active", "ls-figure-held");
+      document.body.classList.remove("ls-corridor-active");
       try { window.LS_NARRATIVE.setFlag("corridorActive", false); } catch (_) {}
-      try { window.LS_FX?.turnWhoosh?.(); window.LS_FX?.stopFootScuff?.(); window.LS_FX?.stopHeartbeat?.(); } catch (_) {}
+      // Force hide any active events
       if (eyesEl) eyesEl.classList.remove("is-visible");
       if (figureEl) figureEl.classList.remove("is-visible", "is-fleeing", "is-held");
       document.body.classList.remove("ls-corridor-figure-lit");
-      if (visitCount >= 1) document.body.dataset.lsBehindYou = "1";
     }
     // Wait for the CSS transition to settle
     setTimeout(() => { transitioning = false; }, reducedMotion ? 200 : 800);
@@ -7873,35 +7475,12 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
           figureFled = true;
           figureEl.classList.remove("is-held");
           figureEl.classList.add("is-fleeing");
-          document.body.classList.remove("ls-figure-held");
-          corridor.classList.add("hall-aftermath");
-          corridor.dataset.scar = "1";
-          try { window.LS_FX?.fleeStinger?.(); } catch (_) {}
-          try { window.LS_FX?.stopHeartbeat?.(); } catch (_) {}
-        } else {
-          document.body.classList.add("ls-figure-held");
-          try { window.LS_FX?.startHeartbeat?.(); } catch (_) {}
-          if (!window.__lsFoundFigure) {
-            window.__lsFoundFigure = true;
-            try { window.LS_FX?.silenceScare?.(); } catch (_) {}
-          }
+          try { window.LASTSEEN?.playTone?.(70 + Math.random()*18, .12, .03, "sine"); } catch (_) {}
         }
       } else {
         figureLitMs = Math.max(0, figureLitMs - dt * 1.4);
-        if (figureLitMs < 180) {
-          figureEl.classList.remove("is-held");
-          document.body.classList.remove("ls-figure-held");
-          try { window.LS_FX?.stopHeartbeat?.(); } catch (_) {}
-        }
+        if (figureLitMs < 180) figureEl.classList.remove("is-held");
       }
-    }
-
-    const door = corridor.querySelector(".ls-hall-end-door");
-    if (door && beamHits(door, pos, 1.05)) {
-      doorLitMs += dt;
-      if (doorLitMs >= 1000) corridor.classList.add("hall-door-still");
-    } else {
-      doorLitMs = Math.max(0, doorLitMs - dt);
     }
   }
 
@@ -8048,17 +7627,6 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
 
     // Main exposure burst: this brightens the actual room layers and window
     // frame, while the Canvas flashlight remains a separate occlusion system.
-    try { window.LS_FX?.lightningPrecrackle?.(); } catch (_) {}
-    if (window.LS_PHONE) window.LS_PHONE.clock = "07:13";
-    try { window.LASTSEEN?.render?.(); } catch (_) {}
-    if (document.body.dataset.lsBehindYou === "1" && !fromCorridor) {
-      document.body.dataset.lsBehindYou = "0";
-      const by = document.getElementById("ls-behind-you");
-      if (by) {
-        by.classList.add("is-seen");
-        window.setTimeout(() => by.classList.remove("is-seen"), 420);
-      }
-    }
     document.body.classList.add("ls-lightning-active");
     scene.classList.add("ls-lightning-active");
     if (flash) flash.classList.add("is-flashing");
@@ -8103,13 +7671,10 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
     if (lightningTimer) window.clearTimeout(lightningTimer);
     const min = 25000;
     const max = first ? 45000 : 90000;
-    const delay = min + Math.random() * (max - min);
-    window.__lsNextLightning = delay;
-    window.__lsLightningAt = Date.now();
     lightningTimer = window.setTimeout(() => {
       if (active) flashWorld();
       scheduleLightning(false);
-    }, delay);
+    }, min + Math.random() * (max - min));
   }
 
   function displayEas() {
@@ -8121,16 +7686,6 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
     } catch (_) {}
     setTakeover(true);
     try { window.LS_AUDIO.playEAS(); } catch (_) {}
-    if (window.LS_PHONE) {
-      window.LS_PHONE.signalBars = 1;
-      window.LS_PHONE.easDropped = true;
-    }
-    document.dispatchEvent(new CustomEvent("ls:injectEasMessage"));
-    try { window.LASTSEEN?.render?.(); } catch (_) {}
-    window.setTimeout(() => {
-      if (window.LS_PHONE && window.LS_PHONE.easDropped) window.LS_PHONE.signalBars = 2;
-      try { window.LASTSEEN?.render?.(); } catch (_) {}
-    }, 28000);
     if (easTimer) window.clearTimeout(easTimer);
     easTimer = window.setTimeout(() => {
       setTakeover(false);
@@ -8201,24 +7756,7 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
     stop: stopStorm,
     flash: flashWorld,
     isActive: () => active,
-    isEasActive: () => eas.classList.contains("is-active"),
-    pause() {
-      if (!lightningTimer) return;
-      window.clearTimeout(lightningTimer);
-      lightningTimer = null;
-      const elapsed = Date.now() - (window.__lsLightningAt || Date.now());
-      window.__lsNextLightning = Math.max(800, (window.__lsNextLightning || 25000) - elapsed);
-      window.__lsStormPaused = true;
-    },
-    resume() {
-      if (!window.__lsStormPaused || !active) return;
-      window.__lsStormPaused = false;
-      window.__lsLightningAt = Date.now();
-      lightningTimer = window.setTimeout(() => {
-        if (active) flashWorld();
-        scheduleLightning(false);
-      }, window.__lsNextLightning || 8000);
-    }
+    isEasActive: () => eas.classList.contains("is-active")
   };
 })();
 
@@ -8596,312 +8134,6 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
 
   </script>
 <script>
-
-/* LAST SEEN — enhancement FX + systems (no new MP3s) */
-(function () {
-  "use strict";
-
-  function ctx() {
-    try {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return null;
-      if (!window.__lsFxCtx) window.__lsFxCtx = new AC();
-      if (window.__lsFxCtx.state === "suspended") window.__lsFxCtx.resume().catch(() => {});
-      return window.__lsFxCtx;
-    } catch (_) { return null; }
-  }
-  function noiseBuf(c, sec) {
-    const b = c.createBuffer(1, Math.floor(c.sampleRate * sec), c.sampleRate);
-    const d = b.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    return b;
-  }
-  function blip(freq, dur, vol, type, extra) {
-    const c = ctx(); if (!c) return;
-    const t = c.currentTime;
-    const o = c.createOscillator();
-    const g = c.createGain();
-    o.type = type || "sine";
-    o.frequency.setValueAtTime(freq, t);
-    if (extra) extra(o, g, t);
-    g.gain.setValueAtTime(.0001, t);
-    g.gain.linearRampToValueAtTime(vol, t + .01);
-    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
-    o.connect(g).connect(c.destination);
-    o.start(t); o.stop(t + dur + .03);
-  }
-
-  let footNodes = null, heartNodes = null, heartOn = false;
-
-  const FX = {
-    turnWhoosh() {
-      const c = ctx(); if (!c) return;
-      const t = c.currentTime;
-      const src = c.createBufferSource();
-      src.buffer = noiseBuf(c, .35);
-      const f = c.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 420;
-      const g = c.createGain();
-      g.gain.setValueAtTime(.0001, t);
-      g.gain.linearRampToValueAtTime(.07, t + .04);
-      g.gain.exponentialRampToValueAtTime(.0001, t + .28);
-      src.connect(f).connect(g).connect(c.destination);
-      src.start(t); src.stop(t + .32);
-      blip(70, .18, .03, "sine");
-    },
-    flashlightClick(dead) {
-      blip(dead ? 140 : 210, dead ? .08 : .045, dead ? .02 : .035, "square");
-      blip(dead ? 90 : 880, .03, .012, "triangle");
-    },
-    startFootScuff() {
-      if (footNodes) return;
-      const c = ctx(); if (!c) return;
-      const master = c.createGain(); master.gain.value = .0001; master.connect(c.destination);
-      const src = c.createBufferSource(); src.buffer = noiseBuf(c, 1.4); src.loop = true;
-      const hp = c.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 900;
-      const g = c.createGain(); g.gain.value = .025;
-      src.connect(hp).connect(g).connect(master);
-      src.start();
-      master.gain.linearRampToValueAtTime(.04, c.currentTime + .4);
-      footNodes = { master, src };
-    },
-    stopFootScuff() {
-      if (!footNodes) return;
-      try { footNodes.src.stop(); } catch (_) {}
-      try { footNodes.master.disconnect(); } catch (_) {}
-      footNodes = null;
-    },
-    fleeStinger() {
-      const c = ctx(); if (!c) return;
-      const t = c.currentTime;
-      const src = c.createBufferSource(); src.buffer = noiseBuf(c, .4);
-      const bp = c.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 1400; bp.Q.value = 4;
-      const g = c.createGain();
-      g.gain.setValueAtTime(.0001, t);
-      g.gain.linearRampToValueAtTime(.16, t + .03);
-      g.gain.exponentialRampToValueAtTime(.0001, t + .28);
-      src.connect(bp).connect(g).connect(c.destination);
-      src.start(t); src.stop(t + .35);
-      blip(55, .22, .07, "sawtooth", (o, gn, tt) => { o.frequency.exponentialRampToValueAtTime(28, tt + .2); });
-    },
-    startHeartbeat() {
-      if (heartOn) return;
-      heartOn = true;
-      const c = ctx(); if (!c) return;
-      const beat = () => {
-        if (!heartOn) return;
-        blip(62, .12, .04, "sine");
-        setTimeout(() => { if (heartOn) blip(54, .1, .028, "sine"); }, 140);
-        heartNodes = setTimeout(beat, 920);
-      };
-      beat();
-    },
-    stopHeartbeat() {
-      heartOn = false;
-      if (heartNodes) { clearTimeout(heartNodes); heartNodes = null; }
-    },
-    ghostRing() {
-      let n = 0;
-      const ring = () => {
-        if (n >= 3) {
-          document.dispatchEvent(new CustomEvent("ls:injectMissedCall"));
-          return;
-        }
-        blip(440, .55, .03, "sine");
-        blip(480, .55, .022, "sine");
-        n++;
-        setTimeout(ring, 1400);
-      };
-      ring();
-    },
-    tapeClunk() {
-      blip(90, .08, .04, "square");
-      blip(40, .12, .03, "sine");
-    },
-    lightningPrecrackle() {
-      const c = ctx(); if (!c) return;
-      const t = c.currentTime;
-      const src = c.createBufferSource(); src.buffer = noiseBuf(c, .22);
-      const hp = c.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 2400;
-      const g = c.createGain();
-      g.gain.setValueAtTime(.0001, t);
-      g.gain.linearRampToValueAtTime(.05, t + .04);
-      g.gain.exponentialRampToValueAtTime(.0001, t + .2);
-      src.connect(hp).connect(g).connect(c.destination);
-      src.start(t); src.stop(t + .22);
-    },
-    silenceScare() {
-      try { window.LS_AUDIO?.duckAmbience?.(0.08, 120); } catch (_) {}
-      setTimeout(() => { try { window.LS_AUDIO?.unduckAmbience?.(900); } catch (_) {} }, 1500);
-    }
-  };
-  window.LS_FX = FX;
-
-  /* Evidence */
-  const ev = { phone: false, tape: false, pin: false, nadito: false };
-  function paintEvidence() {
-    const root = document.getElementById("ls-evidence");
-    if (!root) return;
-    root.querySelectorAll("[data-ev]").forEach(el => {
-      el.classList.toggle("is-got", Boolean(ev[el.dataset.ev]));
-    });
-  }
-  function found(key) { ev[key] = true; paintEvidence(); }
-
-  document.addEventListener("ls:narrativeState", e => {
-    if (e.detail.to === "main") found("phone");
-  });
-  document.addEventListener("ls:cassettePlayed", () => found("tape"));
-  document.addEventListener("ls:cassetteCodeAccepted", () => found("pin"));
-  document.addEventListener("ls:naditoMessageOpened", () => found("nadito"));
-
-  document.addEventListener("keydown", e => {
-    if (e.repeat) return;
-    const st = window.LS_NARRATIVE?.getState?.();
-    if ((e.key === "i" || e.key === "I") && st === "main") {
-      const el = document.getElementById("ls-evidence");
-      if (!el) return;
-      el.hidden = !el.hidden;
-    }
-  });
-
-  /* Hold Enter on title to skip */
-  let holdTimer = null;
-  document.addEventListener("keydown", e => {
-    if (e.key !== "Enter") return;
-    if (window.LS_NARRATIVE?.getState?.() !== "title") return;
-    if (holdTimer) return;
-    holdTimer = setTimeout(() => {
-      holdTimer = null;
-      document.dispatchEvent(new CustomEvent("ls:skipOpening"));
-    }, 1200);
-  });
-  document.addEventListener("keyup", e => {
-    if (e.key === "Enter" && holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
-  });
-
-  /* Fullscreen */
-  const fsBtn = document.getElementById("ls-fullscreen");
-  if (fsBtn) {
-    fsBtn.addEventListener("click", () => {
-      const el = document.documentElement;
-      if (!document.fullscreenElement) el.requestFullscreen?.().catch(() => {});
-      else document.exitFullscreen?.();
-    });
-  }
-
-  /* Force-audio collapses after success */
-  const soundBtn = document.getElementById("ls-force-audio");
-  if (soundBtn) {
-    const orig = soundBtn.addEventListener;
-    soundBtn.addEventListener("click", () => {
-      setTimeout(() => {
-        if (soundBtn.classList.contains("is-playing") || /✓/.test(soundBtn.textContent)) {
-          soundBtn.classList.add("is-armed");
-          soundBtn.setAttribute("aria-label", "Sound on");
-        }
-      }, 2300);
-    });
-  }
-
-  /* Desk note */
-  const note = document.getElementById("deskNote");
-  if (note) {
-    note.addEventListener("click", () => {
-      try {
-        window.LASTSEEN?.openLooseReader?.(
-          "FOLDED NOTE",
-          "Recovered from the desk · 16-02-1999",
-          "Drawer. Voice tape. There is a PIN on the back of the cassette.\nDo not play it in front of the children.\nIf the phone rings after midnight, do not answer."
-        );
-      } catch (_) {}
-    });
-  }
-
-  /* Hall light switch */
-  const sw = document.getElementById("lsHallSwitch");
-  let swClicks = 0;
-  if (sw) {
-    sw.addEventListener("click", evnt => {
-      evnt.stopPropagation();
-      swClicks++;
-      FX.flashlightClick(swClicks === 1);
-      if (swClicks >= 2) {
-        blipSafe(48, .35, .08, "sine");
-        blipSafe(90, .18, .05, "square");
-        swClicks = 0;
-      }
-    });
-  }
-  function blipSafe(a,b,c,d) { try { blip(a,b,c,d); } catch (_) {} }
-
-  /* Wet prints */
-  const wet = document.getElementById("lsWetPrints");
-  if (wet) {
-    const wctx = wet.getContext("2d");
-    function drawPrints() {
-      wet.width = wet.clientWidth || innerWidth;
-      wet.height = wet.clientHeight || innerHeight;
-      if (!wctx) return;
-      wctx.clearRect(0, 0, wet.width, wet.height);
-      wctx.fillStyle = "rgba(180,200,205,.09)";
-      for (let i = 0; i < 14; i++) {
-        const x = wet.width * (0.32 + (i % 2) * 0.08 + i * 0.018);
-        const y = wet.height * (0.62 + i * 0.022);
-        wctx.beginPath();
-        wctx.ellipse(x, y, 7, 12, i * 0.1, 0, Math.PI * 2);
-        wctx.fill();
-      }
-    }
-    drawPrints();
-    window.addEventListener("resize", drawPrints, { passive: true });
-    document.addEventListener("ls:fitted", drawPrints);
-  }
-
-  /* Phone battery drain */
-  setInterval(() => {
-    const phone = window.LS_PHONE;
-    if (!phone || !window.LASTSEEN?.getPowered?.()) {
-      document.body.classList.remove("ls-phone-drain-1", "ls-phone-drain-2");
-      if (phone) phone.drain = 0;
-      return;
-    }
-    const age = performance.now() - (phone.poweredAt || performance.now());
-    const next = age > 420000 ? 2 : age > 240000 ? 1 : 0;
-    if (next !== phone.drain) {
-      phone.drain = next;
-      document.body.classList.toggle("ls-phone-drain-1", next === 1);
-      document.body.classList.toggle("ls-phone-drain-2", next >= 2);
-      try { window.LASTSEEN.render(); } catch (_) {}
-    }
-  }, 8000);
-
-  /* Ghost ring after first return from hall */
-  let hallReturns = 0, ghostDone = false;
-  document.addEventListener("ls:flagChange", e => {
-    if (e.detail.flag !== "corridorActive") return;
-    if (e.detail.value) return;
-    hallReturns++;
-    if (!ghostDone && hallReturns === 1) {
-      ghostDone = true;
-      setTimeout(() => FX.ghostRing(), 9000 + Math.random() * 5000);
-      setTimeout(() => document.dispatchEvent(new CustomEvent("ls:injectGhostSms")), 16000);
-    }
-  });
-
-  /* Pause storm when tab hidden */
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      try { window.LS_STORM?.pause?.(); } catch (_) {}
-      FX.stopFootScuff();
-      FX.stopHeartbeat();
-    } else {
-      try { window.LS_STORM?.resume?.(); } catch (_) {}
-    }
-  });
-
-  paintEvidence();
-})();
-
 /* Fit the whole experience to phones, tablets, and laptop viewports. */
 (function () {
   "use strict";
@@ -8991,5 +8223,5 @@ body.ls-phone-drain-2 .physical-key { filter: brightness(.7); }
 })();
 
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2d93f52e891dd55',t:'MTc4NzE0MzQ0Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2d8fb553af0dd12',t:'MTc4NzE0MDY1Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
