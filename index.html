@@ -2,12 +2,15 @@
 <html lang="fil">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#19130f">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+  <meta name="theme-color" content="#050607">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <!-- LAST SEEN BUILD: 2026-08-19-EYES-ONEPAIR-LIGHTNING-CLEANUP -->
+  <!-- LAST SEEN BUILD: 2026-08-19-FIT-AUDIO-STACK-HALLDARK-POLISH -->
   <title>LAST SEEN: The Final Voice Message</title>
 
   <!--
@@ -61,13 +64,19 @@
 
     * { box-sizing: border-box; }
 
-    html, body { min-height: 100%; }
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      height: 100%;
+      height: 100dvh;
+      height: var(--vh, 100dvh);
+    }
     html { scrollbar-gutter: stable; }
 
     body {
       position: relative;
       margin: 0;
-      overflow-x: hidden;
+      overflow: hidden;
       color: #ddd;
       background:
         radial-gradient(ellipse at 50% 40%, rgba(64, 92, 101, .09) 0 8%, transparent 42%),
@@ -290,11 +299,19 @@
     .scene {
       position: relative;
       z-index: 1;
+      width: 100%;
+      width: var(--vw, 100vw);
       min-height: 100vh;
+      min-height: 100dvh;
+      height: 100%;
+      height: var(--vh, 100dvh);
       display: grid;
       place-items: center;
       padding: 38px 18px 54px;
+      padding-top: max(18px, env(safe-area-inset-top));
+      padding-bottom: max(28px, env(safe-area-inset-bottom));
       isolation: isolate;
+      overflow: hidden;
     }
 
     .desk-object {
@@ -349,15 +366,18 @@
     .phone-wrap {
       position: relative;
       z-index: 4;
-      width: min(480px, 96vw);
+      width: min(480px, 92vw);
+      transform: scale(var(--scene-scale, 1));
+      transform-origin: center center;
       filter: drop-shadow(22px 30px 20px rgba(0,0,0,.62));
+      will-change: transform;
     }
 
     .phone {
       position: relative;
       z-index: 2;
       width: 100%;
-      min-height: 835px;
+      min-height: 0;
       padding: 50px 25px 34px;
       overflow: visible;
       border: 4px solid var(--shell-edge);
@@ -2978,6 +2998,419 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
       pointer-events: auto;
     }
   </style>
+
+  <style id="ls-revision-polish">
+/* LAST SEEN — 2026-08-19 revision
+   Fit-to-screen, audio-safe stacking, hallway darkness, graphic polish. */
+
+html {
+  --scene-scale: 1;
+  --vw: 100vw;
+  --vh: 100dvh;
+}
+@media (max-height: 860px) { html { --scene-scale: .88; } }
+@media (max-height: 760px) { html { --scene-scale: .78; } }
+@media (max-height: 640px) { html { --scene-scale: .66; } }
+@media (max-width: 420px) { html { --scene-scale: .84; } }
+
+html, body {
+  background: #020304 !important;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body.ls-state-title,
+body.ls-state-opening,
+body.ls-state-main,
+body.ls-state-ending,
+body.tape-modal-open {
+  overflow: hidden !important;
+  height: var(--vh, 100dvh);
+}
+
+/* Device-fit: the handset and desk props scale as one composition. */
+.phone-wrap {
+  width: min(480px, calc(var(--vw, 100vw) - 28px)) !important;
+  transform: scale(var(--scene-scale, 1));
+  transform-origin: center center;
+}
+.cassette {
+  transform: rotate(7deg) scale(var(--scene-scale, 1));
+  transform-origin: center center;
+}
+
+/* Keep cinematic overlays inside the live viewport. */
+#ls-overlays,
+#ls-flashlight,
+#ls-corridor,
+.cassette-player,
+.message-reader,
+.global-subtitles {
+  width: var(--vw, 100vw);
+}
+
+/* ---------- Hallway is pitch black with the light off ----------
+   The phone room already crushes to near-black. The corridor used to
+   render at brightness(1), which made turning the flashlight off feel
+   brighter than the desk. Match the phone-facing darkness. */
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor,
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor.is-active {
+  background: #000 !important;
+  filter: brightness(.028) contrast(1.18) saturate(.7) !important;
+}
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor::before {
+  z-index: 40 !important;
+  opacity: 1 !important;
+  background:
+    radial-gradient(ellipse at 50% 46%, rgba(0,0,0,.55) 0 10%, rgba(0,0,0,.92) 38%, #000 72%),
+    rgba(0, 1, 2, .97) !important;
+}
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor .ls-corridor-wall,
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor .ls-hall-ceiling,
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor .ls-hall-door,
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor .ls-corridor-floor,
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor .ls-hall-end,
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor .ls-hall-pipes,
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor .ls-hall-stain,
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor .ls-hall-fog,
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor .ls-corridor-window-shadow,
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor .ls-hall-handprints,
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor .ls-hall-peeker,
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor .ls-hall-crawler {
+  filter: brightness(.06) !important;
+  opacity: .05 !important;
+}
+/* Eyes / figure stay just barely present so a strike or beam can still reveal them. */
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor.psych-red-eyes .ls-corridor-eyes {
+  opacity: .18 !important;
+  filter: brightness(.35) !important;
+}
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor.psych-silhouette .ls-corridor-figure.is-visible {
+  opacity: .12 !important;
+}
+
+/* With the flashlight on, the canvas veil does the dark surround and the
+   hallway itself must be fully visible inside the beam. */
+body.ls-state-main.ls-corridor-active.ls-flashlight-on #ls-corridor.is-active {
+  filter: blur(0) brightness(1.02) contrast(1.08) saturate(.88) !important;
+  background: #030506 !important;
+}
+body.ls-state-main.ls-corridor-active.ls-flashlight-on #ls-corridor::before {
+  background: radial-gradient(ellipse at 50% 45%, transparent 0 18%, rgba(0,0,0,.18) 50%, rgba(0,0,0,.62) 100%) !important;
+  opacity: .85 !important;
+}
+
+/* ---------- Cassette always sits above EAS / inbox ---------- */
+body.ls-state-main #ls-overlays { z-index: 80 !important; }
+body.ls-state-title #ls-overlays,
+body.ls-state-opening #ls-overlays,
+body.ls-state-ending #ls-overlays { z-index: 1000 !important; }
+
+.cassette-player,
+.cassette-player.is-open,
+.cassette-player.is-preparing,
+.cassette-player.is-closing {
+  z-index: 2400 !important;
+}
+.cassette-flight,
+.cassette-ground-shadow,
+.landing-dust-burst { z-index: 2500 !important; }
+.global-subtitles { z-index: 2600 !important; }
+
+body.tape-modal-open #ls-overlays { z-index: 40 !important; }
+body.tape-modal-open #ls-eas,
+body.tape-modal-open #ls-eas.is-active,
+body.tape-modal-open #ls-notification,
+body.tape-modal-open #ls-notification.is-active,
+body.tape-modal-open #ls-inbox-takeover,
+body.tape-modal-open #ls-inbox-takeover.is-active {
+  z-index: 2 !important;
+  pointer-events: none !important;
+}
+body.tape-modal-open #ls-flashlight { z-index: 20 !important; }
+body.tape-modal-open #ls-mobile-controls { opacity: 0 !important; pointer-events: none !important; }
+
+/* ---------- Graphic polish: title ---------- */
+#ls-title-screen {
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 42%, rgba(48, 34, 16, .22), transparent 58%),
+    radial-gradient(ellipse at 50% 100%, rgba(20, 10, 4, .55), transparent 42%),
+    #000 !important;
+}
+#ls-title-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-radial-gradient(circle at 30% 20%, rgba(255,255,255,.045) 0 1px, transparent 1px 4px);
+  background-size: 3px 3px;
+  opacity: .18;
+  mix-blend-mode: overlay;
+  animation: grainShift 1.4s steps(2) infinite;
+}
+#ls-title-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 50%, transparent 36%, rgba(0,0,0,.72) 100%);
+}
+#ls-title-text {
+  position: relative;
+  z-index: 2;
+  letter-spacing: .42em;
+  text-shadow:
+    0 0 18px rgba(210, 170, 90, .28),
+    0 0 56px rgba(140, 90, 30, .18),
+    0 2px 0 rgba(0,0,0,.8) !important;
+}
+#ls-title-play {
+  position: relative;
+  z-index: 2;
+  border-radius: 1px;
+  backdrop-filter: blur(6px);
+  background: rgba(255, 244, 220, .03);
+}
+#ls-title-play:hover {
+  background: rgba(255, 244, 220, .07);
+}
+
+#ls-opening-text {
+  max-width: min(820px, 86vw);
+  text-wrap: balance;
+}
+#ls-candle-glow {
+  background:
+    radial-gradient(ellipse 48% 58% at 50% 68%,
+      rgba(255, 186, 92, .2) 0%,
+      rgba(220, 130, 40, .11) 28%,
+      rgba(120, 60, 18, .05) 52%,
+      transparent 78%) !important;
+}
+
+.ls-controls-card {
+  border-radius: 2px;
+  background:
+    linear-gradient(180deg, rgba(22,20,16,.55), rgba(6,6,5,.9)),
+    rgba(8,8,7,.84) !important;
+  box-shadow:
+    0 0 80px rgba(115,91,52,.14),
+    inset 0 1px 0 rgba(255,230,170,.08),
+    inset 0 0 50px rgba(255,230,170,.03) !important;
+}
+
+/* ---------- Graphic polish: room + phone ---------- */
+.phone {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255,255,255,.045), transparent 22%),
+    repeating-linear-gradient(88deg, rgba(255,255,255,.018) 0 1px, transparent 2px 7px),
+    linear-gradient(180deg, #171d1f 0%, #101516 46%, #0c1011 100%) !important;
+  box-shadow:
+    inset 8px 4px 0 #2a3638,
+    inset -9px -3px 0 #070a0a,
+    inset 0 -14px 0 rgba(0,0,0,.32),
+    0 28px 40px rgba(0,0,0,.55) !important;
+}
+.faceplate {
+  background:
+    linear-gradient(93deg, transparent 0 4%, rgba(255,255,255,.07) 5%, transparent 9%),
+    linear-gradient(173deg, #547888 0 5%, #3a5b68 17% 72%, #1b333b 100%) !important;
+}
+.lcd-frame {
+  box-shadow:
+    inset 5px 5px 12px rgba(28,38,26,.4),
+    inset -3px -3px 6px rgba(219,228,207,.22),
+    0 0 0 1px rgba(0,0,0,.55);
+}
+.physical-key {
+  transition: transform .08s ease, filter .16s ease, box-shadow .16s ease;
+}
+.physical-key:hover {
+  filter: brightness(1.08);
+}
+.brand {
+  letter-spacing: .2em;
+  text-shadow: 0 2px 0 #15272d, 0 0 12px rgba(210,230,230,.12);
+}
+
+.rain-window {
+  box-shadow:
+    inset 0 0 70px #000,
+    0 20px 50px rgba(0,0,0,.65),
+    0 0 40px rgba(80,130,140,.06);
+}
+.aparador-silhouette {
+  box-shadow:
+    inset 14px 0 22px rgba(255,255,255,.025),
+    -25px 24px 60px rgba(0,0,0,.76);
+}
+
+/* ---------- Graphic polish: cassette ---------- */
+.cassette-player {
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(78, 112, 118, .18), transparent 46%),
+    radial-gradient(ellipse at 50% 100%, rgba(0,0,0,.55), transparent 40%),
+    rgba(0,1,2,.972) !important;
+}
+.tape-face {
+  box-shadow:
+    inset 0 0 0 3px #565e5b,
+    inset 0 -28px 40px rgba(0,0,0,.5),
+    inset 0 20px 30px rgba(255,255,255,.045),
+    0 18px 40px rgba(0,0,0,.45),
+    0 0 0 1px #000 !important;
+}
+.front-label, .back-label {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 20px, rgba(85,68,47,.12) 21px 22px),
+    linear-gradient(180deg, #e0d4b0, #cbbd94) !important;
+}
+.tape-bottom-ui {
+  border-color: rgba(186, 220, 210, .34) !important;
+  background: linear-gradient(180deg, rgba(22, 34, 33, .9), rgba(4, 8, 8, .96)) !important;
+}
+
+/* ---------- Graphic polish: hallway when lit ---------- */
+#ls-corridor .ls-corridor-wall {
+  background:
+    linear-gradient(90deg, transparent 49.7%, rgba(160,172,166,.07) 50%, transparent 50.3%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.022) 0 2px, transparent 2px 86px),
+    repeating-linear-gradient(0deg, transparent 0 75px, rgba(0,0,0,.38) 76px 78px),
+    radial-gradient(ellipse at 50% 34%, #1c282c 0, #0d1416 28%, #06090b 64%, #020303 100%) !important;
+}
+.ls-hall-door {
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.03), transparent 18% 82%, rgba(0,0,0,.25)),
+    repeating-linear-gradient(90deg, #161c1b 0 22px, #0c1010 23px 25px) !important;
+}
+.ls-hall-end {
+  box-shadow: 0 0 80px 36px rgba(0,0,0,.8), inset 0 0 28px #000 !important;
+}
+
+/* ---------- Graphic polish: LCD takeovers + newer phone ---------- */
+#ls-eas .ls-eas-header,
+#ls-inbox-takeover .ls-inbox-header {
+  letter-spacing: .14em !important;
+}
+#ls-newer-phone .ls-newer-shell {
+  box-shadow:
+    inset 0 0 0 1px rgba(150, 170, 190, .16),
+    inset 0 0 28px rgba(0, 0, 0, .88),
+    0 36px 90px -18px rgba(0, 0, 0, .96),
+    0 0 40px rgba(80, 140, 180, .08) !important;
+}
+
+/* ---------- Graphic polish: chrome ---------- */
+#ls-force-audio {
+  backdrop-filter: blur(10px);
+  border-radius: 6px;
+}
+#ls-mobile-controls button {
+  backdrop-filter: blur(10px);
+}
+
+/* Short-screen / landscape phones: keep the composition inside the glass. */
+@media (max-height: 740px) {
+  .scene { padding: 12px 10px 18px; }
+  .phone { padding: 28px 14px 18px; }
+  .faceplate { padding: 12px 10px 16px; }
+  .control-cluster { margin: 10px 6px 12px; }
+  .keypad { row-gap: 8px; }
+  .number-key { height: 42px; }
+}
+@media (max-height: 560px) and (orientation: landscape) {
+  .scene { place-items: center; padding: 6px; }
+  .rain-ambience-badge { display: none; }
+}
+
+@media (max-width: 650px) {
+  .scene {
+    padding: 16px 8px 118px;
+    padding-bottom: calc(118px + env(safe-area-inset-bottom));
+    align-items: center;
+  }
+  .cassette {
+    bottom: 118px;
+    transform: rotate(7deg) scale(calc(var(--scene-scale, 1) * .58));
+  }
+}
+
+/* Desk tape sits on the table, not under the room dimmer. */
+button.cassette {
+  z-index: 3 !important;
+  border-color: #1a1e1d;
+  background:
+    linear-gradient(165deg, rgba(255,255,255,.1), transparent 26%),
+    linear-gradient(345deg, rgba(0,0,0,.28), transparent 34%),
+    #2c312f;
+  box-shadow:
+    15px 18px 24px rgba(0,0,0,.5),
+    inset 0 0 0 3px #5a605c,
+    inset 0 -16px 18px rgba(0,0,0,.28);
+}
+
+.antenna {
+  background: linear-gradient(90deg, #1b2325, #101617 60%, #1a2224);
+}
+.power-key {
+  background: linear-gradient(#2a3334, #1a2122);
+}
+.earpiece {
+  background: linear-gradient(#1d282b, #12181a);
+}
+
+.message-reader {
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(40, 70, 68, .18), transparent 42%),
+    rgba(4, 6, 6, .95);
+}
+.reader-shell {
+  box-shadow:
+    18px 22px 0 rgba(0,0,0,.46),
+    inset 4px 4px 0 #556366,
+    inset -4px -4px 0 #0a0f0f,
+    0 0 60px rgba(90, 160, 140, .08);
+}
+
+.global-subtitles {
+  border-color: rgba(200, 230, 220, .38) !important;
+  background: linear-gradient(180deg, rgba(10, 16, 16, .88), rgba(2, 5, 5, .96)) !important;
+}
+
+#ls-credit-card h2 {
+  text-shadow:
+    0 0 24px rgba(200, 160, 80, .28),
+    0 0 70px rgba(120, 80, 30, .16) !important;
+}
+
+/* Soft analog grade over the live room once you are inside it. */
+body.ls-state-main main.scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+  background:
+    radial-gradient(ellipse at 50% 40%, transparent 30%, rgba(0,0,0,.28) 100%),
+    repeating-radial-gradient(circle at 20% 30%, rgba(255,255,255,.35) 0 1px, transparent 1px 6px);
+  background-size: auto, 28px 24px;
+  opacity: .07;
+  mix-blend-mode: overlay;
+}
+body.ls-state-main.ls-flashlight-on main.scene::after { opacity: .05; }
+
+/* Keep the 3D tape inspection filling phones and desktops. */
+.cassette-inspection {
+  width: min(1040px, calc(var(--vw, 100vw) - 16px));
+  height: min(820px, calc(var(--vh, 100dvh) - 16px));
+}
+.cassette-3d {
+  width: min(570px, calc(var(--vw, 100vw) * .82));
+}
+  </style>
+
   <script>
     // Prevent the legacy inline ambience and lightning schedulers from
     // starting before the title/opening controller takes ownership.
@@ -3078,56 +3511,6 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
           <p id="readerBody"></p>
         </article>
       </div>
-    </div>
-
-    <div class="cassette-player" id="cassettePlayer" role="dialog" aria-modal="true" aria-label="Interactive cassette" aria-hidden="true">
-      <section class="cassette-inspection">
-
-        <div class="cassette-viewport" id="cassetteViewport" tabindex="0" aria-label="Interactive three-dimensional cassette. Drag left or right to rotate.">
-          <div class="cassette-3d front-facing" id="cassette3d">
-            <section class="tape-face tape-front" aria-label="Front side of cassette">
-              <div class="tape-shell-highlight"></div>
-              <div class="front-label"><b>4 my one &amp; onli lab ATO</b><i></i></div>
-              <div class="spool-window" aria-hidden="true">
-                <span class="spool left-spool"><i></i></span>
-                <span class="tape-bridge"></span>
-                <span class="spool right-spool"><i></i></span>
-              </div>
-              <i class="tape-screw ts1"></i><i class="tape-screw ts2"></i><i class="tape-screw ts3"></i><i class="tape-screw ts4"></i>
-            </section>
-
-            <section class="tape-face tape-back" aria-label="Back side of cassette">
-              <div class="back-ridges" aria-hidden="true"></div>
-              <div class="back-label"><small>SIDE B · PERSONAL RECORDING</small></div>
-              <div class="back-window" aria-hidden="true"><i></i><i></i></div>
-              <i class="tape-screw ts1"></i><i class="tape-screw ts2"></i><i class="tape-screw ts3"></i><i class="tape-screw ts4"></i>
-            </section>
-
-            <i class="tape-edge edge-top"></i><i class="tape-edge edge-bottom"></i><i class="tape-edge edge-left"></i><i class="tape-edge edge-right"></i>
-          </div>
-        </div>
-
-        <div class="tape-bottom-ui">
-          <button type="button" class="tape-close" id="cassetteClose" aria-label="Return cassette to desk">×</button>
-          <div class="tape-code-entry" id="tapeCodeEntry">
-            <input id="cassetteCodeInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="CODE" aria-label="Cassette code" aria-describedby="cassetteCodeStatus">
-            <button type="button" id="cassetteCodeSubmit" aria-label="Unlock cassette">↵</button>
-            <span id="cassetteCodeStatus">ROTATE · READ BACK · ENTER CODE</span>
-          </div>
-          <div class="tape-controls" id="tapeControls">
-            <button type="button" id="cassetteRewind" aria-label="Rewind">◀◀</button>
-            <button type="button" id="cassettePlay" aria-label="Play">▶</button>
-            <button type="button" id="cassetteStop" aria-label="Stop">■</button>
-            <output id="cassetteCounter">00:00</output>
-            <i class="murmur-meter" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></i>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <div class="global-subtitles" id="globalSubtitles" aria-live="polite" aria-hidden="true">
-      <time id="cassetteSubtitleTime">00:00</time>
-      <p id="cassetteSubtitle"> </p>
     </div>
 
     <div id="screenReader" class="sr-only" aria-live="polite"></div>
@@ -3258,6 +3641,58 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
 
   </div>
   <!-- ============== END NARRATIVE OVERLAYS ============== -->
+
+  <!-- Cassette lives outside main.scene so 3D inspection stays above LCD takeovers. -->
+    <div class="cassette-player" id="cassettePlayer" role="dialog" aria-modal="true" aria-label="Interactive cassette" aria-hidden="true">
+      <section class="cassette-inspection">
+
+        <div class="cassette-viewport" id="cassetteViewport" tabindex="0" aria-label="Interactive three-dimensional cassette. Drag left or right to rotate.">
+          <div class="cassette-3d front-facing" id="cassette3d">
+            <section class="tape-face tape-front" aria-label="Front side of cassette">
+              <div class="tape-shell-highlight"></div>
+              <div class="front-label"><b>4 my one &amp; onli lab ATO</b><i></i></div>
+              <div class="spool-window" aria-hidden="true">
+                <span class="spool left-spool"><i></i></span>
+                <span class="tape-bridge"></span>
+                <span class="spool right-spool"><i></i></span>
+              </div>
+              <i class="tape-screw ts1"></i><i class="tape-screw ts2"></i><i class="tape-screw ts3"></i><i class="tape-screw ts4"></i>
+            </section>
+
+            <section class="tape-face tape-back" aria-label="Back side of cassette">
+              <div class="back-ridges" aria-hidden="true"></div>
+              <div class="back-label"><small>SIDE B · PERSONAL RECORDING</small></div>
+              <div class="back-window" aria-hidden="true"><i></i><i></i></div>
+              <i class="tape-screw ts1"></i><i class="tape-screw ts2"></i><i class="tape-screw ts3"></i><i class="tape-screw ts4"></i>
+            </section>
+
+            <i class="tape-edge edge-top"></i><i class="tape-edge edge-bottom"></i><i class="tape-edge edge-left"></i><i class="tape-edge edge-right"></i>
+          </div>
+        </div>
+
+        <div class="tape-bottom-ui">
+          <button type="button" class="tape-close" id="cassetteClose" aria-label="Return cassette to desk">×</button>
+          <div class="tape-code-entry" id="tapeCodeEntry">
+            <input id="cassetteCodeInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="CODE" aria-label="Cassette code" aria-describedby="cassetteCodeStatus">
+            <button type="button" id="cassetteCodeSubmit" aria-label="Unlock cassette">↵</button>
+            <span id="cassetteCodeStatus">ROTATE · READ BACK · ENTER CODE</span>
+          </div>
+          <div class="tape-controls" id="tapeControls">
+            <button type="button" id="cassetteRewind" aria-label="Rewind">◀◀</button>
+            <button type="button" id="cassettePlay" aria-label="Play">▶</button>
+            <button type="button" id="cassetteStop" aria-label="Stop">■</button>
+            <output id="cassetteCounter">00:00</output>
+            <i class="murmur-meter" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></i>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="global-subtitles" id="globalSubtitles" aria-live="polite" aria-hidden="true">
+      <time id="cassetteSubtitleTime">00:00</time>
+      <p id="cassetteSubtitle"> </p>
+    </div>
+
 
   <script>
     (() => {
@@ -4094,6 +4529,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
         noise.start(); voice.start(); secondVoice.start(); phraseLfo.start(); flutter.start();
         tapeAudioNodes = { master,noise,voice,secondVoice,phraseLfo,flutter };
         if (ambientNodes && audioContext) ambientNodes.master.gain.setTargetAtTime(.18,audioContext.currentTime,.25);
+        try { window.LS_AUDIO?.duckAmbience?.(0.28, 220); } catch (_) {}
       }
 
       function stopTapeMurmurs() {
@@ -4104,6 +4540,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
         try { tapeAudioNodes.master.disconnect(); } catch (_) {}
         tapeAudioNodes = null;
         if (ambientNodes && audioContext) ambientNodes.master.gain.setTargetAtTime(.42,audioContext.currentTime,.3);
+        try { window.LS_AUDIO?.unduckAmbience?.(400); } catch (_) {}
       }
 
       function updateCassetteSubtitle() {
@@ -5230,17 +5667,28 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
   // then re-used for main and ending ambience. The alert channel is primed at
   // the same time for the later EAS sequence.
   const musicBus = new Audio(new URL(AUDIO_DIR + FILES.title, document.baseURI).href);
+  const ambienceBus = new Audio(new URL(AUDIO_DIR + FILES.ambience, document.baseURI).href);
   const alertBus = new Audio(new URL(AUDIO_DIR + FILES.eas, document.baseURI).href);
-  for (const bus of [musicBus, alertBus]) {
+  const thunderBus = new Audio();
+  for (const bus of [musicBus, ambienceBus, alertBus, thunderBus]) {
     bus.preload = "auto";
     bus.playsInline = true;
     bus.setAttribute("playsinline", "");
     bus.setAttribute("webkit-playsinline", "");
-    bus.loop = true;
-    bus.load();
+    bus.crossOrigin = "anonymous";
   }
+  musicBus.loop = true;
+  ambienceBus.loop = true;
+  alertBus.loop = true;
+  thunderBus.loop = false;
+  musicBus.load();
+  ambienceBus.load();
+  alertBus.load();
   musicBus.dataset.lsKey = "title";
+  ambienceBus.dataset.lsKey = "ambience";
   alertBus.dataset.lsKey = "eas";
+  thunderBus.dataset.lsKey = "thunder";
+  const AMBIENCE_VOL = 0.55;
 
   let audioCtx = null;
   let unlocked = false;
@@ -5280,7 +5728,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     // iOS/Safari may grant permission per HTMLMediaElement. Prime every real
     // MP3 during the user's gesture, at zero volume, so tracks requested later
     // in the story can start without another click.
-    [...Object.values(tracks).map(track => track && track.audio), musicBus, alertBus].forEach(audio => {
+    [...Object.values(tracks).map(track => track && track.audio), musicBus, ambienceBus, alertBus, thunderBus].forEach(audio => {
       if (!audio || audio.dataset.lsPrimed === "1") return;
       audio.dataset.lsPriming = "1";
       const oldVolume = audio.volume;
@@ -5385,8 +5833,10 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
   function playPersistent(bus, key, volume, fadeMs, fallback) {
     const url = new URL(AUDIO_DIR + FILES[key], document.baseURI).href;
     bus.dataset.lsWanted = "1";
+    bus.dataset.lsAllowPause = "0";
     bus._lsFadeToken = (bus._lsFadeToken || 0) + 1;
-    if (bus.dataset.lsKey !== key || bus.src !== url) {
+    const current = bus.getAttribute("src") || bus.src || "";
+    if (bus.dataset.lsKey !== key || !current.includes(FILES[key])) {
       try { bus.pause(); } catch (_) {}
       bus.src = url;
       bus.dataset.lsKey = key;
@@ -5397,13 +5847,62 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     const attempt = bus.play();
     if (attempt && typeof attempt.then === "function") {
       attempt.then(() => fadeHtmlAudio(bus, volume, fadeMs)).catch(fallback);
+    } else if (typeof fallback === "function") {
+      fallback();
     }
   }
 
   function stopPersistent(bus, key, fadeMs) {
-    if (bus.dataset.lsKey !== key) return;
+    if (key && bus.dataset.lsKey !== key) return;
     bus.dataset.lsWanted = "0";
+    bus.dataset.lsAllowPause = "1";
     fadeHtmlAudio(bus, 0, fadeMs);
+  }
+
+  let ambienceResumeLock = false;
+  function resumeAmbienceIfNeeded() {
+    if (ambienceResumeLock) return;
+    if (ambienceBus.dataset.lsWanted !== "1") return;
+    if (ambienceBus.dataset.lsAllowPause === "1") return;
+    if (!ambienceBus.paused && !ambienceBus.ended) return;
+    ambienceResumeLock = true;
+    const target = Number(ambienceBus.dataset.lsTargetVol || AMBIENCE_VOL);
+    ambienceBus.play().then(() => {
+      if (ambienceBus.volume < 0.05) ambienceBus.volume = target;
+    }).catch(() => {}).finally(() => { ambienceResumeLock = false; });
+  }
+  function scheduleAmbienceGuard() {
+    window.setTimeout(resumeAmbienceIfNeeded, 40);
+    window.setTimeout(resumeAmbienceIfNeeded, 180);
+    window.setTimeout(resumeAmbienceIfNeeded, 480);
+  }
+  ambienceBus.addEventListener("pause", () => {
+    if (ambienceBus.dataset.lsWanted === "1" && ambienceBus.dataset.lsAllowPause !== "1") {
+      scheduleAmbienceGuard();
+    }
+  });
+  ambienceBus.addEventListener("ended", resumeAmbienceIfNeeded);
+  ambienceBus.addEventListener("stalled", scheduleAmbienceGuard);
+  ambienceBus.addEventListener("waiting", scheduleAmbienceGuard);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) scheduleAmbienceGuard();
+  });
+  window.setInterval(() => {
+    if (document.hidden) return;
+    resumeAmbienceIfNeeded();
+  }, 1600);
+
+  function duckAmbience(volume, ms) {
+    if (ambienceBus.dataset.lsWanted !== "1") return;
+    ambienceBus.dataset.lsTargetVol = String(volume);
+    fadeHtmlAudio(ambienceBus, volume, ms || 180);
+    scheduleAmbienceGuard();
+  }
+  function unduckAmbience(ms) {
+    if (ambienceBus.dataset.lsWanted !== "1") return;
+    ambienceBus.dataset.lsTargetVol = String(AMBIENCE_VOL);
+    fadeHtmlAudio(ambienceBus, AMBIENCE_VOL, ms || 500);
+    scheduleAmbienceGuard();
   }
 
   // ---------- Synth fallbacks ----------
@@ -5600,38 +6099,62 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
       stopTitleSynth();
     },
 
-    // Main room ambience (ambience.mp3)
+    // Main room ambience (ambience.mp3) lives on its own element so EAS,
+    // thunder, cassette murmurs and keypad tones cannot unload or halt it.
     playAmbience() {
       unlock();
       stopTitleSynth(); stopEndingSynth();
-      playPersistent(musicBus, "ambience", 0.55, 1100, startAmbienceSynth);
+      stopPersistent(musicBus, musicBus.dataset.lsKey, 700);
+      ambienceBus.dataset.lsTargetVol = String(AMBIENCE_VOL);
+      playPersistent(ambienceBus, "ambience", AMBIENCE_VOL, 1100, startAmbienceSynth);
+      scheduleAmbienceGuard();
     },
     stopAmbience(fadeMs = 1200) {
-      stopPersistent(musicBus, "ambience", fadeMs);
+      stopPersistent(ambienceBus, "ambience", fadeMs);
       stopAmbienceSynth();
     },
+    duckAmbience,
+    unduckAmbience,
+    guardAmbience: scheduleAmbienceGuard,
 
-    // Thunder (thunder1/2/3.mp3 — random variant)
+    // Thunder (thunder1/2/3.mp3 — random variant) uses a dedicated bus.
     playThunder(variant) {
       unlock();
       const key = variant || (["thunder1","thunder2","thunder3"][Math.floor(Math.random()*3)]);
-      withTrack(key, t => {
-        markWanted(t, true);
-        try { t.audio.currentTime = 0; } catch (_) {}
-        t.audio.loop = false;
-        t.audio.volume = 0.9;
-        t.audio.play().catch(() => playThunderSynth());
-      }, playThunderSynth);
+      const url = new URL(AUDIO_DIR + FILES[key], document.baseURI).href;
+      duckAmbience(0.3, 120);
+      try { thunderBus.pause(); } catch (_) {}
+      thunderBus.src = url;
+      thunderBus.loop = false;
+      thunderBus.volume = 0.9;
+      thunderBus.dataset.lsWanted = "1";
+      const boom = thunderBus.play();
+      const restore = () => {
+        thunderBus.dataset.lsWanted = "0";
+        unduckAmbience(700);
+        scheduleAmbienceGuard();
+      };
+      thunderBus.onended = restore;
+      if (boom && typeof boom.then === "function") {
+        boom.then(() => scheduleAmbienceGuard()).catch(() => { playThunderSynth(); restore(); });
+      }
+      window.setTimeout(scheduleAmbienceGuard, 60);
+      window.setTimeout(() => {
+        if (thunderBus.paused && thunderBus.dataset.lsWanted === "1") playThunderSynth();
+      }, 240);
     },
 
-    // EAS alarm (eas.mp3)
+    // EAS alarm (eas.mp3) layers over ambience instead of replacing it.
     playEAS() {
       unlock();
+      duckAmbience(0.22, 140);
       playPersistent(alertBus, "eas", 0.7, 120, startEASSynth);
+      scheduleAmbienceGuard();
     },
     stopEAS(fadeMs = 800) {
       stopPersistent(alertBus, "eas", fadeMs);
       stopEASSynth();
+      unduckAmbience(fadeMs);
     },
 
     // Ending ambience (ambienceending.mp3)
@@ -5648,7 +6171,11 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     // Hard-stop everything (pagehide / replay)
     stopAll() {
       Object.values(tracks).forEach(t => { if (t && t.audio) { markWanted(t, false); stopHtmlAudio(t.audio); } });
-      for (const bus of [musicBus, alertBus]) { bus.dataset.lsWanted = "0"; stopHtmlAudio(bus); }
+      for (const bus of [musicBus, ambienceBus, alertBus, thunderBus]) {
+        bus.dataset.lsWanted = "0";
+        bus.dataset.lsAllowPause = "1";
+        stopHtmlAudio(bus);
+      }
       stopTitleSynth(); stopAmbienceSynth(); stopEndingSynth(); stopEASSynth();
     },
 
@@ -6626,7 +7153,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
 
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches || false;
   const MAIN_DELAY = 120000;
-  const EAS_HOLD = 15000;
+  const EAS_HOLD = 6000;
 
   let mainTimer = null;
   let lightningTimer = null;
@@ -6927,6 +7454,9 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     notificationOpen = true;
     setFlag("notificationActive", true);
     notification.focus?.({ preventScroll: true });
+    later(() => {
+      if (notificationOpen && !messageOpened && !endingStarted) hideNotification();
+    }, 6000);
   }
 
   function showInboxMessage() {
@@ -6939,6 +7469,9 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     inboxTakeover.tabIndex = 0;
     messageVisible = true;
     inboxTakeover.focus?.({ preventScroll: true });
+    later(() => {
+      if (messageVisible && !endingStarted) hideInboxMessage();
+    }, 6000);
   }
 
   function openMessage() {
@@ -7194,5 +7727,78 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
 })();
 
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2d5b55e7cec3d5c',t:'MTc4NzEwNjMzNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>
+/* Fit the whole experience to the live visual viewport on every device. */
+(function () {
+  "use strict";
+  function measure() {
+    const vv = window.visualViewport;
+    const vw = Math.max(1, Math.round(vv ? vv.width : window.innerWidth));
+    const vh = Math.max(1, Math.round(vv ? vv.height : window.innerHeight));
+    const root = document.documentElement;
+    root.style.setProperty("--vw", vw + "px");
+    root.style.setProperty("--vh", vh + "px");
+    const wrap = document.querySelector(".phone-wrap");
+    if (!wrap) return;
+    const prev = root.style.getPropertyValue("--scene-scale") || "1";
+    root.style.setProperty("--scene-scale", "1");
+    wrap.style.transform = "none";
+    const mobile = document.body.classList.contains("ls-mobile");
+    const reserve = mobile ? 126 : 36;
+    const availW = vw - 24;
+    const availH = Math.max(220, vh - reserve);
+    const w = Math.max(1, wrap.offsetWidth);
+    const h = Math.max(1, wrap.offsetHeight);
+    let scale = Math.min(1, availW / w, availH / h);
+    if (!isFinite(scale) || scale <= 0) scale = 1;
+    scale = Math.max(0.42, Math.min(1, scale));
+    wrap.style.transform = "";
+    root.style.setProperty("--scene-scale", scale.toFixed(3));
+    const lcd = document.querySelector(".lcd-frame");
+    if (lcd) {
+      const rect = lcd.getBoundingClientRect();
+      if (rect.width && rect.height) {
+        ["ls-eas", "ls-notification", "ls-inbox-takeover"].forEach(id => {
+          const el = document.getElementById(id);
+          if (!el || !el.classList.contains("is-active")) return;
+          el.style.inset = "auto";
+          el.style.right = "auto";
+          el.style.bottom = "auto";
+          el.style.left = `${rect.left + rect.width / 2}px`;
+          el.style.top = `${rect.top + rect.height / 2}px`;
+          el.style.width = `${rect.width}px`;
+          el.style.height = `${rect.height}px`;
+          el.style.transform = "translate(-50%, -50%)";
+        });
+      }
+    }
+    if (prev !== scale.toFixed(3)) {
+      window.dispatchEvent(new Event("ls:fitted"));
+    }
+  }
+  let raf = 0;
+  function requestFit() {
+    if (raf) return;
+    raf = requestAnimationFrame(() => { raf = 0; measure(); });
+  }
+  window.addEventListener("resize", requestFit, { passive: true });
+  window.addEventListener("orientationchange", () => setTimeout(requestFit, 180), { passive: true });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", requestFit, { passive: true });
+    window.visualViewport.addEventListener("scroll", requestFit, { passive: true });
+  }
+  document.addEventListener("ls:narrativeState", requestFit);
+  document.addEventListener("ls:flagChange", requestFit);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", requestFit, { once: true });
+  } else {
+    requestFit();
+  }
+  window.setTimeout(requestFit, 80);
+  window.setTimeout(requestFit, 400);
+  window.LS_FIT = { measure: requestFit };
+})();
+
+  </script>
+</body>
 </html>
