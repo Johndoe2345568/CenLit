@@ -2955,6 +2955,38 @@ body:not(.ls-corridor-active) main.scene { transform:perspective(1100px) rotateY
 #ls-corridor .ls-corridor-figure.is-visible{opacity:.48;transform:none}
 body.ls-flashlight-on #ls-corridor .ls-corridor-figure.is-visible{opacity:.48;transform:none}
 body.ls-corridor-figure-lit #ls-corridor .ls-corridor-figure{opacity:.58;filter:brightness(1.5) blur(.4px);transform:translateX(58vw) skewX(-11deg);}
+
+/* Psychological hallway details change only while they are out of view. The
+   player is encouraged to check behind them, but nothing steals control. */
+.ls-hall-fog{position:absolute;z-index:7;left:20%;right:20%;bottom:9%;height:34%;opacity:.22;background:radial-gradient(ellipse at 50% 80%,rgba(131,151,142,.22),transparent 60%);filter:blur(18px);animation:lsFogBreathe 9s ease-in-out infinite alternate;pointer-events:none}
+.ls-hall-scratches{position:absolute;z-index:8;left:10%;top:57%;color:#5d5148;opacity:.12;transform:rotate(-5deg);font:900 clamp(9px,1.3vw,16px)/1 "Courier New",monospace;letter-spacing:.15em;text-shadow:1px 0 #111,-1px 1px #000;filter:blur(.35px)}
+body.ls-flashlight-on .ls-hall-scratches{opacity:.46}
+.ls-hall-handprints{position:absolute;z-index:8;right:12%;top:42%;width:110px;height:150px;opacity:.14;transform:rotate(8deg)}
+.ls-hall-handprints i{position:absolute;width:24px;height:34px;border-radius:45% 45% 55% 55%;background:#382a25;box-shadow:-9px -18px 0 -7px #382a25,-3px -24px 0 -8px #382a25,4px -25px 0 -8px #382a25,11px -20px 0 -8px #382a25;filter:blur(1px)}
+.ls-hall-handprints i:nth-child(1){left:5px;top:25px}.ls-hall-handprints i:nth-child(2){right:4px;top:76px;transform:scale(.72) rotate(-18deg)}.ls-hall-handprints i:nth-child(3){left:28px;bottom:0;transform:scale(.48) rotate(24deg)}
+.ls-hall-peeker{position:absolute;z-index:9;right:15.5%;top:28%;width:42px;height:148px;opacity:0;transform:translateX(28px);background:radial-gradient(circle at 48% 12%,#000 0 14px,transparent 15px),linear-gradient(90deg,transparent,#000 25% 78%,transparent);clip-path:polygon(30% 0,70% 0,86% 20%,76% 100%,18% 100%,12% 22%);filter:blur(1px);transition:opacity 1.4s ease,transform 2.2s cubic-bezier(.16,.8,.22,1)}
+#ls-corridor.psych-peek .ls-hall-peeker{opacity:.7;transform:translateX(0)}
+body.ls-flashlight-on #ls-corridor.psych-peek .ls-hall-peeker{opacity:.36}
+.ls-hall-crawler{position:absolute;z-index:9;left:40%;top:8%;width:150px;height:56px;opacity:0;transform:translateY(-24px) rotate(2deg);background:radial-gradient(ellipse at 50% 50%,#000 0 24%,transparent 57%);filter:blur(2px);transition:opacity 1.7s,transform 2.8s ease}
+.ls-hall-crawler::before,.ls-hall-crawler::after{content:"";position:absolute;top:34px;width:78px;height:4px;background:#000;transform-origin:100% 50%;box-shadow:0 11px 0 #000}.ls-hall-crawler::before{left:-38px;transform:rotate(-24deg)}.ls-hall-crawler::after{right:-38px;transform-origin:0 50%;transform:rotate(24deg)}
+#ls-corridor.psych-crawl .ls-hall-crawler{opacity:.58;transform:translateY(0) rotate(2deg)}
+#ls-corridor.psych-door .ls-hall-door.right{transform:skewY(-5deg) perspective(500px) rotateY(-22deg);transform-origin:right;box-shadow:inset 28px 0 35px #000,-18px 15px 38px #000}
+#ls-corridor.psych-near .ls-corridor-figure{right:17%;bottom:10%;width:105px;height:330px;opacity:.52}
+#ls-corridor.psych-empty .ls-corridor-figure{opacity:0 !important}
+#ls-corridor.psych-empty .ls-static-eyes.e3{opacity:.62;transform:scale(.8)}
+#ls-corridor.psych-look .ls-static-eyes.e1{left:var(--watch-x,16%);top:var(--watch-y,35%)}
+.ls-static-eyes{animation:lsEyesBlink 8.5s steps(1,end) infinite}.ls-static-eyes.e2{animation-delay:-3.1s}.ls-static-eyes.e3{animation-delay:-5.8s}
+#ls-corridor.psych-pulse .ls-hall-lamp::after{animation:lsSickLamp 3.8s steps(1,end) infinite}
+@keyframes lsEyesBlink{0%,42%,44%,100%{opacity:var(--eye-opacity,.5)}43%{opacity:.03}}
+@keyframes lsFogBreathe{from{transform:translateX(-3%) scale(.94);opacity:.14}to{transform:translateX(4%) scale(1.08);opacity:.3}}
+@keyframes lsSickLamp{0%,71%,74%,100%{opacity:.35}72%{opacity:.04}73%{opacity:.6}}
+
+/* A narrow exposure smear crosses the screen during the actual camera turn,
+   making it feel like a vulnerable physical movement rather than a crossfade. */
+#ls-corridor .ls-turn-smear{position:absolute;z-index:30;inset:-20%;pointer-events:none;opacity:0;background:linear-gradient(105deg,transparent 30%,rgba(177,194,185,.11) 48%,transparent 64%);filter:blur(16px);transform:translateX(-70%)}
+#ls-corridor.is-turning .ls-turn-smear{animation:lsTurnSmear .8s ease both}
+@keyframes lsTurnSmear{0%{opacity:0;transform:translateX(-75%)}35%{opacity:.65}100%{opacity:0;transform:translateX(75%)}}
+
 /* CSS fallback keeps the ending figure visible even when the optional SVG
    file is unavailable on a single-file/mobile deployment. */
 #ls-man-silhouette::before{content:"";position:absolute;left:50%;bottom:0;width:min(260px,48vw);height:91vh;transform:translateX(-50%);background:radial-gradient(circle at 50% 12%,#000 0 10%,transparent 10.5%),linear-gradient(90deg,transparent 8%,#000 26% 74%,transparent 92%);clip-path:polygon(39% 0,61% 0,72% 16%,78% 53%,100% 100%,61% 100%,53% 56%,45% 100%,0 100%,24% 53%,28% 16%);filter:drop-shadow(0 0 35px #000)}
@@ -3186,12 +3218,16 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
       <div class="ls-hall-door left" aria-hidden="true"></div><div class="ls-hall-door right" aria-hidden="true"></div>
       <div class="ls-hall-pipes" aria-hidden="true"></div><div class="ls-hall-stain" aria-hidden="true"></div>
       <div class="ls-hall-end" aria-hidden="true"></div><div class="ls-hall-lamp" aria-hidden="true"></div>
+      <div class="ls-hall-fog" aria-hidden="true"></div><div class="ls-hall-scratches" aria-hidden="true">HUWAG KANG LILINGON</div>
+      <div class="ls-hall-peeker" aria-hidden="true"></div><div class="ls-hall-crawler" aria-hidden="true"></div>
+      <div class="ls-hall-handprints" aria-hidden="true"><i></i><i></i><i></i></div>
       <i class="ls-static-eyes e1" aria-hidden="true"></i><i class="ls-static-eyes e2" aria-hidden="true"></i><i class="ls-static-eyes e3" aria-hidden="true"></i>
       <div class="ls-corridor-floor"></div>
       <div class="ls-corridor-window-shadow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       <div class="ls-corridor-storm-flash" aria-hidden="true"></div>
       <div class="ls-corridor-eyes" aria-hidden="true"></div>
       <div class="ls-corridor-figure is-visible" aria-hidden="true"></div>
+      <div class="ls-turn-smear" aria-hidden="true"></div>
     </div>
 
     <!-- Mobile-only controls; activated automatically for touch/mobile platforms. -->
@@ -5273,6 +5309,28 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
       audioCtx.resume().catch(() => {});
     }
     unlocked = true;
+
+    // iOS/Safari may grant permission per HTMLMediaElement. Prime every real
+    // MP3 during the user's gesture, at zero volume, so tracks requested later
+    // in the story can start without another click.
+    Object.values(tracks).forEach(track => {
+      const audio = track && track.audio;
+      if (!audio || audio.dataset.lsPrimed === "1") return;
+      audio.dataset.lsPriming = "1";
+      const oldVolume = audio.volume;
+      audio.volume = 0;
+      const attempt = audio.play();
+      if (attempt && typeof attempt.then === "function") {
+        attempt.then(() => {
+          audio.dataset.lsPrimed = "1";
+          audio.dataset.lsPriming = "0";
+          if (audio.dataset.lsWanted !== "1") {
+            try { audio.pause(); audio.currentTime = 0; } catch (_) {}
+            audio.volume = oldVolume;
+          }
+        }).catch(() => { audio.dataset.lsPriming = "0"; });
+      }
+    });
   }
 
   // Attempt to load a single MP3 file. Returns a Promise that resolves
@@ -5288,10 +5346,14 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
       audio.src = url;
       audio.loop = true; // ambience tracks loop by default; EAS may be one-shot
       audio.load();
-      const result = { audio, ok: false, tried: true };
+      const result = { audio, ok: false, pending: true, tried: true, filename, url };
+      // Register immediately, before canplay. Playback called from the Play
+      // button must reach this exact media element synchronously.
+      tracks[key] = result;
 
       const onCanPlay = () => {
         result.ok = true;
+        result.pending = false;
         cleanup();
         // Try a tiny probe play to verify decode (some browsers lie about canplaythrough)
         // We don't actually start playback here — just resolve.
@@ -5299,6 +5361,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
       };
       const onError = () => {
         result.ok = false;
+        result.pending = false;
         cleanup();
         resolve(result);
       };
@@ -5510,21 +5573,22 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
 
   // ---------- Public API ----------
 
-  // Playback can be requested before a slow GitHub Pages connection has
-  // finished preloading. Wait for the actual file instead of permanently
-  // choosing the synth fallback just because the first click was early.
+  // Start the media element immediately from the requesting gesture. Waiting
+  // for canplay before calling play() breaks autoplay permission on Safari.
   function withTrack(key, onReady, onMissing) {
     const existing = tracks[key];
-    if (existing) {
-      if (existing.ok) onReady(existing);
-      else onMissing();
+    if (existing && existing.audio) {
+      onReady(existing);
       return;
     }
-    loadFile(key, FILES[key]).then(result => {
-      tracks[key] = result;
-      if (result && result.ok) onReady(result);
-      else onMissing();
-    }).catch(onMissing);
+    loadFile(key, FILES[key]);
+    const created = tracks[key];
+    if (created && created.audio) onReady(created);
+    else onMissing();
+  }
+
+  function markWanted(track, wanted) {
+    if (track && track.audio) track.audio.dataset.lsWanted = wanted ? "1" : "0";
   }
 
   const api = {
@@ -5536,6 +5600,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     playTitle() {
       unlock();
       withTrack("title", t => {
+        markWanted(t, true);
         stopAmbienceSynth(); stopEndingSynth();
         try { t.audio.currentTime = 0; } catch (_) {}
         t.audio.volume = 0;
@@ -5545,7 +5610,8 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     },
     stopTitle(fadeMs = 1200) {
       const t = tracks.title;
-      if (t && t.ok && t.audio && !t.audio.paused) {
+      markWanted(t, false);
+      if (t && t.audio && !t.audio.paused) {
         fadeHtmlAudio(t.audio, 0, fadeMs);
       }
       stopTitleSynth();
@@ -5555,6 +5621,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     playAmbience() {
       unlock();
       withTrack("ambience", t => {
+        markWanted(t, true);
         stopTitleSynth(); stopEndingSynth();
         try { t.audio.currentTime = 0; } catch (_) {}
         t.audio.volume = 0;
@@ -5564,7 +5631,8 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     },
     stopAmbience(fadeMs = 1200) {
       const t = tracks.ambience;
-      if (t && t.ok && t.audio && !t.audio.paused) {
+      markWanted(t, false);
+      if (t && t.audio && !t.audio.paused) {
         fadeHtmlAudio(t.audio, 0, fadeMs);
       }
       stopAmbienceSynth();
@@ -5575,6 +5643,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
       unlock();
       const key = variant || (["thunder1","thunder2","thunder3"][Math.floor(Math.random()*3)]);
       withTrack(key, t => {
+        markWanted(t, true);
         try { t.audio.currentTime = 0; } catch (_) {}
         t.audio.loop = false;
         t.audio.volume = 0.9;
@@ -5586,6 +5655,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     playEAS() {
       unlock();
       withTrack("eas", t => {
+        markWanted(t, true);
         try { t.audio.currentTime = 0; } catch (_) {}
         t.audio.loop = true; // loop the klaxon until stopped
         t.audio.volume = 0.7;
@@ -5594,7 +5664,8 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     },
     stopEAS(fadeMs = 800) {
       const t = tracks.eas;
-      if (t && t.ok && t.audio && !t.audio.paused) {
+      markWanted(t, false);
+      if (t && t.audio && !t.audio.paused) {
         fadeHtmlAudio(t.audio, 0, fadeMs);
       }
       stopEASSynth();
@@ -5604,6 +5675,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     playEnding() {
       unlock();
       withTrack("ending", t => {
+        markWanted(t, true);
         stopAmbienceSynth(); stopTitleSynth();
         try { t.audio.currentTime = 0; } catch (_) {}
         t.audio.volume = 0;
@@ -5613,7 +5685,8 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     },
     stopEnding(fadeMs = 1500) {
       const t = tracks.ending;
-      if (t && t.ok && t.audio && !t.audio.paused) {
+      markWanted(t, false);
+      if (t && t.audio && !t.audio.paused) {
         fadeHtmlAudio(t.audio, 0, fadeMs);
       }
       stopEndingSynth();
@@ -5621,7 +5694,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
 
     // Hard-stop everything (pagehide / replay)
     stopAll() {
-      Object.values(tracks).forEach(t => { if (t && t.audio) stopHtmlAudio(t.audio); });
+      Object.values(tracks).forEach(t => { if (t && t.audio) { markWanted(t, false); stopHtmlAudio(t.audio); } });
       stopTitleSynth(); stopAmbienceSynth(); stopEndingSynth(); stopEASSynth();
     },
 
@@ -5630,7 +5703,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
       const result = {};
       for (const k of Object.keys(FILES)) {
         const t = tracks[k];
-        result[k] = { filename: FILES[k], ok: t ? t.ok : false, tried: t ? t.tried : false };
+        result[k] = { filename: FILES[k], url: t ? t.url : new URL(FILES[k], document.baseURI).href, ok: t ? t.ok : false, pending: t ? Boolean(t.pending) : true, tried: t ? t.tried : false };
       }
       return result;
     }
@@ -6386,6 +6459,32 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
   let eventScheduler = null;
   let eyeVisibilityTimeout = null;
   let figureVisibilityTimeout = null;
+  let visitCount = 0;
+  let anomalyTimer = null;
+  const anomalyClasses = ["psych-peek","psych-crawl","psych-door","psych-near","psych-empty","psych-look","psych-pulse"];
+
+  function prepareUnobservedHallway() {
+    visitCount++;
+    corridor.classList.remove(...anomalyClasses);
+    corridor.style.setProperty("--watch-x", `${10 + Math.random()*28}%`);
+    corridor.style.setProperty("--watch-y", `${22 + Math.random()*28}%`);
+    corridor.classList.add("psych-look", "psych-pulse");
+
+    // The hall does not change every time, and events are never guaranteed.
+    // This uncertainty is what makes turning away uncomfortable.
+    const roll = Math.random();
+    if (visitCount > 1 && roll < .18) corridor.classList.add("psych-empty");
+    else if (visitCount > 2 && roll < .36) corridor.classList.add("psych-near");
+    else if (roll < .56) corridor.classList.add("psych-peek");
+    else if (visitCount > 1 && roll < .72) corridor.classList.add("psych-crawl");
+    else if (roll < .88) corridor.classList.add("psych-door");
+
+    // A restrained low pressure tone marks some turns without a sting or
+    // jumpscare. It uses the already-unlocked Web Audio path.
+    if (visitCount > 1 && Math.random() < .42) {
+      try { window.LASTSEEN?.playTone?.(42 + Math.random()*13, .75, .009, "sine"); } catch (_) {}
+    }
+  }
 
   // ---------- Toggle ----------
   function turnTo(target) {
@@ -6399,7 +6498,12 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
 
     transitioning = true;
     active = target;
+    corridor.classList.remove("is-turning");
+    void corridor.offsetWidth;
+    corridor.classList.add("is-turning");
+    window.setTimeout(() => corridor.classList.remove("is-turning"), reducedMotion ? 220 : 850);
     if (active) {
+      prepareUnobservedHallway();
       corridor.classList.add("is-active");
       corridor.setAttribute("aria-hidden", "false");
       document.body.classList.add("ls-corridor-active");
@@ -7133,5 +7237,5 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
 })();
 
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2d530492f6ce8a8',t:'MTc4NzEwMDg4Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2d558a85bcc5112',t:'MTc4NzEwMjUzNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
