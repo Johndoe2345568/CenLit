@@ -2734,6 +2734,17 @@ body.ls-corridor-active #ls-inbox-takeover.is-active {
 body.tape-modal-open #ls-overlays { z-index: 100 !important; }
 body.tape-modal-open main.scene { z-index: 200 !important; }
 body.tape-modal-open .cassette-player { z-index: 1200 !important; }
+/* The subtitle deck is a sibling of the cassette modal. It must sit above
+   the modal's dark backdrop instead of being hidden behind it. */
+body.tape-modal-open .global-subtitles {
+  z-index: 1300 !important;
+  display: block !important;
+}
+body.tape-modal-open .global-subtitles.is-visible {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translate(-50%, 0) !important;
+}
 
 /* EAS, notification, and Inbox surfaces use the vintage LCD rather than a
    neon modern warning card. */
@@ -5212,7 +5223,9 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
 (function () {
   "use strict";
 
-  // The single-file GitHub build keeps the seven MP3 files beside index.html.
+  // GitHub Pages serves every MP3 directly beside index.html. Resolve against
+  // document.baseURI so project-site paths (user.github.io/repository/) work
+  // correctly without accidentally requesting audio from the domain root.
   const AUDIO_DIR = "";
   const FILES = {
     title: "ambiencetitlle.mp3",        // exact spelling preserved
@@ -5266,7 +5279,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
   // to { audio: HTMLAudioElement|null, ok: bool }.
   function loadFile(key, filename) {
     return new Promise(resolve => {
-      const url = AUDIO_DIR + filename;
+      const url = new URL(AUDIO_DIR + filename, document.baseURI).href;
       const audio = new Audio();
       audio.preload = "auto";
       audio.playsInline = true;
@@ -7120,5 +7133,5 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
 })();
 
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2d524009f9852ba',t:'MTc4NzEwMDM4MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2d530492f6ce8a8',t:'MTc4NzEwMDg4Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
