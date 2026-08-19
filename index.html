@@ -2856,6 +2856,105 @@ body.tape-modal-open .cassette-player { z-index: 1200 !important; }
   #ls-credit-card.is-active { animation: none; }
 }
 
+/* -------------------------------------------------------------------------
+   2026 EXPERIENCE REVISION: controls, hallway, turn, and mobile UI
+   ------------------------------------------------------------------------- */
+#ls-controls-page {
+  position:absolute;
+  inset:0;
+  z-index:8;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:
+    radial-gradient(ellipse at 50% 48%,rgba(72,65,49,.18),transparent 48%),
+    linear-gradient(rgba(0,0,0,.82),rgba(0,0,0,.96));
+}
+#ls-controls-page.is-visible { display:flex; animation:lsControlsIn 1s ease both; }
+#ls-controls-page [hidden] { display:none !important; }
+.ls-controls-card {
+  width:min(620px,92vw);
+  padding:clamp(26px,6vw,58px);
+  border:1px solid rgba(211,198,164,.25);
+  color:#ddd4c0;
+  background:rgba(8,8,7,.84);
+  box-shadow:0 0 80px rgba(115,91,52,.1),inset 0 0 50px rgba(255,230,170,.025);
+  text-align:center;
+  font-family:"Courier New",monospace;
+}
+.ls-controls-card h2 { margin:0 0 32px;font:400 clamp(24px,5vw,38px) "Times New Roman",serif;letter-spacing:.28em;text-indent:.28em; }
+.ls-control-row { display:grid;grid-template-columns:80px 1fr;gap:20px;align-items:center;margin:18px 0;text-align:left; }
+.ls-control-key { display:grid;place-items:center;height:58px;border:1px solid #8d846e;background:#11110f;color:#fff;font-size:25px;box-shadow:inset 0 0 16px #000,0 0 16px rgba(215,195,145,.08); }
+.ls-control-row b { display:block;font-size:14px;letter-spacing:.14em;color:#f2ead7; }
+.ls-control-row small { display:block;margin-top:5px;color:#847e70;font-size:10px;line-height:1.5; }
+#ls-controls-continue { margin-top:30px;padding:12px 25px;border:1px solid #736c5c;color:#cfc5ae;background:transparent;font:700 11px "Courier New",monospace;letter-spacing:.16em;cursor:pointer; }
+#ls-controls-continue:hover,#ls-controls-continue:focus-visible { color:#fff;border-color:#d3c7aa;box-shadow:0 0 24px rgba(211,199,170,.12);outline:none; }
+@keyframes lsControlsIn { from{opacity:0;filter:blur(7px)} to{opacity:1;filter:blur(0)} }
+
+/* A legible, decayed hallway with depth even when the flashlight is off. */
+#ls-corridor {
+  background:#030506 !important;
+  transform:perspective(1100px) rotateY(-17deg) translateX(-24%) scale(1.035);
+  transform-origin:0 50%;
+  filter:blur(5px) brightness(.45);
+  transition:opacity .68s ease,transform .78s cubic-bezier(.18,.78,.2,1),filter .68s ease,visibility 0s linear .78s !important;
+}
+#ls-corridor.is-active {
+  transform:perspective(1100px) rotateY(0) translateX(0) scale(1);
+  filter:blur(0) brightness(1);
+  transition:opacity .68s ease,transform .78s cubic-bezier(.18,.78,.2,1),filter .68s ease,visibility 0s !important;
+}
+body.ls-corridor-active main.scene {
+  transform:perspective(1100px) rotateY(12deg) translateX(24%) scale(.96);
+  transform-origin:100% 50%;
+  filter:brightness(.3) blur(3px) !important;
+  transition:transform .78s cubic-bezier(.18,.78,.2,1),filter .68s ease !important;
+}
+body:not(.ls-corridor-active) main.scene { transform:perspective(1100px) rotateY(0) translateX(0);transition:transform .78s cubic-bezier(.18,.78,.2,1),filter .68s ease; }
+#ls-corridor::before {
+  content:"";position:absolute;inset:0;z-index:20;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 45%,transparent 0 18%,rgba(0,0,0,.22) 46%,rgba(0,0,0,.78) 100%),linear-gradient(90deg,rgba(0,0,0,.52),transparent 22% 74%,rgba(0,0,0,.72));
+}
+#ls-corridor::after { content:"";position:absolute;inset:-10%;z-index:21;pointer-events:none;opacity:.12;background:repeating-radial-gradient(circle at 30% 40%,#fff 0 1px,transparent 1px 5px);background-size:11px 13px;animation:grainShift 1.3s steps(2) infinite;mix-blend-mode:overlay; }
+#ls-corridor .ls-corridor-wall {
+  background:
+    linear-gradient(90deg,transparent 49.7%,rgba(133,145,139,.05) 50%,transparent 50.3%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 2px,transparent 2px 86px),
+    repeating-linear-gradient(0deg,transparent 0 75px,rgba(0,0,0,.34) 76px 78px),
+    radial-gradient(ellipse at 50% 38%,#172023 0,#0b1113 25%,#050809 63%,#020303 100%) !important;
+  clip-path:polygon(0 0,100% 0,75% 100%,25% 100%);
+}
+#ls-corridor .ls-corridor-floor { height:44% !important;opacity:1;background:repeating-linear-gradient(90deg,rgba(89,96,90,.08) 0 2px,transparent 2px 100px),repeating-linear-gradient(0deg,rgba(75,82,78,.08) 0 2px,transparent 2px 74px),linear-gradient(#0b0f10,#020303) !important; }
+.ls-hall-ceiling { position:absolute;left:18%;right:18%;top:0;height:30%;clip-path:polygon(0 0,100% 0,73% 100%,27% 100%);background:repeating-linear-gradient(90deg,#0d1112 0 2px,transparent 2px 120px),linear-gradient(#050707,#111617);box-shadow:0 18px 40px #000; }
+.ls-hall-door { position:absolute;top:19%;width:16%;height:53%;border:7px solid #080a0a;background:repeating-linear-gradient(90deg,#111615 0 22px,#0b0e0e 23px 25px);box-shadow:inset 0 0 35px #000,12px 18px 28px #000; }
+.ls-hall-door.left { left:7%;transform:skewY(5deg); }.ls-hall-door.right{right:7%;transform:skewY(-5deg)}
+.ls-hall-door::after{content:"";position:absolute;top:50%;width:8px;height:8px;border-radius:50%;background:#756b4d;box-shadow:0 0 8px #000}.ls-hall-door.left::after{right:12px}.ls-hall-door.right::after{left:12px}
+.ls-hall-pipes { position:absolute;left:5%;top:8%;width:6px;height:70%;background:#151d1c;box-shadow:14px 0 0 #0b1111,17px 0 0 #1b2422,0 0 10px #000;transform:rotate(-1deg); }
+.ls-hall-stain { position:absolute;left:34%;top:20%;width:32%;height:38%;opacity:.34;background:radial-gradient(ellipse at 40% 20%,#261d18,transparent 35%),radial-gradient(ellipse at 70% 65%,#15120f,transparent 40%);filter:blur(7px); }
+.ls-hall-end { position:absolute;left:43%;top:24%;width:14%;height:39%;border:4px solid #060707;background:linear-gradient(#020303,#000);box-shadow:0 0 60px 30px rgba(0,0,0,.72),inset 0 0 22px #000; }
+.ls-hall-lamp { position:absolute;left:49%;top:8%;width:2%;height:12%;background:#0b0d0d;box-shadow:0 0 0 3px #030404; }
+.ls-hall-lamp::after{content:"";position:absolute;left:50%;bottom:-8px;width:34px;height:10px;transform:translateX(-50%);background:#43504c;border-radius:50%;opacity:.35;box-shadow:0 0 18px rgba(165,190,175,.18),0 20px 75px rgba(115,144,130,.1)}
+.ls-static-eyes { position:absolute;z-index:9;width:34px;height:7px;opacity:.52;filter:drop-shadow(0 0 5px rgba(207,62,44,.45)); }
+.ls-static-eyes::before,.ls-static-eyes::after{content:"";position:absolute;top:0;width:6px;height:4px;border-radius:50%;background:#a84235;box-shadow:0 0 6px #7b1c18}.ls-static-eyes::before{left:3px}.ls-static-eyes::after{right:3px}
+.ls-static-eyes.e1{left:16%;top:35%;transform:rotate(4deg)}.ls-static-eyes.e2{right:18%;top:27%;transform:scale(.7) rotate(-7deg);opacity:.35}.ls-static-eyes.e3{left:47%;top:32%;transform:scale(.48);opacity:.28}
+#ls-corridor .ls-corridor-eyes { display:block;top:29%;left:29%;width:74px;height:24px;opacity:.38;filter:none;background:radial-gradient(ellipse at 25% 50%,#d55842 0 3px,transparent 5px),radial-gradient(ellipse at 75% 50%,#d55842 0 3px,transparent 5px);box-shadow:0 0 20px rgba(140,34,28,.12); }
+#ls-corridor .ls-corridor-eyes img{display:none}.ls-corridor-eyes.is-visible{opacity:.72 !important}
+#ls-corridor .ls-corridor-figure { z-index:10;bottom:17%;right:26%;width:74px;height:245px;opacity:.43;filter:blur(1.4px);background:radial-gradient(circle at 50% 13%,#000 0 20px,transparent 21px),linear-gradient(90deg,transparent 8%,#000 26% 74%,transparent 92%);clip-path:polygon(35% 0,65% 0,78% 15%,76% 52%,100% 100%,60% 100%,51% 58%,43% 100%,0 100%,25% 52%,22% 16%);transition:opacity .3s,filter .3s,transform .9s cubic-bezier(.2,.8,.2,1); }
+#ls-corridor .ls-corridor-figure.is-visible{opacity:.48;transform:none}
+body.ls-flashlight-on #ls-corridor .ls-corridor-figure.is-visible{opacity:.48;transform:none}
+body.ls-corridor-figure-lit #ls-corridor .ls-corridor-figure{opacity:.58;filter:brightness(1.5) blur(.4px);transform:translateX(58vw) skewX(-11deg);}
+/* CSS fallback keeps the ending figure visible even when the optional SVG
+   file is unavailable on a single-file/mobile deployment. */
+#ls-man-silhouette::before{content:"";position:absolute;left:50%;bottom:0;width:min(260px,48vw);height:91vh;transform:translateX(-50%);background:radial-gradient(circle at 50% 12%,#000 0 10%,transparent 10.5%),linear-gradient(90deg,transparent 8%,#000 26% 74%,transparent 92%);clip-path:polygon(39% 0,61% 0,72% 16%,78% 53%,100% 100%,61% 100%,53% 56%,45% 100%,0 100%,24% 53%,28% 16%);filter:drop-shadow(0 0 35px #000)}
+
+#ls-mobile-controls { z-index:87 !important;inset:auto 0 0 !important;height:100px;display:none;align-items:center;justify-content:center;gap:14px;padding:14px 16px 20px;background:linear-gradient(transparent,rgba(0,0,0,.82)); }
+body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacity:1;visibility:visible;pointer-events:none; }
+#ls-mobile-controls button{pointer-events:auto;min-width:136px;min-height:54px;border:1px solid rgba(205,215,204,.38);border-radius:7px;color:#e7eee7;background:rgba(10,16,15,.88);box-shadow:inset 0 0 18px rgba(150,180,160,.06),0 8px 24px #000;font:800 11px "Courier New",monospace;letter-spacing:.08em;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#ls-mobile-controls button:active{transform:translateY(2px);background:#26312e}
+@media (max-width:650px){.ls-control-row{grid-template-columns:62px 1fr}.ls-control-key{height:50px}.ls-controls-card{padding:24px 20px}.ls-controls-card h2{margin-bottom:22px}body.ls-mobile.ls-state-main main.scene{padding-bottom:150px}.ls-static-eyes.e1{left:11%}.ls-static-eyes.e2{right:9%}}
+@media (prefers-reduced-motion:reduce){#ls-corridor,#ls-corridor.is-active,body.ls-corridor-active main.scene{transition-duration:.2s !important}.ls-controls-page.is-visible{animation:none}}
+
   </style>
   <style id="ls-critical-boot">
     html, body { background: #000 !important; }
@@ -3054,6 +3153,16 @@ body.tape-modal-open .cassette-player { z-index: 1200 !important; }
     <div id="ls-opening" aria-hidden="true">
       <div id="ls-candle-glow" aria-hidden="true"></div>
       <div id="ls-opening-text"></div>
+      <section id="ls-controls-page" aria-label="Game controls" aria-hidden="true">
+        <div class="ls-controls-card">
+          <h2>CONTROLS</h2>
+          <div class="ls-control-row" data-desktop-control><span class="ls-control-key">F</span><span><b>FLASHLIGHT</b><small>Toggle your flashlight. Aim with the pointer.</small></span></div>
+          <div class="ls-control-row" data-desktop-control><span class="ls-control-key">Z</span><span><b>TURN AROUND</b><small>Look into the hallway, or turn back to the phone.</small></span></div>
+          <div class="ls-control-row" data-mobile-control hidden><span class="ls-control-key">☼</span><span><b>FLASHLIGHT</b><small>Tap the flashlight button, then drag to aim.</small></span></div>
+          <div class="ls-control-row" data-mobile-control hidden><span class="ls-control-key">↶</span><span><b>TURN AROUND</b><small>Tap TURN to face the hallway or the phone.</small></span></div>
+          <button id="ls-controls-continue" type="button">I UNDERSTAND</button>
+        </div>
+      </section>
     </div>
 
     <!-- Flashlight (cursor-following, F to toggle) -->
@@ -3062,13 +3171,22 @@ body.tape-modal-open .cassette-player { z-index: 1200 !important; }
     <!-- Corridor view (Z to toggle) -->
     <div id="ls-corridor" aria-hidden="true">
       <div class="ls-corridor-wall"></div>
+      <div class="ls-hall-ceiling" aria-hidden="true"></div>
+      <div class="ls-hall-door left" aria-hidden="true"></div><div class="ls-hall-door right" aria-hidden="true"></div>
+      <div class="ls-hall-pipes" aria-hidden="true"></div><div class="ls-hall-stain" aria-hidden="true"></div>
+      <div class="ls-hall-end" aria-hidden="true"></div><div class="ls-hall-lamp" aria-hidden="true"></div>
+      <i class="ls-static-eyes e1" aria-hidden="true"></i><i class="ls-static-eyes e2" aria-hidden="true"></i><i class="ls-static-eyes e3" aria-hidden="true"></i>
       <div class="ls-corridor-floor"></div>
       <div class="ls-corridor-window-shadow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       <div class="ls-corridor-storm-flash" aria-hidden="true"></div>
-      <div class="ls-corridor-eyes" aria-hidden="true">
-        <img src="eyes.svg" alt="" />
-      </div>
-      <div class="ls-corridor-figure" aria-hidden="true"></div>
+      <div class="ls-corridor-eyes" aria-hidden="true"></div>
+      <div class="ls-corridor-figure is-visible" aria-hidden="true"></div>
+    </div>
+
+    <!-- Mobile-only controls; activated automatically for touch/mobile platforms. -->
+    <div id="ls-mobile-controls" aria-label="Mobile game controls" aria-hidden="true">
+      <button id="ls-mobile-flashlight" type="button" aria-pressed="false">☼ FLASHLIGHT</button>
+      <button id="ls-mobile-turn" type="button" aria-pressed="false">↶ TURN</button>
     </div>
 
     <!-- EAS alert (Philippine-style fictional emergency alert) -->
@@ -5135,8 +5253,9 @@ body.tape-modal-open .cassette-player { z-index: 1200 !important; }
   }
 
   function unlock() {
-    if (unlocked) return;
     ensureContext();
+    // Resume on every real gesture, not only the first one. Mobile browsers
+    // may suspend an AudioContext after a tab switch, screen lock, or call.
     if (audioCtx && audioCtx.state === "suspended") {
       audioCtx.resume().catch(() => {});
     }
@@ -5150,6 +5269,9 @@ body.tape-modal-open .cassette-player { z-index: 1200 !important; }
       const url = AUDIO_DIR + filename;
       const audio = new Audio();
       audio.preload = "auto";
+      audio.playsInline = true;
+      audio.setAttribute("playsinline", "");
+      audio.setAttribute("webkit-playsinline", "");
       audio.src = url;
       audio.loop = true; // ambience tracks loop by default; EAS may be one-shot
       audio.load();
@@ -5527,11 +5649,18 @@ body.tape-modal-open .cassette-player { z-index: 1200 !important; }
   // Unlock on first user gesture
   const unlockOnce = () => {
     unlock();
-    document.removeEventListener("pointerdown", unlockOnce);
-    document.removeEventListener("keydown", unlockOnce);
+    document.removeEventListener("pointerdown", unlockOnce, true);
+    document.removeEventListener("touchstart", unlockOnce, true);
+    document.removeEventListener("click", unlockOnce, true);
+    document.removeEventListener("keydown", unlockOnce, true);
   };
-  document.addEventListener("pointerdown", unlockOnce);
-  document.addEventListener("keydown", unlockOnce);
+  document.addEventListener("pointerdown", unlockOnce, { capture:true });
+  document.addEventListener("touchstart", unlockOnce, { capture:true, passive:true });
+  document.addEventListener("click", unlockOnce, { capture:true });
+  document.addEventListener("keydown", unlockOnce, { capture:true });
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && audioCtx && audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
+  });
 
   // Stop everything on pagehide
   window.addEventListener("pagehide", () => api.stopAll(), { once: true });
@@ -5803,6 +5932,8 @@ body.tape-modal-open .cassette-player { z-index: 1200 !important; }
   const openingText = document.getElementById("ls-opening-text");
   const candleGlow = document.getElementById("ls-candle-glow");
   const fadeEl = document.getElementById("ls-fade");
+  const controlsPage = document.getElementById("ls-controls-page");
+  const controlsContinue = document.getElementById("ls-controls-continue");
 
   if (!titleScreen || !playBtn || !opening || !openingText) return;
 
@@ -5922,6 +6053,35 @@ body.tape-modal-open .cassette-player { z-index: 1200 !important; }
         min: reducedMotion ? 1800 : 3800,
         max: reducedMotion ? 3600 : 8000
       });
+    }
+
+    // A dedicated controls page is the final opening beat, immediately before
+    // the fade into gameplay. It also provides a fresh user gesture that keeps
+    // audio unlocked on stricter mobile browsers.
+    if (controlsPage && controlsContinue) {
+      controlsPage.classList.add("is-visible");
+      controlsPage.setAttribute("aria-hidden", "false");
+      controlsContinue.focus({ preventScroll:true });
+      await new Promise(resolve => {
+        let done = false;
+        const finish = () => {
+          if (done) return;
+          done = true;
+          controlsContinue.removeEventListener("click", finish);
+          document.removeEventListener("keydown", onControlKey, true);
+          try { window.LS_AUDIO.unlock(); } catch (_) {}
+          resolve();
+        };
+        const onControlKey = event => {
+          if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+            event.preventDefault(); finish();
+          }
+        };
+        controlsContinue.addEventListener("click", finish);
+        document.addEventListener("keydown", onControlKey, true);
+      });
+      controlsPage.classList.remove("is-visible");
+      controlsPage.setAttribute("aria-hidden", "true");
     }
 
     // Fade to black, then transition into main scene with no hard cut.
@@ -6240,7 +6400,8 @@ body.tape-modal-open .cassette-player { z-index: 1200 !important; }
       stopEventScheduler();
       // Force hide any active events
       if (eyesEl) eyesEl.classList.remove("is-visible");
-      if (figureEl) figureEl.classList.remove("is-visible");
+      if (figureEl) figureEl.classList.add("is-visible");
+      document.body.classList.remove("ls-corridor-figure-lit");
     }
     // Wait for the CSS transition to settle
     setTimeout(() => { transitioning = false; }, reducedMotion ? 200 : 800);
@@ -6350,7 +6511,7 @@ body.tape-modal-open .cassette-player { z-index: 1200 !important; }
   function checkEyesIllumination() {
     if (!active || !eyesEl) return;
     if (!window.LS_FLASHLIGHT || !window.LS_FLASHLIGHT.isOn()) {
-      document.body.classList.remove("ls-corridor-eyes-lit");
+      document.body.classList.remove("ls-corridor-eyes-lit", "ls-corridor-figure-lit");
       return;
     }
     const pos = window.LS_FLASHLIGHT.getPosition();
@@ -6365,6 +6526,20 @@ body.tape-modal-open .cassette-player { z-index: 1200 !important; }
       document.body.classList.add("ls-corridor-eyes-lit");
     } else {
       document.body.classList.remove("ls-corridor-eyes-lit");
+    }
+    if (figureEl) {
+      const fr = figureEl.getBoundingClientRect();
+      const fdist = Math.hypot(pos.x - (fr.left + fr.width/2), pos.y - (fr.top + fr.height/2));
+      if (fdist < pos.radius * 1.18 && !document.body.classList.contains("ls-corridor-figure-lit")) {
+        document.body.classList.add("ls-corridor-figure-lit");
+        window.setTimeout(() => {
+          document.body.classList.remove("ls-corridor-figure-lit");
+          if (figureEl) {
+            figureEl.style.opacity = "0";
+            window.setTimeout(() => { figureEl.style.opacity = ""; }, 5500 + Math.random()*3500);
+          }
+        }, 1050);
+      }
     }
   }
 
@@ -6840,9 +7015,9 @@ body.tape-modal-open .cassette-player { z-index: 1200 !important; }
   notification.addEventListener("keydown", onNotificationKey);
 
   document.addEventListener("ls:triggerNotification", showNotification);
-  document.addEventListener("ls:triggerEndingSequence", () => {
-    if (messageOpened && !endingStarted) later(revealMan, 10000);
-  });
+  // The ending is armed when the message is opened, but the silhouette is
+  // never allowed to appear while the player is still facing the phone.
+  document.addEventListener("ls:triggerEndingSequence", () => {});
 
   // If a legacy phone reader opens the message through the underlying archive,
   // retain the same ending gate but keep the visible message pixel-styled.
@@ -6851,8 +7026,8 @@ body.tape-modal-open .cassette-player { z-index: 1200 !important; }
     messageOpened = true;
     hideNotification();
     setFlag("naditoOpened", true);
-    // The ten-second reveal starts from the actual Inbox message-open event.
-    later(revealMan, 10000);
+    // No elapsed-time reveal: wait until the player deliberately turns to
+    // the hallway. This preserves the phone view and makes the turn causal.
   });
 
   // Never leave a phone-only takeover floating over the hallway. Queue it and
@@ -6862,6 +7037,7 @@ body.tape-modal-open .cassette-player { z-index: 1200 !important; }
     if (event.detail.value) {
       if (notificationOpen) hideNotification(true);
       if (messageVisible) hideInboxMessage();
+      if (messageOpened && !endingStarted) later(revealMan, 520);
     } else {
       if (notificationPending && !messageOpened) showNotification();
       if (messageOpened && !endingStarted) showInboxMessage();
@@ -6901,6 +7077,48 @@ body.tape-modal-open .cassette-player { z-index: 1200 !important; }
   };
 })();
 
+/* Mobile platform adaptation: explicit, thumb-sized controls replace hidden
+   multi-touch gestures. Pointer dragging still aims an enabled flashlight. */
+(function(){
+  "use strict";
+  const coarse = window.matchMedia?.("(pointer: coarse)")?.matches;
+  const mobileUA = /Android|iPhone|iPad|iPod|Mobile|Silk|Kindle/i.test(navigator.userAgent || "");
+  const mobile = Boolean(coarse || mobileUA || Math.min(screen.width,screen.height) < 760);
+  if (!mobile) return;
+  document.body.classList.add("ls-mobile");
+  document.querySelectorAll("[data-desktop-control]").forEach(el => el.hidden = true);
+  document.querySelectorAll("[data-mobile-control]").forEach(el => el.hidden = false);
+  const tray = document.getElementById("ls-mobile-controls");
+  const flash = document.getElementById("ls-mobile-flashlight");
+  const turn = document.getElementById("ls-mobile-turn");
+  if (!tray || !flash || !turn) return;
+  const sync = () => {
+    const main = window.LS_NARRATIVE?.getState?.() === "main";
+    tray.classList.toggle("is-active", main);
+    tray.setAttribute("aria-hidden", String(!main));
+    const lightOn = Boolean(window.LS_FLASHLIGHT?.isOn?.());
+    const turned = Boolean(window.LS_CORRIDOR?.isActive?.());
+    flash.setAttribute("aria-pressed", String(lightOn));
+    turn.setAttribute("aria-pressed", String(turned));
+    flash.textContent = lightOn ? "☼ LIGHT OFF" : "☼ FLASHLIGHT";
+    turn.textContent = turned ? "↶ FACE PHONE" : "↶ TURN";
+  };
+  flash.addEventListener("click", event => {
+    event.preventDefault();
+    try { window.LS_AUDIO?.unlock?.(); window.LS_FLASHLIGHT?.toggle?.(); } catch (_) {}
+    sync();
+  });
+  turn.addEventListener("click", event => {
+    event.preventDefault();
+    try { window.LS_AUDIO?.unlock?.(); window.LS_CORRIDOR?.turnTo?.(!window.LS_CORRIDOR.isActive()); } catch (_) {}
+    window.setTimeout(sync,30);
+  });
+  document.addEventListener("ls:narrativeState", sync);
+  document.addEventListener("ls:flagChange", sync);
+  window.addEventListener("orientationchange", () => window.setTimeout(sync,200));
+  sync();
+})();
+
   </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2d524009f9852ba',t:'MTc4NzEwMDM4MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
