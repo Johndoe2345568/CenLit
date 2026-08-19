@@ -4,6 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#19130f">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <!-- LAST SEEN BUILD: 2026-08-19-EYES-ONEPAIR-LIGHTNING-CLEANUP -->
   <title>LAST SEEN: The Final Voice Message</title>
 
   <!--
@@ -2023,61 +2027,6 @@ body.ls-flashlight-on #ls-flashlight::after {
   100% { opacity: 0; }
 }
 
-/* Eyes (image-based). Hidden by default; surfaced via JS with bounded cooldown. */
-#ls-corridor .ls-corridor-eyes {
-  position: absolute;
-  top: 30%;
-  left: 8%;
-  width: 24%;
-  max-width: 220px;
-  opacity: 0;
-  filter: blur(2px) brightness(0.7);
-  transition: opacity 1200ms ease, filter 1200ms ease, transform 1200ms ease;
-  transform: translateY(8px);
-}
-#ls-corridor .ls-corridor-eyes img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-#ls-corridor .ls-corridor-eyes.is-visible {
-  opacity: 0.78;
-  filter: blur(0.6px) brightness(0.85);
-  transform: translateY(0);
-}
-/* When the flashlight is on AND pointing at the eyes, they retreat/close. */
-body.ls-flashlight-on.ls-corridor-eyes-lit #ls-corridor .ls-corridor-eyes.is-visible {
-  opacity: 0.06;
-  filter: blur(8px) brightness(0.4);
-  transform: translateY(-6px) scale(0.96);
-}
-
-/* Distant shadow figure (a shape that vanishes under the flashlight). */
-#ls-corridor .ls-corridor-figure {
-  position: absolute;
-  bottom: 18%;
-  right: 16%;
-  width: 90px;
-  height: 220px;
-  background: radial-gradient(ellipse 50% 60% at 50% 50%,
-    rgba(0, 0, 0, 0.7) 0%,
-    rgba(0, 0, 0, 0.4) 50%,
-    transparent 100%
-  );
-  opacity: 0;
-  filter: blur(3px);
-  transition: opacity 900ms ease, transform 1400ms ease;
-  transform: translateX(0);
-}
-#ls-corridor .ls-corridor-figure.is-visible {
-  opacity: 0.5;
-  transform: translateX(-12px);
-}
-body.ls-flashlight-on #ls-corridor .ls-corridor-figure.is-visible {
-  opacity: 0;
-  transform: translateX(40px);
-}
-
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   #ls-corridor .ls-corridor-window-shadow { animation: none !important; }
@@ -2944,23 +2893,23 @@ body:not(.ls-corridor-active) main.scene { transform:perspective(1100px) rotateY
 .ls-hall-pipes { position:absolute;left:5%;top:8%;width:6px;height:70%;background:#151d1c;box-shadow:14px 0 0 #0b1111,17px 0 0 #1b2422,0 0 10px #000;transform:rotate(-1deg); }
 .ls-hall-stain { position:absolute;left:34%;top:20%;width:32%;height:38%;opacity:.34;background:radial-gradient(ellipse at 40% 20%,#261d18,transparent 35%),radial-gradient(ellipse at 70% 65%,#15120f,transparent 40%);filter:blur(7px); }
 .ls-hall-end { position:absolute;left:43%;top:24%;width:14%;height:39%;border:4px solid #060707;background:linear-gradient(#020303,#000);box-shadow:0 0 60px 30px rgba(0,0,0,.72),inset 0 0 22px #000; }
-.ls-hall-lamp { position:absolute;left:49%;top:8%;width:2%;height:12%;background:#0b0d0d;box-shadow:0 0 0 3px #030404; }
-.ls-hall-lamp::after{content:"";position:absolute;left:50%;bottom:-8px;width:34px;height:10px;transform:translateX(-50%);background:#43504c;border-radius:50%;opacity:.35;box-shadow:0 0 18px rgba(165,190,175,.18),0 20px 75px rgba(115,144,130,.1)}
-.ls-static-eyes { position:absolute;z-index:9;width:34px;height:7px;opacity:.52;filter:drop-shadow(0 0 5px rgba(207,62,44,.45)); }
-.ls-static-eyes::before,.ls-static-eyes::after{content:"";position:absolute;top:0;width:6px;height:4px;border-radius:50%;background:#a84235;box-shadow:0 0 6px #7b1c18}.ls-static-eyes::before{left:3px}.ls-static-eyes::after{right:3px}
-.ls-static-eyes.e1{left:16%;top:35%;transform:rotate(4deg)}.ls-static-eyes.e2{right:18%;top:27%;transform:scale(.7) rotate(-7deg);opacity:.35}.ls-static-eyes.e3{left:47%;top:32%;transform:scale(.48);opacity:.28}
-#ls-corridor .ls-corridor-eyes { display:block;top:29%;left:29%;width:74px;height:24px;opacity:.38;filter:none;background:radial-gradient(ellipse at 25% 50%,#d55842 0 3px,transparent 5px),radial-gradient(ellipse at 75% 50%,#d55842 0 3px,transparent 5px);box-shadow:0 0 20px rgba(140,34,28,.12); }
-#ls-corridor .ls-corridor-eyes img{display:none}.ls-corridor-eyes.is-visible{opacity:.72 !important}
-#ls-corridor .ls-corridor-figure { z-index:10;bottom:17%;right:26%;width:74px;height:245px;opacity:.43;filter:blur(1.4px);background:radial-gradient(circle at 50% 13%,#000 0 20px,transparent 21px),linear-gradient(90deg,transparent 8%,#000 26% 74%,transparent 92%);clip-path:polygon(35% 0,65% 0,78% 15%,76% 52%,100% 100%,60% 100%,51% 58%,43% 100%,0 100%,25% 52%,22% 16%);transition:opacity .3s,filter .3s,transform .9s cubic-bezier(.2,.8,.2,1); }
-#ls-corridor .ls-corridor-figure.is-visible{opacity:.48;transform:none}
-body.ls-flashlight-on #ls-corridor .ls-corridor-figure.is-visible{opacity:.48;transform:none}
-body.ls-corridor-figure-lit #ls-corridor .ls-corridor-figure{opacity:.58;filter:brightness(1.5) blur(.4px);transform:translateX(58vw) skewX(-11deg);}
+#ls-corridor .ls-corridor-eyes img{display:none}
+/* One possible red watcher, located inside the far doorway. It is invisible
+   unless the per-turn 25% roll adds psych-red-eyes. */
+#ls-corridor .ls-corridor-eyes{position:absolute;z-index:11;left:47.2%;top:37%;width:5.6%;height:18px;opacity:0 !important;transform:scale(.7);background:radial-gradient(ellipse at 27% 50%,#f03724 0 3px,transparent 5px),radial-gradient(ellipse at 73% 50%,#f03724 0 3px,transparent 5px);transition:opacity .7s,filter .35s,transform .7s}
+#ls-corridor.psych-red-eyes .ls-corridor-eyes{opacity:.92 !important;transform:scale(1);filter:drop-shadow(0 0 9px rgba(220,38,24,.9))}
+body.ls-corridor-eyes-lit #ls-corridor .ls-corridor-eyes{opacity:0 !important;filter:blur(8px);transform:scale(.45)}
+
+/* The silhouette is deliberately unmistakable when its independent 20% roll
+   succeeds: large, centered against the far doorway, and sharply rimmed. */
+#ls-corridor .ls-corridor-figure { z-index:10;bottom:11%;right:38%;width:150px;height:390px;opacity:0;filter:drop-shadow(0 0 3px rgba(190,212,201,.72)) drop-shadow(0 0 28px rgba(120,155,140,.3));background:radial-gradient(circle at 50% 13%,#000 0 25px,transparent 26px),linear-gradient(90deg,transparent 5%,#000 22% 78%,transparent 95%);clip-path:polygon(35% 0,65% 0,78% 15%,76% 52%,100% 100%,60% 100%,51% 58%,43% 100%,0 100%,25% 52%,22% 16%);transition:opacity .28s,filter .28s,transform .55s cubic-bezier(.2,.8,.2,1); }
+#ls-corridor.psych-silhouette .ls-corridor-figure.is-visible{opacity:.94;transform:none}
+body.ls-flashlight-on #ls-corridor.psych-silhouette .ls-corridor-figure.is-visible{opacity:.94}
+body.ls-corridor-figure-lit #ls-corridor .ls-corridor-figure{opacity:0 !important;filter:blur(9px);transform:translateX(22vw) scale(.72) !important;}
 
 /* Psychological hallway details change only while they are out of view. The
    player is encouraged to check behind them, but nothing steals control. */
 .ls-hall-fog{position:absolute;z-index:7;left:20%;right:20%;bottom:9%;height:34%;opacity:.22;background:radial-gradient(ellipse at 50% 80%,rgba(131,151,142,.22),transparent 60%);filter:blur(18px);animation:lsFogBreathe 9s ease-in-out infinite alternate;pointer-events:none}
-.ls-hall-scratches{position:absolute;z-index:8;left:10%;top:57%;color:#5d5148;opacity:.12;transform:rotate(-5deg);font:900 clamp(9px,1.3vw,16px)/1 "Courier New",monospace;letter-spacing:.15em;text-shadow:1px 0 #111,-1px 1px #000;filter:blur(.35px)}
-body.ls-flashlight-on .ls-hall-scratches{opacity:.46}
 .ls-hall-handprints{position:absolute;z-index:8;right:12%;top:42%;width:110px;height:150px;opacity:.14;transform:rotate(8deg)}
 .ls-hall-handprints i{position:absolute;width:24px;height:34px;border-radius:45% 45% 55% 55%;background:#382a25;box-shadow:-9px -18px 0 -7px #382a25,-3px -24px 0 -8px #382a25,4px -25px 0 -8px #382a25,11px -20px 0 -8px #382a25;filter:blur(1px)}
 .ls-hall-handprints i:nth-child(1){left:5px;top:25px}.ls-hall-handprints i:nth-child(2){right:4px;top:76px;transform:scale(.72) rotate(-18deg)}.ls-hall-handprints i:nth-child(3){left:28px;bottom:0;transform:scale(.48) rotate(24deg)}
@@ -2973,29 +2922,30 @@ body.ls-flashlight-on #ls-corridor.psych-peek .ls-hall-peeker{opacity:.36}
 #ls-corridor.psych-door .ls-hall-door.right{transform:skewY(-5deg) perspective(500px) rotateY(-22deg);transform-origin:right;box-shadow:inset 28px 0 35px #000,-18px 15px 38px #000}
 #ls-corridor.psych-near .ls-corridor-figure{right:17%;bottom:10%;width:105px;height:330px;opacity:.52}
 #ls-corridor.psych-empty .ls-corridor-figure{opacity:0 !important}
-#ls-corridor.psych-empty .ls-static-eyes.e3{opacity:.62;transform:scale(.8)}
-#ls-corridor.psych-look .ls-static-eyes.e1{left:var(--watch-x,16%);top:var(--watch-y,35%)}
-.ls-static-eyes{animation:lsEyesBlink 8.5s steps(1,end) infinite}.ls-static-eyes.e2{animation-delay:-3.1s}.ls-static-eyes.e3{animation-delay:-5.8s}
-#ls-corridor.psych-pulse .ls-hall-lamp::after{animation:lsSickLamp 3.8s steps(1,end) infinite}
-@keyframes lsEyesBlink{0%,42%,44%,100%{opacity:var(--eye-opacity,.5)}43%{opacity:.03}}
 @keyframes lsFogBreathe{from{transform:translateX(-3%) scale(.94);opacity:.14}to{transform:translateX(4%) scale(1.08);opacity:.3}}
-@keyframes lsSickLamp{0%,71%,74%,100%{opacity:.35}72%{opacity:.04}73%{opacity:.6}}
 
-/* A narrow exposure smear crosses the screen during the actual camera turn,
-   making it feel like a vulnerable physical movement rather than a crossfade. */
-#ls-corridor .ls-turn-smear{position:absolute;z-index:30;inset:-20%;pointer-events:none;opacity:0;background:linear-gradient(105deg,transparent 30%,rgba(177,194,185,.11) 48%,transparent 64%);filter:blur(16px);transform:translateX(-70%)}
-#ls-corridor.is-turning .ls-turn-smear{animation:lsTurnSmear .8s ease both}
-@keyframes lsTurnSmear{0%{opacity:0;transform:translateX(-75%)}35%{opacity:.65}100%{opacity:0;transform:translateX(75%)}}
 
 /* CSS fallback keeps the ending figure visible even when the optional SVG
    file is unavailable on a single-file/mobile deployment. */
 #ls-man-silhouette::before{content:"";position:absolute;left:50%;bottom:0;width:min(260px,48vw);height:91vh;transform:translateX(-50%);background:radial-gradient(circle at 50% 12%,#000 0 10%,transparent 10.5%),linear-gradient(90deg,transparent 8%,#000 26% 74%,transparent 92%);clip-path:polygon(39% 0,61% 0,72% 16%,78% 53%,100% 100%,61% 100%,53% 56%,45% 100%,0 100%,24% 53%,28% 16%);filter:drop-shadow(0 0 35px #000)}
 
+#ls-force-audio{
+  position:fixed;z-index:5000;right:14px;bottom:14px;min-width:142px;min-height:42px;padding:9px 13px;
+  border:1px solid rgba(205,215,204,.46);border-radius:5px;color:#e7eee7;background:rgba(8,13,12,.92);
+  box-shadow:0 8px 28px rgba(0,0,0,.78),inset 0 0 18px rgba(150,180,160,.06);
+  font:800 10px/1.2 "Courier New",monospace;letter-spacing:.08em;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+}
+#ls-force-audio:hover,#ls-force-audio:focus-visible{color:#fff;border-color:#d5dfd6;outline:none;box-shadow:0 8px 28px #000,0 0 20px rgba(150,190,165,.16)}
+#ls-force-audio:active{transform:translateY(2px)}
+#ls-force-audio.is-playing{color:#bde5c8;border-color:#6fa27c}
+#ls-force-audio.is-error{color:#ffc1b9;border-color:#a65c55}
+body.ls-mobile #ls-force-audio{bottom:112px;right:10px;min-width:124px}
+
 #ls-mobile-controls { z-index:87 !important;inset:auto 0 0 !important;height:100px;display:none;align-items:center;justify-content:center;gap:14px;padding:14px 16px 20px;background:linear-gradient(transparent,rgba(0,0,0,.82)); }
 body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacity:1;visibility:visible;pointer-events:none; }
 #ls-mobile-controls button{pointer-events:auto;min-width:136px;min-height:54px;border:1px solid rgba(205,215,204,.38);border-radius:7px;color:#e7eee7;background:rgba(10,16,15,.88);box-shadow:inset 0 0 18px rgba(150,180,160,.06),0 8px 24px #000;font:800 11px "Courier New",monospace;letter-spacing:.08em;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 #ls-mobile-controls button:active{transform:translateY(2px);background:#26312e}
-@media (max-width:650px){.ls-control-row{grid-template-columns:62px 1fr}.ls-control-key{height:50px}.ls-controls-card{padding:24px 20px}.ls-controls-card h2{margin-bottom:22px}body.ls-mobile.ls-state-main main.scene{padding-bottom:150px}.ls-static-eyes.e1{left:11%}.ls-static-eyes.e2{right:9%}}
+@media (max-width:650px){.ls-control-row{grid-template-columns:62px 1fr}.ls-control-key{height:50px}.ls-controls-card{padding:24px 20px}.ls-controls-card h2{margin-bottom:22px}body.ls-mobile.ls-state-main main.scene{padding-bottom:150px}}
 @media (prefers-reduced-motion:reduce){#ls-corridor,#ls-corridor.is-active,body.ls-corridor-active main.scene{transition-duration:.2s !important}.ls-controls-page.is-visible{animation:none}}
 
   </style>
@@ -3217,17 +3167,15 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
       <div class="ls-hall-ceiling" aria-hidden="true"></div>
       <div class="ls-hall-door left" aria-hidden="true"></div><div class="ls-hall-door right" aria-hidden="true"></div>
       <div class="ls-hall-pipes" aria-hidden="true"></div><div class="ls-hall-stain" aria-hidden="true"></div>
-      <div class="ls-hall-end" aria-hidden="true"></div><div class="ls-hall-lamp" aria-hidden="true"></div>
-      <div class="ls-hall-fog" aria-hidden="true"></div><div class="ls-hall-scratches" aria-hidden="true">HUWAG KANG LILINGON</div>
+      <div class="ls-hall-end" aria-hidden="true"></div>
+      <div class="ls-hall-fog" aria-hidden="true"></div>
       <div class="ls-hall-peeker" aria-hidden="true"></div><div class="ls-hall-crawler" aria-hidden="true"></div>
       <div class="ls-hall-handprints" aria-hidden="true"><i></i><i></i><i></i></div>
-      <i class="ls-static-eyes e1" aria-hidden="true"></i><i class="ls-static-eyes e2" aria-hidden="true"></i><i class="ls-static-eyes e3" aria-hidden="true"></i>
       <div class="ls-corridor-floor"></div>
       <div class="ls-corridor-window-shadow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       <div class="ls-corridor-storm-flash" aria-hidden="true"></div>
       <div class="ls-corridor-eyes" aria-hidden="true"></div>
-      <div class="ls-corridor-figure is-visible" aria-hidden="true"></div>
-      <div class="ls-turn-smear" aria-hidden="true"></div>
+      <div class="ls-corridor-figure" aria-hidden="true"></div>
     </div>
 
     <!-- Mobile-only controls; activated automatically for touch/mobile platforms. -->
@@ -5245,6 +5193,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
       };
     })();
   </script>
+<button id="ls-force-audio" type="button" aria-live="polite" title="Force the correct soundtrack for the current scene">ENABLE SOUND</button>
 <!-- ============== LAST SEEN — NARRATIVE MODULES ============== -->
 
   <script id="ls-bundled-support-scripts">
@@ -5264,7 +5213,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
   // correctly without accidentally requesting audio from the domain root.
   const AUDIO_DIR = "";
   const FILES = {
-    title: "ambiencetitlle.mp3",        // exact spelling preserved
+    title: "ambienceitlle.mp3",        // exact spelling preserved
     ambience: "ambience.mp3",
     thunder1: "thunder1.mp3",
     thunder2: "thunder2.mp3",
@@ -5275,6 +5224,24 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
 
   // Tracks: { audio: HTMLAudioElement, ok: bool, tried: bool }
   const tracks = {};
+
+  // Persistent media channels are more reliable than creating a new element
+  // for every scene on iOS. The music channel is unlocked by the title click,
+  // then re-used for main and ending ambience. The alert channel is primed at
+  // the same time for the later EAS sequence.
+  const musicBus = new Audio(new URL(AUDIO_DIR + FILES.title, document.baseURI).href);
+  const alertBus = new Audio(new URL(AUDIO_DIR + FILES.eas, document.baseURI).href);
+  for (const bus of [musicBus, alertBus]) {
+    bus.preload = "auto";
+    bus.playsInline = true;
+    bus.setAttribute("playsinline", "");
+    bus.setAttribute("webkit-playsinline", "");
+    bus.loop = true;
+    bus.load();
+  }
+  musicBus.dataset.lsKey = "title";
+  alertBus.dataset.lsKey = "eas";
+
   let audioCtx = null;
   let unlocked = false;
   let masterGain = null; // shared master gain for synthesized layers
@@ -5313,8 +5280,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     // iOS/Safari may grant permission per HTMLMediaElement. Prime every real
     // MP3 during the user's gesture, at zero volume, so tracks requested later
     // in the story can start without another click.
-    Object.values(tracks).forEach(track => {
-      const audio = track && track.audio;
+    [...Object.values(tracks).map(track => track && track.audio), musicBus, alertBus].forEach(audio => {
       if (!audio || audio.dataset.lsPrimed === "1") return;
       audio.dataset.lsPriming = "1";
       const oldVolume = audio.volume;
@@ -5402,15 +5368,42 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
 
   function fadeHtmlAudio(audio, target, ms) {
     if (!audio) return;
+    const token = (audio._lsFadeToken || 0) + 1;
+    audio._lsFadeToken = token;
     const start = audio.volume;
     const t0 = performance.now();
     function step(now) {
-      const k = Math.min(1, (now - t0) / ms);
+      if (audio._lsFadeToken !== token) return;
+      const k = Math.min(1, (now - t0) / Math.max(1, ms));
       audio.volume = start + (target - start) * k;
       if (k < 1) requestAnimationFrame(step);
-      else if (target === 0) { try { audio.pause(); } catch (_) {} }
+      else if (target === 0 && audio.dataset.lsWanted !== "1") { try { audio.pause(); } catch (_) {} }
     }
     requestAnimationFrame(step);
+  }
+
+  function playPersistent(bus, key, volume, fadeMs, fallback) {
+    const url = new URL(AUDIO_DIR + FILES[key], document.baseURI).href;
+    bus.dataset.lsWanted = "1";
+    bus._lsFadeToken = (bus._lsFadeToken || 0) + 1;
+    if (bus.dataset.lsKey !== key || bus.src !== url) {
+      try { bus.pause(); } catch (_) {}
+      bus.src = url;
+      bus.dataset.lsKey = key;
+      bus.load();
+    }
+    bus.loop = true;
+    bus.volume = 0;
+    const attempt = bus.play();
+    if (attempt && typeof attempt.then === "function") {
+      attempt.then(() => fadeHtmlAudio(bus, volume, fadeMs)).catch(fallback);
+    }
+  }
+
+  function stopPersistent(bus, key, fadeMs) {
+    if (bus.dataset.lsKey !== key) return;
+    bus.dataset.lsWanted = "0";
+    fadeHtmlAudio(bus, 0, fadeMs);
   }
 
   // ---------- Synth fallbacks ----------
@@ -5596,45 +5589,25 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     unlock,
     isUnlocked: () => unlocked,
 
-    // Title ambience (ambiencetitlle.mp3)
+    // Title ambience (ambienceitlle.mp3)
     playTitle() {
       unlock();
-      withTrack("title", t => {
-        markWanted(t, true);
-        stopAmbienceSynth(); stopEndingSynth();
-        try { t.audio.currentTime = 0; } catch (_) {}
-        t.audio.volume = 0;
-        t.audio.loop = true;
-        t.audio.play().then(() => fadeHtmlAudio(t.audio, 0.45, 1800)).catch(() => startTitleSynth());
-      }, startTitleSynth);
+      stopAmbienceSynth(); stopEndingSynth();
+      playPersistent(musicBus, "title", 0.45, 900, startTitleSynth);
     },
     stopTitle(fadeMs = 1200) {
-      const t = tracks.title;
-      markWanted(t, false);
-      if (t && t.audio && !t.audio.paused) {
-        fadeHtmlAudio(t.audio, 0, fadeMs);
-      }
+      stopPersistent(musicBus, "title", fadeMs);
       stopTitleSynth();
     },
 
     // Main room ambience (ambience.mp3)
     playAmbience() {
       unlock();
-      withTrack("ambience", t => {
-        markWanted(t, true);
-        stopTitleSynth(); stopEndingSynth();
-        try { t.audio.currentTime = 0; } catch (_) {}
-        t.audio.volume = 0;
-        t.audio.loop = true;
-        t.audio.play().then(() => fadeHtmlAudio(t.audio, 0.45, 2500)).catch(() => startAmbienceSynth());
-      }, startAmbienceSynth);
+      stopTitleSynth(); stopEndingSynth();
+      playPersistent(musicBus, "ambience", 0.55, 1100, startAmbienceSynth);
     },
     stopAmbience(fadeMs = 1200) {
-      const t = tracks.ambience;
-      markWanted(t, false);
-      if (t && t.audio && !t.audio.paused) {
-        fadeHtmlAudio(t.audio, 0, fadeMs);
-      }
+      stopPersistent(musicBus, "ambience", fadeMs);
       stopAmbienceSynth();
     },
 
@@ -5654,47 +5627,28 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     // EAS alarm (eas.mp3)
     playEAS() {
       unlock();
-      withTrack("eas", t => {
-        markWanted(t, true);
-        try { t.audio.currentTime = 0; } catch (_) {}
-        t.audio.loop = true; // loop the klaxon until stopped
-        t.audio.volume = 0.7;
-        t.audio.play().catch(() => startEASSynth());
-      }, startEASSynth);
+      playPersistent(alertBus, "eas", 0.7, 120, startEASSynth);
     },
     stopEAS(fadeMs = 800) {
-      const t = tracks.eas;
-      markWanted(t, false);
-      if (t && t.audio && !t.audio.paused) {
-        fadeHtmlAudio(t.audio, 0, fadeMs);
-      }
+      stopPersistent(alertBus, "eas", fadeMs);
       stopEASSynth();
     },
 
     // Ending ambience (ambienceending.mp3)
     playEnding() {
       unlock();
-      withTrack("ending", t => {
-        markWanted(t, true);
-        stopAmbienceSynth(); stopTitleSynth();
-        try { t.audio.currentTime = 0; } catch (_) {}
-        t.audio.volume = 0;
-        t.audio.loop = true;
-        t.audio.play().then(() => fadeHtmlAudio(t.audio, 0.4, 3500)).catch(() => startEndingSynth());
-      }, startEndingSynth);
+      stopAmbienceSynth(); stopTitleSynth();
+      playPersistent(musicBus, "ending", 0.5, 1200, startEndingSynth);
     },
     stopEnding(fadeMs = 1500) {
-      const t = tracks.ending;
-      markWanted(t, false);
-      if (t && t.audio && !t.audio.paused) {
-        fadeHtmlAudio(t.audio, 0, fadeMs);
-      }
+      stopPersistent(musicBus, "ending", fadeMs);
       stopEndingSynth();
     },
 
     // Hard-stop everything (pagehide / replay)
     stopAll() {
       Object.values(tracks).forEach(t => { if (t && t.audio) { markWanted(t, false); stopHtmlAudio(t.audio); } });
+      for (const bus of [musicBus, alertBus]) { bus.dataset.lsWanted = "0"; stopHtmlAudio(bus); }
       stopTitleSynth(); stopAmbienceSynth(); stopEndingSynth(); stopEASSynth();
     },
 
@@ -5814,7 +5768,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
       try { window.LS_AUDIO.stopAmbience(); } catch (_) {}
       try { window.LS_AUDIO.stopEnding(); } catch (_) {}
     } else if (name === STATES.OPENING) {
-      // ambiencetitlle.mp3 already started by title.js — keep playing
+      // ambienceitlle.mp3 already started by title.js — keep playing
     } else if (name === STATES.MAIN) {
       // Crossfade title ambience -> main ambience handled by storm-eas.js
       // when the main-scene fade completes. Here we just signal the
@@ -6000,7 +5954,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
    LAST SEEN — title.js
    Pitch-black title screen + opening cinematic.
    - Title: only "LAST SEEN" and a Play button visible.
-   - Opening: ambiencetitlle.mp3, warm candle-like glow (no visible
+   - Opening: ambienceitlle.mp3, warm candle-like glow (no visible
      candle), stark beats "Nuyda productions presents:" then "LAST SEEN",
      then exactly three Filipino pages in order. Click/Enter/Space to
      advance (no visible "continue" text). After last page, fade into
@@ -6108,7 +6062,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     if (inOpening) return;
     inOpening = true;
 
-    // Start ambiencetitlle.mp3 (or synth fallback)
+    // Start ambienceitlle.mp3 (or synth fallback)
     try { window.LS_AUDIO.playTitle(); } catch (_) {}
     titleAmbienceStarted = true;
 
@@ -6436,10 +6390,9 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
    FNAF6-inspired continuous pivot feeling (no asset/code/ui
    copying). Toggle behavior: Z once → corridor; Z again → main.
    Ignores key-repeat while held. No overlapping transitions.
-   Rare, cooldown-controlled psychological events:
-   image-based eyes, distant shadow figure. No jumpscares.
-   Eyes retreat/close/fade when directly illuminated by the
-   flashlight.
+   Per-turn psychological events only: one doorway eye pair (25%)
+   and one evident silhouette (20%). No timed spawns or jumpscares.
+   Both disappear when directly illuminated by the flashlight.
    ============================================================ */
 
 (function () {
@@ -6456,32 +6409,28 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
   let active = false;
   let transitioning = false;
   let zHeld = false; // ignore key-repeat while held
-  let eventScheduler = null;
-  let eyeVisibilityTimeout = null;
-  let figureVisibilityTimeout = null;
   let visitCount = 0;
   let anomalyTimer = null;
-  const anomalyClasses = ["psych-peek","psych-crawl","psych-door","psych-near","psych-empty","psych-look","psych-pulse"];
+  const anomalyClasses = ["psych-red-eyes","psych-silhouette"];
 
   function prepareUnobservedHallway() {
     visitCount++;
     corridor.classList.remove(...anomalyClasses);
-    corridor.style.setProperty("--watch-x", `${10 + Math.random()*28}%`);
-    corridor.style.setProperty("--watch-y", `${22 + Math.random()*28}%`);
-    corridor.classList.add("psych-look", "psych-pulse");
+    document.body.classList.remove("ls-corridor-eyes-lit", "ls-corridor-figure-lit");
+    if (figureEl) {
+      figureEl.style.opacity = "";
+      figureEl.classList.remove("is-visible");
+    }
 
-    // The hall does not change every time, and events are never guaranteed.
-    // This uncertainty is what makes turning away uncomfortable.
-    const roll = Math.random();
-    if (visitCount > 1 && roll < .18) corridor.classList.add("psych-empty");
-    else if (visitCount > 2 && roll < .36) corridor.classList.add("psych-near");
-    else if (roll < .56) corridor.classList.add("psych-peek");
-    else if (visitCount > 1 && roll < .72) corridor.classList.add("psych-crawl");
-    else if (roll < .88) corridor.classList.add("psych-door");
+    // Independent per-turn rolls: one red pair in the far doorway has a 25%
+    // chance; the unmistakable silhouette has a 20% chance. Neither is forced.
+    if (Math.random() < .25) corridor.classList.add("psych-red-eyes");
+    if (Math.random() < .20) {
+      corridor.classList.add("psych-silhouette");
+      figureEl?.classList.add("is-visible");
+    }
 
-    // A restrained low pressure tone marks some turns without a sting or
-    // jumpscare. It uses the already-unlocked Web Audio path.
-    if (visitCount > 1 && Math.random() < .42) {
+    if (visitCount > 1 && Math.random() < .32) {
       try { window.LASTSEEN?.playTone?.(42 + Math.random()*13, .75, .009, "sine"); } catch (_) {}
     }
   }
@@ -6498,26 +6447,21 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
 
     transitioning = true;
     active = target;
-    corridor.classList.remove("is-turning");
-    void corridor.offsetWidth;
-    corridor.classList.add("is-turning");
-    window.setTimeout(() => corridor.classList.remove("is-turning"), reducedMotion ? 220 : 850);
     if (active) {
       prepareUnobservedHallway();
       corridor.classList.add("is-active");
       corridor.setAttribute("aria-hidden", "false");
       document.body.classList.add("ls-corridor-active");
       try { window.LS_NARRATIVE.setFlag("corridorActive", true); } catch (_) {}
-      startEventScheduler();
+      // Appearances are rolled once per deliberate turn, never on a timer.
     } else {
       corridor.classList.remove("is-active");
       corridor.setAttribute("aria-hidden", "true");
       document.body.classList.remove("ls-corridor-active");
       try { window.LS_NARRATIVE.setFlag("corridorActive", false); } catch (_) {}
-      stopEventScheduler();
       // Force hide any active events
       if (eyesEl) eyesEl.classList.remove("is-visible");
-      if (figureEl) figureEl.classList.add("is-visible");
+      if (figureEl) figureEl.classList.remove("is-visible");
       document.body.classList.remove("ls-corridor-figure-lit");
     }
     // Wait for the CSS transition to settle
@@ -6567,59 +6511,6 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
   document.addEventListener("pointerup", () => {
     setTimeout(() => { threeFingerCount = 0; }, 100);
   }, { passive: true });
-
-  // ---------- Rare psychological event scheduler ----------
-  // Eyes appear briefly and retreat. Figure crosses distantly. Both with
-  // cooldowns. NO jumpscares, NO screams.
-
-  function startEventScheduler() {
-    if (eventScheduler) return;
-    scheduleNextEvent();
-  }
-  function stopEventScheduler() {
-    if (eventScheduler) clearTimeout(eventScheduler);
-    eventScheduler = null;
-    if (eyeVisibilityTimeout) { clearTimeout(eyeVisibilityTimeout); eyeVisibilityTimeout = null; }
-    if (figureVisibilityTimeout) { clearTimeout(figureVisibilityTimeout); figureVisibilityTimeout = null; }
-  }
-
-  function scheduleNextEvent() {
-    if (!active) return;
-    // Bounded cooldown: 25-65s between events (rare)
-    const next = 25000 + Math.random() * 40000;
-    eventScheduler = setTimeout(() => {
-      if (!active) return;
-      // Choose an event
-      const roll = Math.random();
-      if (roll < 0.6) {
-        showEyes();
-      } else {
-        showFigure();
-      }
-      scheduleNextEvent();
-    }, reducedMotion ? next * 0.5 : next);
-  }
-
-  function showEyes() {
-    if (!eyesEl) return;
-    // Briefly visible, then fades
-    eyesEl.classList.add("is-visible");
-    const duration = reducedMotion ? 1500 : 4000 + Math.random() * 3000;
-    eyeVisibilityTimeout = setTimeout(() => {
-      eyesEl.classList.remove("is-visible");
-      eyeVisibilityTimeout = null;
-    }, duration);
-  }
-
-  function showFigure() {
-    if (!figureEl) return;
-    figureEl.classList.add("is-visible");
-    const duration = reducedMotion ? 1000 : 2500 + Math.random() * 2000;
-    figureVisibilityTimeout = setTimeout(() => {
-      figureEl.classList.remove("is-visible");
-      figureVisibilityTimeout = null;
-    }, duration);
-  }
 
   // ---------- Flashlight detection on eyes ----------
   // When the flashlight is on AND its current position overlaps the eyes'
@@ -6690,6 +6581,10 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     stormFlashEl.classList.remove("is-flashing");
     void stormFlashEl.offsetWidth;
     stormFlashEl.classList.add("is-flashing");
+    // The class must be removed, not merely left at the animation's last
+    // frame. A quality override uses !important opacity while this class is
+    // present, which previously allowed the white projection to remain stuck.
+    window.setTimeout(() => stormFlashEl.classList.remove("is-flashing"), 1250);
   });
 
   // ---------- Narrative state gating ----------
@@ -6740,6 +6635,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
   let stormStarted = false;
   let easQueued = false;
   let strikeToken = 0;
+  let flashCleanupTimer = null;
 
   const LOCATION = "SAINT FRANCIS AREA · ISABELA";
   const PHONE_TIME = "07:12 · 16-02-1999";
@@ -6787,6 +6683,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
   function flashWorld() {
     const token = ++strikeToken;
     const duration = reducedMotion ? 900 : 1200;
+    if (flashCleanupTimer) window.clearTimeout(flashCleanupTimer);
     const fromCorridor = isCorridor();
     document.body.classList.remove("ls-lightning-active", "ls-lightning-secondary");
     scene.classList.remove("ls-lightning-active", "ls-lightning-secondary");
@@ -6824,14 +6721,15 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
       try { window.LS_AUDIO.playThunder(variant); } catch (_) {}
     }, thunderDelay);
 
-    window.setTimeout(() => {
-      if (token !== strikeToken) return;
+    flashCleanupTimer = window.setTimeout(() => {
       window.clearTimeout(secondary);
       document.body.classList.remove("ls-lightning-active", "ls-lightning-secondary");
       scene.classList.remove("ls-lightning-active", "ls-lightning-secondary");
       if (flash) flash.classList.remove("is-flashing");
       if (windowShadow) windowShadow.classList.remove("is-flashing");
       if (exposure) exposure.classList.remove("is-active", "is-corridor");
+      document.querySelector("#ls-corridor .ls-corridor-storm-flash")?.classList.remove("is-flashing");
+      flashCleanupTimer = null;
     }, duration);
   }
 
@@ -6881,7 +6779,8 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     if (mainTimer) window.clearTimeout(mainTimer);
     if (lightningTimer) window.clearTimeout(lightningTimer);
     if (easTimer) window.clearTimeout(easTimer);
-    mainTimer = lightningTimer = easTimer = null;
+    if (flashCleanupTimer) window.clearTimeout(flashCleanupTimer);
+    mainTimer = lightningTimer = easTimer = flashCleanupTimer = null;
     setTakeover(false);
     try { window.LS_AUDIO.stopEAS(); } catch (_) {}
     document.body.classList.remove("ls-lightning-active", "ls-lightning-secondary");
@@ -7194,6 +7093,64 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
   };
 })();
 
+/* Manual audio recovery. The bottom-right button performs playback inside a
+   fresh user gesture and selects the exact soundtrack for the visible state. */
+(function(){
+  "use strict";
+  const button = document.getElementById("ls-force-audio");
+  if (!button) return;
+
+  function situation() {
+    const state = window.LS_NARRATIVE?.getState?.() || "title";
+    const easVisible = Boolean(document.getElementById("ls-eas")?.classList.contains("is-active"));
+    const newerVisible = Boolean(document.getElementById("ls-newer-phone")?.classList.contains("is-active"));
+    if (easVisible || newerVisible) return { state, kind:"alert", label:"PLAY ALERT MP3" };
+    if (state === "title" || state === "opening") return { state, kind:"title", label:"PLAY TITLE MP3" };
+    if (state === "ending") return { state, kind:"ending", label:"PLAY ENDING MP3" };
+    return { state, kind:"ambience", label:"PLAY AMBIENCE MP3" };
+  }
+
+  function updateLabel() {
+    if (!button.classList.contains("is-playing")) button.textContent = situation().label;
+  }
+
+  button.addEventListener("click", event => {
+    event.preventDefault();
+    const current = situation();
+    button.classList.remove("is-playing", "is-error");
+    button.textContent = "STARTING AUDIO…";
+    try {
+      window.LS_AUDIO?.stopAll?.();
+      window.LS_AUDIO?.unlock?.();
+      if (current.kind === "title") window.LS_AUDIO?.playTitle?.();
+      else if (current.kind === "ambience") window.LS_AUDIO?.playAmbience?.();
+      else if (current.kind === "ending") window.LS_AUDIO?.playEnding?.();
+      else {
+        // The alert scenes normally layer their alarm over the appropriate
+        // ambience, so restore both rather than playing an isolated klaxon.
+        if (current.state === "ending") window.LS_AUDIO?.playEnding?.();
+        else window.LS_AUDIO?.playAmbience?.();
+        window.LS_AUDIO?.playEAS?.();
+      }
+      button.classList.add("is-playing");
+      button.textContent = "SOUND REQUESTED ✓";
+      window.setTimeout(() => {
+        button.classList.remove("is-playing");
+        updateLabel();
+      }, 2200);
+    } catch (error) {
+      button.classList.add("is-error");
+      button.textContent = "AUDIO FAILED — RETRY";
+      console.error("[LS_AUDIO] manual playback failed", error, window.LS_AUDIO?.listTracks?.());
+    }
+  });
+
+  document.addEventListener("ls:narrativeState", updateLabel);
+  document.addEventListener("ls:flagChange", updateLabel);
+  document.addEventListener("visibilitychange", updateLabel);
+  window.setTimeout(updateLabel, 0);
+})();
+
 /* Mobile platform adaptation: explicit, thumb-sized controls replace hidden
    multi-touch gestures. Pointer dragging still aims an enabled flashlight. */
 (function(){
@@ -7237,5 +7194,5 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
 })();
 
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2d558a85bcc5112',t:'MTc4NzEwMjUzNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2d5a9d5db61096e',t:'MTc4NzEwNTg2Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
