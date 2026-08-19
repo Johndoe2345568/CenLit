@@ -5213,7 +5213,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
   // correctly without accidentally requesting audio from the domain root.
   const AUDIO_DIR = "";
   const FILES = {
-    title: "ambienceitlle.mp3",        // exact spelling preserved
+    title: "ambiencetitlle.mp3",        // exact spelling preserved
     ambience: "ambience.mp3",
     thunder1: "thunder1.mp3",
     thunder2: "thunder2.mp3",
@@ -5589,7 +5589,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     unlock,
     isUnlocked: () => unlocked,
 
-    // Title ambience (ambienceitlle.mp3)
+    // Title ambience (ambiencetitlle.mp3)
     playTitle() {
       unlock();
       stopAmbienceSynth(); stopEndingSynth();
@@ -5768,7 +5768,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
       try { window.LS_AUDIO.stopAmbience(); } catch (_) {}
       try { window.LS_AUDIO.stopEnding(); } catch (_) {}
     } else if (name === STATES.OPENING) {
-      // ambienceitlle.mp3 already started by title.js — keep playing
+      // ambiencetitlle.mp3 already started by title.js — keep playing
     } else if (name === STATES.MAIN) {
       // Crossfade title ambience -> main ambience handled by storm-eas.js
       // when the main-scene fade completes. Here we just signal the
@@ -5954,7 +5954,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
    LAST SEEN — title.js
    Pitch-black title screen + opening cinematic.
    - Title: only "LAST SEEN" and a Play button visible.
-   - Opening: ambienceitlle.mp3, warm candle-like glow (no visible
+   - Opening: ambiencetitlle.mp3, warm candle-like glow (no visible
      candle), stark beats "Nuyda productions presents:" then "LAST SEEN",
      then exactly three Filipino pages in order. Click/Enter/Space to
      advance (no visible "continue" text). After last page, fade into
@@ -6062,7 +6062,7 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
     if (inOpening) return;
     inOpening = true;
 
-    // Start ambienceitlle.mp3 (or synth fallback)
+    // Start ambiencetitlle.mp3 (or synth fallback)
     try { window.LS_AUDIO.playTitle(); } catch (_) {}
     titleAmbienceStarted = true;
 
@@ -7194,5 +7194,5 @@ body.ls-mobile.ls-state-main #ls-mobile-controls.is-active { display:flex;opacit
 })();
 
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2d5a9d5db61096e',t:'MTc4NzEwNTg2Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2d5b55e7cec3d5c',t:'MTc4NzEwNjMzNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
