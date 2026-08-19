@@ -2573,9 +2573,28 @@ body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .
 body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .lamp-bloom,
 body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .light-beam,
 body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .rain-sheen,
-body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .moth-field {
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .moth-field,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .cassette,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene button.cassette,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .rain-ambience-badge {
   opacity: .004 !important;
   filter: brightness(.08) !important;
+}
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene button.cassette,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .cassette {
+  opacity: .07 !important;
+  filter: brightness(.05) contrast(1.15) saturate(.4) !important;
+  box-shadow: none !important;
+}
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene button.cassette:hover,
+body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .cassette:hover {
+  translate: none !important;
+  filter: brightness(.05) contrast(1.15) saturate(.4) !important;
+}
+body.ls-state-main.ls-flashlight-on main.scene button.cassette,
+body.ls-state-main.ls-flashlight-on main.scene .cassette {
+  opacity: 1 !important;
+  filter: none;
 }
 body.ls-state-main:not(.ls-flashlight-on):not(.ls-lightning-active) main.scene .phone-aura {
   display: none !important;
@@ -3029,11 +3048,15 @@ body.tape-modal-open {
   height: var(--vh, 100dvh);
 }
 
-/* Device-fit: the handset and desk props scale as one composition. */
+/* Device-fit: the handset and desk props scale as one composition.
+   Negative margin collapses the unused transform box so 1366x768 /
+   1440x900 laptops do not clip the keypad. */
 .phone-wrap {
   width: min(480px, calc(var(--vw, 100vw) - 28px)) !important;
   transform: scale(var(--scene-scale, 1));
   transform-origin: center center;
+  margin-block: calc((var(--scene-scale, 1) - 1) * var(--phone-nat-h, 800px) / 2);
+  margin-inline: calc((var(--scene-scale, 1) - 1) * var(--phone-nat-w, 480px) / 2);
 }
 .cassette {
   transform: rotate(7deg) scale(var(--scene-scale, 1));
@@ -3409,6 +3432,338 @@ body.ls-state-main.ls-flashlight-on main.scene::after { opacity: .05; }
 .cassette-3d {
   width: min(570px, calc(var(--vw, 100vw) * .82));
 }
+
+/* ---------- Laptop / desktop viewports ----------
+   Common CSS-pixel sizes after OS scaling:
+   1280x720/800, 1366x768, 1440x900, 1512x982, 1536x864,
+   1600x900, 1680x1050, 1728x1117, 1920x1080/1200, 2560x1440/1600.
+   Height is the usual constraint once browser chrome is subtracted. */
+body.ls-laptop .scene {
+  padding: 18px 20px 28px;
+}
+body.ls-laptop .rain-window { width: min(320px, 26vw); }
+body.ls-laptop .aparador-silhouette { width: min(270px, 22vw); }
+body.ls-laptop #ls-title-text {
+  font-size: clamp(42px, 7vw, 96px);
+  letter-spacing: .34em;
+  text-indent: .34em;
+}
+body.ls-laptop #ls-opening-text.is-title-card {
+  font-size: clamp(40px, 8vw, 104px);
+  letter-spacing: .32em;
+}
+body.ls-laptop #ls-opening-text { max-width: min(760px, 70vw); font-size: clamp(18px, 2.4vw, 32px); }
+body.ls-laptop .ls-controls-card { width: min(560px, 70vw); }
+
+/* Short laptop lids: 1366x768, 1280x800, 1536x864, 1080p with bookmarks bar. */
+body.ls-laptop-short .scene { padding: 10px 16px 16px; }
+body.ls-laptop-short .phone { padding: 36px 20px 22px; }
+body.ls-laptop-short .faceplate { padding: 16px 14px 20px; }
+body.ls-laptop-short .control-cluster { margin: 12px 6px 14px; }
+body.ls-laptop-short .keypad { row-gap: 10px; }
+body.ls-laptop-short .number-key { height: 46px; }
+body.ls-laptop-short .cassette {
+  top: 22%;
+  width: 200px;
+  height: 124px;
+  right: max(10px, calc(50% - 390px));
+}
+body.ls-laptop-short .cassette-viewport { height: min(460px, 62vh); }
+body.ls-laptop-short .cassette-3d { width: min(430px, 56vw); }
+body.ls-laptop-short .tape-bottom-ui { bottom: 10px; }
+body.ls-laptop-short #ls-newer-phone .ls-newer-shell {
+  width: min(280px, 34vw);
+  height: min(580px, 84vh);
+}
+body.ls-laptop-short .global-subtitles { bottom: 72px; width: min(720px, 80vw); }
+body.ls-laptop-short .rain-ambience-badge { bottom: 16px; }
+
+/* Classic 1366x768 Windows laptop. */
+@media (min-width: 1100px) and (max-width: 1440px) and (max-height: 800px) {
+  body.ls-laptop .scene { padding: 8px 14px 12px; }
+  body.ls-laptop #ls-title-text { font-size: clamp(36px, 6vw, 72px); letter-spacing: .28em; }
+}
+
+/* 14–16" 16:10 (1440x900, 1920x1200, MacBook). */
+@media (min-width: 1400px) and (min-height: 860px) and (max-height: 1100px) {
+  body.ls-laptop .phone-wrap { width: min(460px, 38vw) !important; }
+}
+
+/* Large / QHD laptops: keep the phone readable, do not balloon past 480. */
+@media (min-width: 1800px) and (min-height: 1000px) {
+  body.ls-laptop .phone-wrap { width: min(480px, 28vw) !important; }
+  body.ls-laptop .cassette { right: max(24px, calc(50% - 500px)); }
+}
+
+/* Snapped / split laptop windows. */
+@media (min-width: 700px) and (max-width: 1099px) and (min-height: 600px) {
+  .scene { padding: 12px 10px 18px; }
+  .phone-wrap { width: min(420px, calc(var(--vw, 100vw) - 20px)) !important; }
+  .cassette { right: 8px; top: auto; bottom: 24px; }
+}
+
+/* ---------- HALLWAY REVAMP ---------- */
+#ls-corridor {
+  background:
+    radial-gradient(ellipse at 50% 42%, #0b1012 0%, #050708 42%, #020303 100%) !important;
+}
+#ls-corridor.is-active {
+  filter: blur(0) brightness(1) !important;
+}
+body.ls-state-main.ls-corridor-active.ls-flashlight-on #ls-corridor.is-active {
+  filter: blur(0) brightness(1.04) contrast(1.12) saturate(.82) !important;
+  background:
+    radial-gradient(ellipse at 50% 38%, #182226 0%, #0b1113 40%, #040607 100%) !important;
+}
+
+.ls-hall-leftwall,
+.ls-hall-rightwall {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 38%;
+  pointer-events: none;
+}
+.ls-hall-leftwall {
+  left: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 58px, rgba(0,0,0,.28) 59px 61px),
+    linear-gradient(90deg, #0a0e0f 0%, #141b1d 55%, #0c1112 100%);
+  clip-path: polygon(0 0, 100% 12%, 100% 88%, 0 100%);
+  box-shadow: inset -18px 0 28px rgba(0,0,0,.45);
+}
+.ls-hall-rightwall {
+  right: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 62px, rgba(0,0,0,.26) 63px 65px),
+    linear-gradient(270deg, #090c0d 0%, #13191b 55%, #0b1011 100%);
+  clip-path: polygon(0 12%, 100% 0, 100% 100%, 0 88%);
+  box-shadow: inset 18px 0 28px rgba(0,0,0,.45);
+}
+#ls-corridor .ls-corridor-wall {
+  left: 26%;
+  right: 26%;
+  top: 12%;
+  bottom: 22%;
+  clip-path: none !important;
+  background:
+    linear-gradient(90deg, transparent 49.6%, rgba(170,180,174,.06) 50%, transparent 50.4%),
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(0,0,0,.3) 47px 48px),
+    linear-gradient(#1a2427, #0d1315) !important;
+  box-shadow: inset 0 0 40px #000, 0 0 80px 30px rgba(0,0,0,.55);
+}
+.ls-hall-ceiling {
+  left: 18% !important;
+  right: 18% !important;
+  height: 22% !important;
+  background:
+    repeating-linear-gradient(90deg, #101516 0 3px, transparent 3px 90px),
+    linear-gradient(#070909, #161c1d) !important;
+}
+.ls-hall-beam {
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  top: 14%;
+  height: 10px;
+  background: #0a0d0d;
+  box-shadow: 0 10px 18px #000;
+  transform: perspective(500px) rotateX(50deg);
+}
+.ls-hall-bulb {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  top: 8%;
+  width: 14px;
+  height: 22px;
+  margin-left: -7px;
+  border-radius: 40% 40% 45% 45%;
+  background: #2a2e2c;
+  box-shadow: 0 10px 10px #000;
+}
+.ls-hall-bulb i {
+  position: absolute;
+  left: 2px; right: 2px; bottom: 2px; height: 8px;
+  border-radius: 50%;
+  background: #9aa59a;
+  opacity: .18;
+  box-shadow: 0 0 16px rgba(180,200,180,.12);
+}
+.ls-hall-end-door {
+  position: absolute;
+  left: 44.5%;
+  top: 26%;
+  width: 11%;
+  height: 36%;
+  border: 3px solid #050606;
+  background: linear-gradient(#020303, #000);
+  box-shadow: inset 0 0 18px #000;
+}
+.ls-hall-end-door::after {
+  content: "";
+  position: absolute;
+  top: 48%;
+  right: 10%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #6a6148;
+}
+.ls-hall-base.left,
+.ls-hall-base.right {
+  position: absolute;
+  bottom: 10%;
+  width: 28%;
+  height: 8%;
+  background: linear-gradient(#0c1010, #050707);
+}
+.ls-hall-base.left { left: 0; clip-path: polygon(0 40%, 100% 0, 100% 100%, 0 100%); }
+.ls-hall-base.right { right: 0; clip-path: polygon(0 0, 100% 40%, 100% 100%, 0 100%); }
+
+#ls-corridor .ls-hall-door {
+  width: 15%;
+  height: 50%;
+  top: 20%;
+  border-width: 8px 6px 10px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.03), transparent 20% 80%, rgba(0,0,0,.3)),
+    repeating-linear-gradient(90deg, #171e1d 0 20px, #0c1010 21px 23px) !important;
+}
+#ls-corridor .ls-hall-door b {
+  position: absolute;
+  inset: 8% 14%;
+  border: 2px solid rgba(0,0,0,.45);
+  box-shadow: inset 0 0 12px rgba(0,0,0,.4);
+}
+.ls-hall-wires {
+  position: absolute;
+  z-index: 8;
+  left: 31%;
+  top: 8%;
+  width: 28px;
+  height: 42%;
+  opacity: .8;
+}
+.ls-hall-wires svg { width: 100%; height: 100%; display: block; }
+.ls-hall-frame {
+  position: absolute;
+  z-index: 8;
+  left: 8%;
+  top: 26%;
+  width: 54px;
+  height: 66px;
+  transform: rotate(-8deg);
+  opacity: .7;
+  filter: brightness(.55);
+}
+.ls-hall-frame svg { width: 100%; height: 100%; display: block; }
+.ls-hall-scratch {
+  position: absolute;
+  z-index: 7;
+  right: 10%;
+  top: 30%;
+  width: 160px;
+  height: 120px;
+  opacity: .45;
+}
+.ls-hall-scratch svg { width: 100%; height: 100%; display: block; }
+#ls-corridor .ls-hall-handprints {
+  position: absolute;
+  z-index: 8;
+  right: 11%;
+  top: 40%;
+  width: 130px;
+  height: 168px;
+  opacity: 0;
+  transform: none !important;
+}
+#ls-corridor .ls-hall-handprints svg { width: 100%; height: 100%; display: block; }
+#ls-corridor.psych-hands .ls-hall-handprints { opacity: .55; }
+
+#ls-corridor .ls-corridor-floor {
+  height: 46% !important;
+  background:
+    repeating-linear-gradient(90deg, rgba(90,98,92,.1) 0 2px, transparent 2px 78px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.35) 0 2px, transparent 2px 36px),
+    linear-gradient(#121716, #030404) !important;
+}
+
+/* Evident silhouette — left or right, not a faint center smudge */
+#ls-corridor .ls-corridor-figure {
+  position: absolute;
+  z-index: 12;
+  bottom: 8%;
+  width: min(210px, 22vw);
+  height: min(520px, 78vh);
+  opacity: 0;
+  pointer-events: none;
+  background: none !important;
+  clip-path: none !important;
+  filter: drop-shadow(0 0 2px rgba(0,0,0,.9));
+  transform: none;
+  transition: filter .25s ease;
+}
+#ls-corridor .ls-corridor-figure svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 18px 10px rgba(0,0,0,.7));
+}
+#ls-corridor .ls-corridor-figure[data-side="left"] { left: 11%; right: auto; }
+#ls-corridor .ls-corridor-figure[data-side="right"] { right: 11%; left: auto; }
+#ls-corridor.psych-silhouette .ls-corridor-figure.is-visible {
+  opacity: .97;
+}
+body.ls-state-main.ls-corridor-active.ls-flashlight-on #ls-corridor .ls-corridor-figure.is-visible {
+  opacity: 1;
+  filter: drop-shadow(0 0 1px #000) drop-shadow(1px 0 0 rgba(190,210,200,.18));
+}
+#ls-corridor .ls-corridor-figure.is-held svg {
+  filter: drop-shadow(0 0 8px rgba(210,230,220,.35)) drop-shadow(0 18px 10px rgba(0,0,0,.7));
+}
+#ls-corridor .ls-corridor-figure.is-fleeing[data-side="left"] {
+  animation: hallFleeLeft .42s cubic-bezier(.15,.85,.2,1) forwards;
+}
+#ls-corridor .ls-corridor-figure.is-fleeing[data-side="right"] {
+  animation: hallFleeRight .42s cubic-bezier(.15,.85,.2,1) forwards;
+}
+@keyframes hallFleeLeft {
+  0% { transform: translate(0,0) scale(1); opacity: .97; }
+  40% { transform: translate(-16vw, 3vh) scale(.9) skewX(-10deg); opacity: .7; }
+  100% { transform: translate(-72vw, 12vh) scale(.62) skewX(-16deg); opacity: 0; }
+}
+@keyframes hallFleeRight {
+  0% { transform: translate(0,0) scale(1); opacity: .97; }
+  40% { transform: translate(16vw, 3vh) scale(.9) skewX(10deg); opacity: .7; }
+  100% { transform: translate(72vw, 12vh) scale(.62) skewX(16deg); opacity: 0; }
+}
+
+/* Kill the old “instant fade / later return” silhouette rules */
+body.ls-flashlight-on #ls-corridor.psych-silhouette .ls-corridor-figure.is-visible { opacity: .97; }
+body.ls-corridor-figure-lit #ls-corridor .ls-corridor-figure { opacity: .97 !important; filter: none !important; transform: none !important; }
+body.ls-state-main.ls-corridor-active:not(.ls-flashlight-on):not(.ls-lightning-active) #ls-corridor .ls-corridor-figure.is-visible {
+  opacity: .08 !important;
+}
+
+#ls-corridor .ls-corridor-eyes {
+  left: 47.4% !important;
+  top: 36% !important;
+  width: 52px !important;
+  height: 16px !important;
+  background: none !important;
+}
+#ls-corridor .ls-corridor-eyes svg { width: 100%; height: 100%; display: block; }
+#ls-corridor.psych-red-eyes .ls-corridor-eyes { opacity: .95 !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  #ls-corridor .ls-corridor-figure.is-fleeing[data-side="left"],
+  #ls-corridor .ls-corridor-figure.is-fleeing[data-side="right"] {
+    animation: none;
+    opacity: 0;
+  }
+}
+
   </style>
 
   <script>
@@ -3546,19 +3901,44 @@ body.ls-state-main.ls-flashlight-on main.scene::after { opacity: .05; }
 
     <!-- Corridor view (Z to toggle) -->
     <div id="ls-corridor" aria-hidden="true">
+      <div class="ls-hall-leftwall" aria-hidden="true"></div>
+      <div class="ls-hall-rightwall" aria-hidden="true"></div>
       <div class="ls-corridor-wall"></div>
       <div class="ls-hall-ceiling" aria-hidden="true"></div>
-      <div class="ls-hall-door left" aria-hidden="true"></div><div class="ls-hall-door right" aria-hidden="true"></div>
-      <div class="ls-hall-pipes" aria-hidden="true"></div><div class="ls-hall-stain" aria-hidden="true"></div>
+      <div class="ls-hall-beam" aria-hidden="true"></div>
+      <div class="ls-hall-bulb" aria-hidden="true"><i></i></div>
+      <div class="ls-hall-door left" aria-hidden="true"><b></b></div>
+      <div class="ls-hall-door right" aria-hidden="true"><b></b></div>
       <div class="ls-hall-end" aria-hidden="true"></div>
+      <div class="ls-hall-end-door" aria-hidden="true"></div>
+      <div class="ls-hall-pipes" aria-hidden="true"></div>
+      <div class="ls-hall-stain" aria-hidden="true"></div>
+      <div class="ls-hall-base left" aria-hidden="true"></div>
+      <div class="ls-hall-base right" aria-hidden="true"></div>
+      <div class="ls-hall-wires" aria-hidden="true">
+        <svg viewBox="0 0 80 260" aria-hidden="true"><path d="M38 0c2 40-10 70-6 110 4 36 14 50 8 90-4 28-16 40-12 60" fill="none" stroke="#0c1010" stroke-width="3"/><path d="M50 0c-4 50 8 80 4 120-6 30-18 48-10 86" fill="none" stroke="#151c1b" stroke-width="2"/><circle cx="36" cy="248" r="5" fill="#0a0c0c"/></svg>
+      </div>
+      <div class="ls-hall-frame" aria-hidden="true">
+        <svg viewBox="0 0 80 96" aria-hidden="true"><rect x="4" y="4" width="72" height="88" fill="#0b0c0c" stroke="#1a1c1b" stroke-width="6"/><rect x="14" y="16" width="52" height="62" fill="#14110f"/><circle cx="40" cy="40" r="10" fill="#0a0908"/><path d="M22 78c8-14 28-14 36 0" fill="#0a0908"/></svg>
+      </div>
+      <div class="ls-hall-scratch" aria-hidden="true">
+        <svg viewBox="0 0 240 180" aria-hidden="true"><g fill="none" stroke="#1a1410" stroke-linecap="round" opacity=".75"><path d="M12 30c40 8 80-6 140 10" stroke-width="2.2"/><path d="M20 44c36 10 90 2 150 16" stroke-width="1.6"/><path d="M8 58c50 4 96-10 168 8" stroke-width="1.3"/><path d="M70 20c10 40 6 80 18 140" stroke-width="1.4"/><path d="M86 16c6 46 14 86 10 148" stroke-width="1.1"/></g></svg>
+      </div>
+      <div class="ls-hall-handprints" aria-hidden="true">
+        <svg viewBox="0 0 160 200" aria-hidden="true"><g fill="#2a1c18" fill-opacity=".88"><ellipse cx="48" cy="118" rx="18" ry="24"/><ellipse cx="30" cy="72" rx="6" ry="16" transform="rotate(-18 30 72)"/><ellipse cx="42" cy="58" rx="5.5" ry="18" transform="rotate(-6 42 58)"/><ellipse cx="54" cy="56" rx="5.5" ry="19" transform="rotate(6 54 56)"/><ellipse cx="66" cy="66" rx="5" ry="15" transform="rotate(18 66 66)"/><ellipse cx="112" cy="70" rx="14" ry="20" transform="rotate(16 112 70)"/><ellipse cx="108" cy="28" rx="4.5" ry="14"/><ellipse cx="120" cy="30" rx="4.5" ry="13" transform="rotate(10 120 30)"/></g></svg>
+      </div>
       <div class="ls-hall-fog" aria-hidden="true"></div>
-      <div class="ls-hall-peeker" aria-hidden="true"></div><div class="ls-hall-crawler" aria-hidden="true"></div>
-      <div class="ls-hall-handprints" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="ls-hall-peeker" aria-hidden="true"></div>
+      <div class="ls-hall-crawler" aria-hidden="true"></div>
       <div class="ls-corridor-floor"></div>
       <div class="ls-corridor-window-shadow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       <div class="ls-corridor-storm-flash" aria-hidden="true"></div>
-      <div class="ls-corridor-eyes" aria-hidden="true"></div>
-      <div class="ls-corridor-figure" aria-hidden="true"></div>
+      <div class="ls-corridor-eyes" aria-hidden="true">
+        <svg viewBox="0 0 80 24" aria-hidden="true"><ellipse cx="18" cy="12" rx="9" ry="6" fill="#e03a28"/><ellipse cx="62" cy="12" rx="9" ry="6" fill="#e03a28"/><circle cx="18" cy="12" r="2.2" fill="#140000"/><circle cx="62" cy="12" r="2.2" fill="#140000"/></svg>
+      </div>
+      <div class="ls-corridor-figure" aria-hidden="true" data-side="right">
+        <svg viewBox="0 0 220 520" aria-hidden="true"><g fill="#030304"><ellipse cx="108" cy="52" rx="32" ry="38"/><path d="M96 84c-2 10-1 18 2 24h22c3-6 4-14 2-24z"/><path d="M38 112c22-10 46-14 70-12 28 2 52 10 74 22 6 18 10 48 8 78-2 28-8 54-10 86l-8 196h-34l-6-188c-2-8-10-12-16-10l-8 198H76L68 284c-4-34-10-64-14-96-4-30-8-56-16-76z"/><path d="M40 128c-18 36-28 78-26 122 2 28 8 54 18 86l22-6c-8-30-14-58-16-88-2-36 4-72 18-104z"/><path d="M180 130c16 34 24 76 20 118-2 30-10 58-18 88l22 8c12-34 20-66 22-98 4-44-4-86-22-122z"/></g></svg>
+      </div>
     </div>
 
     <!-- Mobile-only controls; activated automatically for touch/mobile platforms. -->
@@ -6938,24 +7318,34 @@ body.ls-state-main.ls-flashlight-on main.scene::after { opacity: .05; }
   let zHeld = false; // ignore key-repeat while held
   let visitCount = 0;
   let anomalyTimer = null;
-  const anomalyClasses = ["psych-red-eyes","psych-silhouette"];
+  let figureFled = false;
+  let figureLitMs = 0;
+  let figureLastTs = 0;
+  let eyesLitMs = 0;
+  const anomalyClasses = ["psych-red-eyes","psych-silhouette","psych-peek","psych-crawl","psych-door","psych-hands","figure-left","figure-right"];
 
   function prepareUnobservedHallway() {
     visitCount++;
+    figureFled = false;
+    figureLitMs = 0;
+    figureLastTs = 0;
+    eyesLitMs = 0;
     corridor.classList.remove(...anomalyClasses);
     document.body.classList.remove("ls-corridor-eyes-lit", "ls-corridor-figure-lit");
     if (figureEl) {
-      figureEl.style.opacity = "";
-      figureEl.classList.remove("is-visible");
+      figureEl.style.cssText = "";
+      figureEl.classList.remove("is-visible", "is-fleeing", "is-held");
+      const side = Math.random() < .5 ? "left" : "right";
+      figureEl.dataset.side = side;
+      figureEl.classList.add("is-visible");
+      corridor.classList.add("psych-silhouette", "figure-" + side);
     }
 
-    // Independent per-turn rolls: one red pair in the far doorway has a 25%
-    // chance; the unmistakable silhouette has a 20% chance. Neither is forced.
-    if (Math.random() < .25) corridor.classList.add("psych-red-eyes");
-    if (Math.random() < .20) {
-      corridor.classList.add("psych-silhouette");
-      figureEl?.classList.add("is-visible");
-    }
+    if (Math.random() < .32) corridor.classList.add("psych-red-eyes");
+    if (Math.random() < .4) corridor.classList.add("psych-hands");
+    if (Math.random() < .28) corridor.classList.add("psych-peek");
+    if (Math.random() < .22) corridor.classList.add("psych-crawl");
+    if (Math.random() < .18) corridor.classList.add("psych-door");
 
     if (visitCount > 1 && Math.random() < .32) {
       try { window.LASTSEEN?.playTone?.(42 + Math.random()*13, .75, .009, "sine"); } catch (_) {}
@@ -6988,7 +7378,7 @@ body.ls-state-main.ls-flashlight-on main.scene::after { opacity: .05; }
       try { window.LS_NARRATIVE.setFlag("corridorActive", false); } catch (_) {}
       // Force hide any active events
       if (eyesEl) eyesEl.classList.remove("is-visible");
-      if (figureEl) figureEl.classList.remove("is-visible");
+      if (figureEl) figureEl.classList.remove("is-visible", "is-fleeing", "is-held");
       document.body.classList.remove("ls-corridor-figure-lit");
     }
     // Wait for the CSS transition to settle
@@ -7043,45 +7433,61 @@ body.ls-state-main.ls-flashlight-on main.scene::after { opacity: .05; }
   // When the flashlight is on AND its current position overlaps the eyes'
   // bounding box, mark the body with `ls-corridor-eyes-lit` so the CSS
   // fades the eyes out (retreat / close).
-  function checkEyesIllumination() {
-    if (!active || !eyesEl) return;
+  function beamHits(el, pos, mul) {
+    if (!el) return false;
+    const rect = el.getBoundingClientRect();
+    if (!rect.width || !rect.height) return false;
+    const dx = pos.x - (rect.left + rect.width / 2);
+    const dy = pos.y - (rect.top + rect.height / 2);
+    return Math.hypot(dx, dy) < pos.radius * mul;
+  }
+
+  function checkEyesIllumination(now) {
+    if (!active) return;
     if (!window.LS_FLASHLIGHT || !window.LS_FLASHLIGHT.isOn()) {
       document.body.classList.remove("ls-corridor-eyes-lit", "ls-corridor-figure-lit");
+      figureEl?.classList.remove("is-held");
+      figureLitMs = 0;
+      eyesLitMs = 0;
+      figureLastTs = now || 0;
       return;
     }
     const pos = window.LS_FLASHLIGHT.getPosition();
-    const rect = eyesEl.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
-    // Distance from flashlight center to eyes center
-    const ecx = rect.left + rect.width / 2;
-    const ecy = rect.top + rect.height / 2;
-    const dist = Math.hypot(pos.x - ecx, pos.y - ecy);
-    // If within 1.4x radius, eyes are lit
-    if (dist < pos.radius * 1.4) {
-      document.body.classList.add("ls-corridor-eyes-lit");
-    } else {
-      document.body.classList.remove("ls-corridor-eyes-lit");
+    const ts = now || performance.now();
+    const dt = figureLastTs ? Math.min(64, ts - figureLastTs) : 16;
+    figureLastTs = ts;
+
+    if (corridor.classList.contains("psych-red-eyes") && eyesEl) {
+      if (beamHits(eyesEl, pos, 1.35)) {
+        eyesLitMs += dt;
+        if (eyesLitMs >= 600) document.body.classList.add("ls-corridor-eyes-lit");
+      } else {
+        eyesLitMs = Math.max(0, eyesLitMs - dt);
+        if (eyesLitMs < 120) document.body.classList.remove("ls-corridor-eyes-lit");
+      }
     }
-    if (figureEl) {
-      const fr = figureEl.getBoundingClientRect();
-      const fdist = Math.hypot(pos.x - (fr.left + fr.width/2), pos.y - (fr.top + fr.height/2));
-      if (fdist < pos.radius * 1.18 && !document.body.classList.contains("ls-corridor-figure-lit")) {
-        document.body.classList.add("ls-corridor-figure-lit");
-        window.setTimeout(() => {
-          document.body.classList.remove("ls-corridor-figure-lit");
-          if (figureEl) {
-            figureEl.style.opacity = "0";
-            window.setTimeout(() => { figureEl.style.opacity = ""; }, 5500 + Math.random()*3500);
-          }
-        }, 1050);
+
+    if (figureEl && figureEl.classList.contains("is-visible") && !figureFled) {
+      if (beamHits(figureEl, pos, 1.12)) {
+        figureLitMs += dt;
+        figureEl.classList.add("is-held");
+        if (figureLitMs >= 1000) {
+          figureFled = true;
+          figureEl.classList.remove("is-held");
+          figureEl.classList.add("is-fleeing");
+          try { window.LASTSEEN?.playTone?.(70 + Math.random()*18, .12, .03, "sine"); } catch (_) {}
+        }
+      } else {
+        figureLitMs = Math.max(0, figureLitMs - dt * 1.4);
+        if (figureLitMs < 180) figureEl.classList.remove("is-held");
       }
     }
   }
 
   // Throttled rAF loop for illumination check
   let checkRaf = null;
-  function illuminationLoop() {
-    checkEyesIllumination();
+  function illuminationLoop(now) {
+    checkEyesIllumination(now);
     if (active) {
       checkRaf = requestAnimationFrame(illuminationLoop);
     } else {
@@ -7728,9 +8134,21 @@ body.ls-state-main.ls-flashlight-on main.scene::after { opacity: .05; }
 
   </script>
 <script>
-/* Fit the whole experience to the live visual viewport on every device. */
+/* Fit the whole experience to phones, tablets, and laptop viewports. */
 (function () {
   "use strict";
+  function classify(vw, vh) {
+    const fine = window.matchMedia?.("(hover: hover) and (pointer: fine)")?.matches;
+    const mobile = document.body.classList.contains("ls-mobile");
+    const laptop = !mobile && vw >= 1024 && vh >= 560 && vh <= 1400 && (fine || vw >= 1100);
+    const short = laptop && vh <= 860;
+    const wide = laptop && vw / Math.max(1, vh) >= 1.7;
+    document.body.classList.toggle("ls-laptop", laptop);
+    document.body.classList.toggle("ls-laptop-short", short);
+    document.body.classList.toggle("ls-laptop-wide", wide);
+    document.body.dataset.lsViewport = `${vw}x${vh}`;
+    return { mobile, laptop, short, wide };
+  }
   function measure() {
     const vv = window.visualViewport;
     const vw = Math.max(1, Math.round(vv ? vv.width : window.innerWidth));
@@ -7738,21 +8156,26 @@ body.ls-state-main.ls-flashlight-on main.scene::after { opacity: .05; }
     const root = document.documentElement;
     root.style.setProperty("--vw", vw + "px");
     root.style.setProperty("--vh", vh + "px");
+    const kind = classify(vw, vh);
     const wrap = document.querySelector(".phone-wrap");
     if (!wrap) return;
     const prev = root.style.getPropertyValue("--scene-scale") || "1";
     root.style.setProperty("--scene-scale", "1");
     wrap.style.transform = "none";
-    const mobile = document.body.classList.contains("ls-mobile");
-    const reserve = mobile ? 126 : 36;
-    const availW = vw - 24;
+    wrap.style.margin = "0";
+    const reserve = kind.mobile ? 126 : kind.short ? 52 : kind.laptop ? 64 : 40;
+    const availW = vw - (kind.laptop ? 36 : 24);
     const availH = Math.max(220, vh - reserve);
     const w = Math.max(1, wrap.offsetWidth);
     const h = Math.max(1, wrap.offsetHeight);
+    root.style.setProperty("--phone-nat-w", w + "px");
+    root.style.setProperty("--phone-nat-h", h + "px");
     let scale = Math.min(1, availW / w, availH / h);
     if (!isFinite(scale) || scale <= 0) scale = 1;
+    if (kind.laptop && vh >= 1000 && vw >= 1600) scale = Math.min(1, scale);
     scale = Math.max(0.42, Math.min(1, scale));
     wrap.style.transform = "";
+    wrap.style.margin = "";
     root.style.setProperty("--scene-scale", scale.toFixed(3));
     const lcd = document.querySelector(".lcd-frame");
     if (lcd) {
@@ -7800,5 +8223,5 @@ body.ls-state-main.ls-flashlight-on main.scene::after { opacity: .05; }
 })();
 
   </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2d8fb553af0dd12',t:'MTc4NzE0MDY1Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
